@@ -5,16 +5,166 @@ date: August 27, 2018
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+## I. Project summary
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+## II. Background
 
-```{r}
-plot(cars)
+Will include details on:
+* the problem I'm trying to address,
+* why it is important,
+* the method I propose using and the end product I hope to obtain,
+* the data sets I'll be using
+
+## III. Data cleaning and preparation
+
+### A. Washington State mortality data - 2016
+  
+Washington State requires by law that all deaths occurring in the state must be registered with the Washington State Department of Health by the funeral director organizing the disposal of the body and the decedents' regular health care provider. In the absence of a health care provider the medical examiner or coroner in the county where the body was found has jurisdiction over the death. In 2016, almost all deaths were registered electronically with a handful registered on paper forms. The Washington State death data set for 2016 contains 56,069 unique observations (death records).
+  
+1.  __Subsetting and Merging 2016 death data sets__
+
+Death data are stored in two separate data sets: 
+(1) the "Names" data set which contains, among other variables, the first and last names of the decedents, the unique state file numbers associated with their death records, social security numbers, death of birth, and other identifying information;
+(2) the "Full" data set that contains, among other variables, the decedents' state file number, social security number, date of birth, residential address, location of death, and causes of death.
+
+Both data sets include death records for both Washington State residents and of out-of-state residents who died in Washington State.  The "full" data set also contains numerous variables that pertain to the processing of the death record.  These variables provide no information about the decedent in terms of his or her demographic information, cause of death, place of death, residential address etc.
+
+The data sets will need to be merged into one data set that contains all variables necessary for the main purpose of classifying deaths by homeless status. 
+
+    a.  __Cleaning Washington State 2016 "Full" death data set__
+
+```{r eval=FALSE}
+
+library(dplyr)
+library(readr)
+library(tidyr)
+library(questionr)
+
+setwd ("H:/Mortality/Data")
+Full16 <- read_csv("Death_FullF16Internal.csv", col_names = TRUE)
+
+glimpse(Full16)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+In this step, I reduced the data set by:
+* excluding all death records of out-of-state residents, and
+* excluding variables that pertain to processing of the death records
+* standardizing the names of variables that will be used for merge with the "Names" file i.e. state file number and social security number. 
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+
+Full16WAres <- filter(Full16, `Residence State FIPS code`=="WA")
+
+F16 <- Full16WAres %>% 
+  select(-'Imaging Proc flag', -'LNI sent flag', -'DOL sent flag', -'Auditor sent flag', -'Traffic sent flag', 
+         -'OOS Resident sent flag', -'OOS Born sent flag', -'SSA Last Sent Date', -contains("Sent flag"), 
+         -'NCHS Last Sent Date', -'OOS SFN', -'EDRS Case Id', -'Local File Number', -'Registrar Print Signature',
+         -'Void Date', -'Date Received State', -'File Method', -'Local Registrar Name', -'ACME Lot Sec Ship Num',
+         -'ACME Data YYYY 10', -starts_with("ACME cause category"), -starts_with("ACME sequence"), 
+         -starts_with("ACME line"), -starts_with("Race NCHS Ecode"), -starts_with("Race NCHS Ccode"), 
+         -'SSN Verified Date', -'Birth Match code', 
+         -'Marital Bypass', -'Age Bypass', -'Res Tribal Reservation', -starts_with("Funeral Director"),
+         -'Funeral Print Signature', -starts_with("Funeral Home"), -'SSN Verified Time', -'Education Bypass',
+         -'Certifier License Num', -'Certifier State', -'ME Coroner Case num', -'Trx Cause Manual', 
+         -'Birth Certificate Number', -'Birth Cert type', -'Birthplace State NCHS code', -'Birthplace State',
+         -'Birthplace County', -'Birthplace City code', -'Birthplace Country', -'Death City', -'Death County', 
+         -'Death County WA code', -'Death State', -'Surviving Spouse first name', -'Surviving Spouse middle name',
+         -'Surviving Spouse suffix', -'Informant suffix', -'Residence City', -'Residence County WA code',
+         -'Residence State code', -'Residence County NCHS code', -'Residence City WA code', -'Date Received', 
+         -'Notes', -'Sex Bypass flag', -'Pregnancy Bypass', -'Residence Country', -'Hispanic NCHS Ecode', 
+         -'Hispanic NCHS Ccode')
+
+```
+
+    b.  __Cleaning Washington State 2016 "Names" death data set__
+
+```{r eval=FALSE}
+
+Names16 <- read_csv("Death_NamesY16.csv", col_names = TRUE)
+
+glimpse(Names16)
+```
+
+
+In this step, I reduced the 2016 "Names" data set by:
+* excluding all death records of out-of-state residents, and
+* excluding variables that ar not necessary to linking the "Names" and "Full" files,
+* standardizing the variable names that will be used to merge the two files i.e. state file number and social security number.
+
+```{r}
+
+Names16WAres <- filter(Names16, `Residence State`=="WASHINGTON")
+
+N16 <- select(Names16WAres,'State file number':'Date of Death', 'Date of Birth', 'Age Unit':'Social Security Number')
+
+```
+
+
+As both variables needed for merging are spelled the same way in the two data sets ("State file number" and "Social Security Number") no further changes are need to those variables.
+
+  c.  __Merging limited "Names" and "Full" death files__
+  
+The final data set created by merging the cleaned "Full" and "Names" datasets is called "Merge16"
+  
+```{r}
+Merge16 <- full_join(N16, F16, by= c("State file number", "Social Security Number"))
+```
+
+
+__REPEAT FOR ALL YEARS GOING BACK TO 2004!!!!!!!!  =( ____
+
+2.  __Creating a training data set of decedents who had permanent homes at time of death__
+
+ Use fields:
+ - "Place of Death" with values of "Hospice", "Nursing Home/Longterm Care", "Decedent Home", "Hospital"
+ - "Res Geo Match Score" of 100
+ - "Residence Zip" is not "99999" - Check with Craig Ferguson/Brianna about this.
+ - "Residence Street" does not have blanks or "homeless" or "Transient" or "&"
+
+
+### B. King County Medical Examiner's Homeless Death Registry data - November 2003 to September 2017
+
+This data set includes all deaths to homeless or transient individuals who died in King County, Washington State and for whom the death certifier (the person who submitted a death certificate to Washington State Department of Health) was the medical examiner for King County.
+
+The King County Medical Examiner's Office (KCMEO) established a given decedent's homeless or transient status by gathering information from family members, acquaintances, social service agencies, and law enforcement (where available). In some situations, the medical examiner (ME) established homelessness based on his own assessment of the situation rather than what the family reported because the stigma associated with homelessness may have resulted in inaccurate reporting. 
+
+KCMEO defines "homelessness" based on the Chief Medical Examiner's criteria rather than standard federal Department of Housing and Urban Development (HUD) or Department of Social and Health Services (DSHS) criteria.  
+
+1.  __Cleaning KCMEO homeless registry__
+
+
+
+```{r}
+HomelessRaw <- read_csv("KCME_HomelessRegistry.csv")
+glimpse(HomelessRaw)
+
+```
+
+- Make names consistent with Merge16 file 
+
+- Merge dth
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
