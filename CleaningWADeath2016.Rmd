@@ -1,0 +1,99 @@
+---
+title: "Washington State Death File 2016"
+subtitle: "Data Cleaning"
+output: github_document
+---
+
+
+```{r setup echo=FALSE}
+
+library(knitr)
+library(tidyr)
+library(dplyr)
+library(readr)
+library(naniar)
+library(data.table)
+
+opts_chunk$set(echo=FALSE,message = FALSE, error=FALSE)
+opts_knit$set(root.dir="H:/Mortality/Homeless/IntroDSCapstone/")
+```
+
+
+##  1.  2016 Washington State Death Data  
+  
+In this step I read in the Washington State 2016 death data set and filtered the observations and variables as follows:
+  
+  - restricted observations to records of decedents who were residents of Washington State who died in Washington State (56,069 to 53,462) records;
+  - subsetted the variables from 372 columns to 33.
+
+```{r}
+Full16 <- read_csv("H:/Mortality/Data/Death_FullF16Internal.csv", col_names = TRUE) 
+glimpse(Full16)
+
+Full_WA16 <- filter(Full16, `Residence State FIPS code`=="WA")
+Full_WA16 <- filter(Full_WA16, Full_WA16$`Death State`=="WASHINGTON")
+glimpse(Full_WA16)
+
+WA16 <- Full_WA16 %>%
+  select(one_of(c("State file number", "Decedent first name", "Decedent last name", "Decedent middle name", "Sex", "Date of Birth", "Date of Death", "Social Security Number", "Death Address", "Death City", "Death County", "Death Zip Code", "Place of Death", "Place of Death type", "Surviving Spouse first name", "Surviving Spouse last name", "Education", "Bridge race", "Hispanic No", "Residence City", "Residence County", "Residence Street", "Residence Latitude", "Residence Longitude", "Res Geo Census Block 2010", "Certifier Designation", "Certifier last name" , "Underlying COD code", "Time of Death", "Time of Death Modifier", "Date of Death Modifier", "Res Geo Match Score", "Residence Zip")))
+
+write_csv(WA16,"H:/Mortality/Data/WA16.csv", append = FALSE)
+
+```
+
+## 2. Examining missing data
+
+```{r}
+
+miss_var_summary(WA16)
+
+```
+
+  - Most of the variables have no missing values at all.  Of the 9 that do have missing values, none have more than 0.4% missing.
+ 
+  - For this project, having missing values in certain variables such as "Residence Street" or "Residence Zipcode" would be helpful in distinguishing between homeless individuals and those with homes.
+  
+## 3. Examining data set for outliers and other problematic values  
+  
+```{r}
+str(WA16)
+summary(WA16)
+
+WA16$`Place of Death type` <- factor(WA16$`Place of Death type`, levels = c(0:9), labels = c("Home", "Other Place", "In Transport", "Emergency Room", "Hospital (Inpatient)", "Nursing Home/Long Term Care", "Hospital", "Hospice Facility", "Other Person's Residence", "Unknown"))
+
+WA16$`Certifier Designation` <- factor(WA16$`Certifier Designation`, levels = c(1:9), labels = c("Physician","Coroner/ME","DO","Chiropractor","Sanipractor","Physician Assistant", "ARNP","Not Applicable","Unknown"))
+
+
+#label Bridge race and Hispanic also
+
+
+table(WA16$Sex)
+table(WA16$`Death County`)
+table(WA16$`Place of Death type`)
+table(WA16$`Bridge race`)
+table(WA16$`Hispanic No`)
+table(WA16$`Certifier Designation`)
+
+
+```
+
+```{r}
+
+### WHY DOESN't THIS WORK?
+
+WA16 %>%
+  table("Sex") %>%
+  table("Death County") %>%
+  table("Place of Death type") %>%
+  table("Bridge race") %>%
+  table("Hispanic No") %>%
+  table("Attendant Title")
+
+#Error in sort.list(y) : 'x' must be atomic for 'sort.list'
+#Have you called 'sort' on a list?
+
+
+```
+
+  - The values for the categorical values tabulated above are all within range
+  - Will need to attach value labels for the categorical variables
