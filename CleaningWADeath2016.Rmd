@@ -5,7 +5,7 @@ output: github_document
 ---
 
 
-```{r setup echo=FALSE}
+```{r setup}
 
 library(knitr)
 library(tidyr)
@@ -13,18 +13,20 @@ library(dplyr)
 library(readr)
 library(naniar)
 library(data.table)
+library(stringi)
 
 opts_chunk$set(echo=FALSE,message = FALSE, error=FALSE)
-opts_knit$set(root.dir="H:/Mortality/Homeless/IntroDSCapstone/")
+#opts_knit$set(root.dir="H:/Mortality/Homeless/IntroDSCapstone/") 
 ```
 
 
 ##  1.  2016 Washington State Death Data  
   
-In this step I read in the Washington State 2016 death data set and filtered the observations and variables as follows:
+In this step I read in the Washington State 2016 death data set and cleaned the data as follows:
   
   - restricted observations to records of decedents who were residents of Washington State who died in Washington State (56,069 to 53,462) records;
-  - subsetted the variables from 372 columns to 33.
+  - subsetted the variables from 372 columns to 33,
+  - standardized specific variable names in preparation for linking with Homeless Death Registry data.
 
 ```{r}
 Full16 <- read_csv("H:/Mortality/Data/Death_FullF16Internal.csv", col_names = TRUE) 
@@ -32,11 +34,24 @@ glimpse(Full16)
 
 Full_WA16 <- filter(Full16, `Residence State FIPS code`=="WA")
 Full_WA16 <- filter(Full_WA16, Full_WA16$`Death State`=="WASHINGTON")
-glimpse(Full_WA16)
+summary(Full_WA16)
+```
 
-WA16 <- Full_WA16 %>%
-  select(one_of(c("State file number", "Decedent first name", "Decedent last name", "Decedent middle name", "Sex", "Date of Birth", "Date of Death", "Social Security Number", "Death Address", "Death City", "Death County", "Death Zip Code", "Place of Death", "Place of Death type", "Surviving Spouse first name", "Surviving Spouse last name", "Education", "Bridge race", "Hispanic No", "Residence City", "Residence County", "Residence Street", "Residence Latitude", "Residence Longitude", "Res Geo Census Block 2010", "Certifier Designation", "Certifier last name" , "Underlying COD code", "Time of Death", "Time of Death Modifier", "Date of Death Modifier", "Res Geo Match Score", "Residence Zip")))
+```{r}
+WA16 <- select(Full_WA16, "State file number", 
+         fname = 'Decedent first name', 
+         lname ="Decedent last name", 
+         dthyr = "Date of Death year",
+         ssn = "Social Security Number", 
+         deathaddr = "Death Address", 
+         deathcity = "Death City", 
+         deathzip ="Death Zip Code",
+         "Death County", "Decedent middle name", "Sex", "Date of Birth", "Date of Death", "Place of Death", "Place of Death type", "Surviving Spouse first name", "Surviving Spouse last name", "Education", "Bridge race", "Hispanic No", "Residence City", "Residence County", "Residence Street", "Residence Latitude", "Residence Longitude", "Res Geo Census Block 2010", "Certifier Designation", "Certifier last name" , "Underlying COD code", "Time of Death", "Time of Death Modifier", "Date of Death Modifier", "Res Geo Match Score", "Residence Zip")
 
+str(WA16)
+```
+
+```{r}
 write_csv(WA16,"H:/Mortality/Data/WA16.csv", append = FALSE)
 
 ```
@@ -44,7 +59,7 @@ write_csv(WA16,"H:/Mortality/Data/WA16.csv", append = FALSE)
 ## 2. Examining missing data
 
 ```{r}
-
+summary(WA16)
 miss_var_summary(WA16)
 
 ```
@@ -81,13 +96,13 @@ table(WA16$`Certifier Designation`)
 
 ### WHY DOESN't THIS WORK?
 
-WA16 %>%
-  table("Sex") %>%
-  table("Death County") %>%
-  table("Place of Death type") %>%
-  table("Bridge race") %>%
-  table("Hispanic No") %>%
-  table("Attendant Title")
+#WA16 %>%
+ # table("Sex") %>%
+ # table("Death County") %>%
+ # table("Place of Death type") %>%
+ # table("Bridge race") %>%
+ # table("Hispanic No") %>%
+ # table("Attendant Title")
 
 #Error in sort.list(y) : 'x' must be atomic for 'sort.list'
 #Have you called 'sort' on a list?
@@ -97,3 +112,198 @@ WA16 %>%
 
   - The values for the categorical values tabulated above are all within range
   - Will need to attach value labels for the categorical variables
+  
+## HOMELESS DATA - 
+
+## Record linkage
+
+The Homeless Death Registry (HDR) data from King County Medical Examiner's office contains 1,131 records for individuals who were deemed "homeless" by the ME.  Attributes for these decedents can be seen below. 
+
+```{r}
+
+homeless <- read_csv("H:/Mortality/Homeless/IntroDSCapstone/Data/HomelessRegistryKingCo.csv")
+
+head(homeless, n=10)
+miss_var_summary(homeless)
+```
+
+The HDR contains name, date of birth, date of death, place of death (address), and social security number. There is no additional information on cause of death, or other attributes that might be used in machine learning to classify persons as homeless or with a permanent home.  For this reason, the HDR data must first be linked to full death certificate data to add the relevant attributes that can be found in the death certificate.  
+
+KCMEO is required by law to submit a death certificate for all deaths it investigates.  For this reason, it is very likely that the decedents' last names, first names, and locations of death will be recorded in an identical manner in HDR as well as the death certificates (barring data entry error).  
+
+In this situation it is possible to use deterministic linkage to link HDR records with their complete death certificates. Using a derived attribute created by concatenating attributes in the HDR data set with low missing data ("namelast", "deathcity", "deathaddress", and "birthdate") and matching it with the same derived variable in the death data set should result in an accurate match and record linkage. 
+
+Pre-processing of the HDR and death datasets includes standardizing the values in the attributes to be used in the linkage, and creating the derived variable (concatenation of the above variables) in both datasets. Missing values in any of the attributes in either HDR or death certificate data may be useful in the upcoming machine learning phase as it is very likely that a key distinction between decedents who were homeless vs. those who had permanent homes is that their records cannot be completed due to lack of information from family members or other "informants".
+
+
+### Cleaning Homeless Registry data  
+
+Standaradize attibute names and values.
+  
+```{r}
+
+homeless <- fread("H:/Mortality/Homeless/IntroDSCapstone/Data/HomelessRegistryKingCo.csv")
+
+homeless <- rename(homeless, lname = namelast,
+         fname = namefirst,
+         mname_h = namemiddle,
+         resaddr_h = resaddr,
+         rescity_h = rescity,
+         dob = birthdate,
+         age_h = age,
+         dod_h = eventdate, 
+         ssn_h = ssn,
+         dthzip = deathzip,
+         marstat_h = maritalstatus,
+         casenum_h = casenum)
+
+
+##THE FOLLOWING CHANGES TO THE TWO DATE FIELDS (DATE OF BIRTH AND DATE OF DEATH) HAVE BEEN IMPLEMENTED TO MAKE
+## THEM CONSISTENT WITH THE FORMAT IN THE DEATH CERTIFICATE DATA SET.  
+
+#REMOVE HYPHENS IN DATES OF BIRTH AND DEATH TO MAKE THEM CONSISTENT WITH DEATH DATA
+#DATES ARE IN DDMMMYY FORMAT TO BEGIN WITH.
+homeless$dob <- gsub("-", "", homeless$dob)
+homeless$dod_h <- gsub("-", "", homeless$dod_h)
+
+#MAKE ALL MONTHS UPPER CASE
+#homeless$dob <-toupper(homeless$dob)
+#homeless$dod_h <-toupper(homeless$dod_h)
+
+#PASTE LEADING 0 TO DAY WHEN DAY IS 1 TO 9 TO MAKE THEM ALL 2 DIGIT DAYS
+homeless$dob <- ifelse((nchar(homeless$dob)) < 7, paste("0",homeless$dob, sep = ""), homeless$dob)
+homeless$dod_h <- ifelse((nchar(homeless$dod_h)) < 7, paste("0",homeless$dod_h, sep = ""), homeless$dod_h)
+
+#INSERT CENTURY (19XX OR 20XX) TO YEARS TO MAKE ALL YEARS YYYY FORMAT
+homeless$dob <- gsub("^([0-3][0-9][A-Z]{3})([0-9]{2})$", "\\119\\2", homeless$dob)
+homeless$dod_h <- gsub("^([0-3][0-9][A-Z]{3})([0-9]{2})$", "\\120\\2", homeless$dod_h)
+
+homeless<- mutate_all(homeless, funs(toupper))
+head(homeless, 10)
+
+
+```
+
+Extract year from date of death to link HDR with death certificate data by year.
+
+```{r}
+dthyr <- substr(homeless$dod_h, 6, 9)
+dthyr <- as.numeric(dthyr)
+str(dthyr)
+
+```
+
+```{r}
+
+keepvars <- c("certno" , "last_name" , "first_name" ,"middle_name" , "date_of_death" , "dob" , "ssn" , "res_street" , "res_city" , "res_zip" , "sex" , "dth_yr" , "race" , "hisp" , "city_occ" , "cnty_occ" , "facility" , "fac_type" , "married" , "city_res" , "cnty_res" , "underly" , "contrib" , "attclass" , "educ" , "zipcode", "st_res", "st_occ")
+
+newnames <- c("certno", "lname", "fname", "mname", "dod", "dob", "ssn", "resst", "rescity", "reszip", "sex", "dthyr", "race", "hisp", "cityocc", "cntyocc", "facility", "factype", "married", "cityres", "cntyres", "underly", "contrib", "attclass", "educ", "zip", "stres", "stocc")
+
+dth03 <- fread("H:/Mortality/Homeless/IntroDSCapstone/Data/statname2003.csv", 
+               select = keepvars)
+dth03_wa <- subset(dth03, st_res==48 & st_occ==48)
+names(dth03_wa)=newnames
+
+dth04 <-fread("H:/Mortality/Homeless/IntroDSCapstone/Data/statname2004.csv", 
+               select = keepvars)
+dth04_wa <- subset(dth04, st_res==48 & st_occ==48)
+names(dth04_wa)=newnames
+
+dth05 <-fread("H:/Mortality/Homeless/IntroDSCapstone/Data/statname2005.csv", 
+               select = keepvars)
+dth05_wa <- subset(dth05, st_res==48 & st_occ==48)
+names(dth05_wa)=newnames
+
+###THIS PROCESS SHOULD BE REPEATED FOR EACH YEAR OF DEATH DATA THROUGH 2017. IN THE INTEREST OF TIME COMPLETED THIS IN STATA AND READ IN THE RESULTING FILES INTO R.  
+```
+
+
+
+
+
+extraneous stuff
+
+__Subsetting and Merging 2017 death data sets__
+
+Death data are stored in two separate data sets: 
+(1) the `Names` data set which contains, among other variables, the first and last names of the decedents, the unique state file numbers associated with their death records, social security numbers, death of birth, and other identifying information;
+(2) the `Statistical` data set that contains, among other variables, the decedents` state file number, social security number, date of birth, residential address, location of death, and causes of death.
+
+Both data sets include death records for both Washington State residents and of out-of-state residents who died in Washington State.  The `full` data set also contains numerous variables that pertain to the processing of the death record.  These variables provide no information about the decedent in terms of his or her demographic information, cause of death, place of death, residential address etc.
+
+The data sets will need to be merged into one data set that contains all variables necessary for the main purpose of classifying deaths by homeless status. 
+
+In this step, I reduced the data set by:
+* excluding all death records of out-of-state residents, and
+* excluding variables that pertain to processing of the death records (not useful for this project)
+* standardizing the names of variables that will be used for merge with the `Names` file i.e. state file number and social security number. 
+
+
+
+Full16 <- fread("H:/Mortality/Homeless/IntroDSCapstone/Data/Death_FullF16Internal.csv", select=c("State file number", "Decedent first name", "Decedent last name", "Decedent middle name", "Sex", "Date of Birth", "Date of Death", "Social Security Number", "Death Address", "Death City", "Death County", "Death Zip Code", "Place of Death", "Place of Death type", "Surviving Spouse first name", "Surviving Spouse last name", "Education", "Bridge race", "Hispanic No", "Residence City", "Residence County", "Residence Street", "Res Geo Census Block 2010", "Certifier Designation", "Underlying COD code", "Res Geo Match Score", "Residence Zip", "Residence State FIPS code", "Death State"))
+
+F16 <- filter(Full16, `Residence State FIPS code`=="WA" & `Death State`=="WASHINGTON")
+summary(F16)
+
+
+ b.  __Cleaning Washington State 2016 `Names` death data set__
+    
+In this step, I reduced the 2016 `Names` data set by:
+* excluding all death records of out-of-state residents, and
+* excluding variables that ar not necessary to linking the `Names` and `Full` files,
+
+```{r}
+
+Names16 <- fread("H:/Mortality/Homeless/IntroDSCapstone/Data/Death_NamesY16.csv", select=c("State file number","Date of Death", "Date of Birth","Social Security Number", "Residence State"))
+
+N16 <- filter(Names16, `Residence State`=="WASHINGTON")
+summary(N16)
+```
+
+As both variables needed for merging are spelled the same way in the two data sets (`State file number` and `Social Security Number`) no further changes are need to those variables.
+
+  c.  __Merging limited `Names` and `Full` death files__
+  
+The final data set created by merging the cleaned `Full` and `Names` datasets is called `Merge16`. 
+
+*For convenience and the purposes of this capstone project, I restricted the dataset to the first 1,000 records (reduced from 56,069 records). However, for my work project I used the full data*
+  
+```{r}
+Merge16 <- full_join(N16, F16, by= c("State file number", "Social Security Number"))
+Merge16 <-Merge16[1:1000, ] %>%
+  select(-c("Date of Birth.y", "Date of Death.y")) %>%
+  rename("Date of Death"="Date of Death.x", "Date of Birth" = "Date of Birth.x")
+
+summary(Merge16)
+```
+
+
+FROM HOMELESS SECTION
+
+
+
+
+
+homeless <- read_csv("H:/Mortality/Homeless/IntroDSCapstone/Data/HomelessRegistryKingCo.csv")
+glimpse(homeless)
+
+homeless <- homeless %>%
+  rename(last_name = namelast,
+         first_name = namefirst,
+         middle_name = namemiddle,
+         res_street = resaddr,
+         res_city = rescity,
+         dob = birthdate,
+         ageunit = age,
+         date_of_death = eventdate) 
+
+homeless$dob <- gsub("-", "", homeless$dob)
+homeless$date_of_death <- gsub("-", "", homeless$date_of_death)
+homeless$dob <-toupper(homeless$dob)
+homeless$dob <- ifelse((nchar(homeless$dob)) < 7, paste("0",homeless$dob, sep = ""), homeless$dob)
+homeless$dob <- gsub("^([0-3][0-9][A-Z]{3})([0-9]{2})$", "\\119\\2", homeless$dob)
+
+homeless$date_of_death <-toupper(homeless$date_of_death)
+homeless$date_of_death <- ifelse((nchar(homeless$date_of_death)) < 7, paste("0",homeless$date_of_death, sep = ""), homeless$date_of_death)
+
+homeless$date_of_death <- gsub("^([0-3][0-9][A-Z]{3})([0-9]{2})$", "\\120\\2", homeless$date_of_death)
