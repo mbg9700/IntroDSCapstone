@@ -24,9 +24,13 @@ II. Data pre-processing
 
 ### A. Overview
 
-                                    INSERT DIAGRAM TO SHOW DATA PROCESSING FLOW
+The following diagram provides an overview of the data pre-processing steps.
 
-#### 1. Data cleaning and standardization
+<!--html_preserve-->
+
+<script type="application/json" data-for="htmlwidget-49bb32fdde3f0093854a">{"x":{"diagram":"\n        graph TD\n        A(WA DEATH DATA 2003-17)-->B(CLEAN )\n        B-->C(DERIVE VARIABLES)\n        C-->D(TEXT ANALYSIS ID frequent terms in COD*, address fields)\n        D-->E(SUBSET DEATHS OCCURRING IN KING CO.)\n        E-->F(SAMPLE SELECTION  random, n=1,200)\n        G(HOMELESS DEATH 2003-17)-->H(CLEAN )\n        H-->I(LINK HOMELESS & DEATH CERTS. add death cert. variables to homeless reg. data)\n        E-->I\n        I-->J(APPEND 'HOMELESS' & 'WITH HOME' including variable with homeless status of each record)\n        E-->J\n        J-->K{EDA}\n\nstyle A font-size: 50px\n        "},"evals":[],"jsHooks":[]}</script>
+<!--/html_preserve-->
+#### \_\_ 1. Data cleaning and standardization \_\_
 
 This step includes:
 
@@ -38,7 +42,7 @@ This step includes:
 
     d.  Deriving new features that group the records by agegroup, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
 
-#### 2. Homeless decedents - linking homeless death data to their death certificates
+#### \_\_ 2. Homeless decedents - linking homeless death data to their death certificates \_\_
 
 This step will add the additional attributes from WAMD to each of the records in HDR so that they have the necessary attributes to train the model. In its raw form, HDR contains very limited information about the homeless individuals who died including their names, dates of birth, dates of death, and places (address) of death.
 
@@ -75,11 +79,6 @@ WA0317 <-subset(WA0317, dstateFIPS=="WA")
 I coerced specific features into factors and dates as they were read in as character strings by R. To prepare for record linkage later I standardized the last and first name fields by removing leading, trailing, and mid-name white spaces, removed all hyphenations. I also removed hyphens from the social security number charcter string. I left social security number as a string to avoid losing leading zeroes.
 
 ``` r
-## COERCE VARIABLES TO FACTOR
-facvars_wa <- c("dcounty", "dzip", "dcity", "attclass", "brgrace", "hispanic", "sex","manner", "rcounty", "rcity", "rstreet","rstateFIPS", "rzip", "dstateFIPS", "dplacelit", "dplacecode", "sex", "dthyr", "marital", "UCOD",  "educ", "MCOD", "occup")
-
-WA0317 %<>% mutate_at(facvars_wa, funs(factor(.)))
-
 ## COERCE VARIABLES TO DATES
 
 WA0317$dob <- as.Date(WA0317$dob, "%m/%d/%Y")
@@ -100,7 +99,19 @@ WA0317$fname <- str_replace_all(WA0317$fname, pattern = " ", replacement = "")
 WA0317$fname <- str_replace_all(WA0317$fname, pattern = "-", replacement = "")
 
 WA0317$ssn <- str_replace_all(WA0317$ssn, pattern= "-", replacement = "")
+
+WA0317$UCOD <- ifelse((nchar(WA0317$UCOD)) < 4, paste(WA0317$UCOD, "0", sep = ""), WA0317$UCOD)
+WA0317$UCOD <- str_replace_all(string = WA0317$UCOD, pattern = " ", replacement = "")
+
+## COERCE VARIABLES TO FACTOR
+facvars_wa <- c("dcounty", "dzip", "dcity", "attclass", "brgrace", "hispanic", "sex","manner", "rcounty", "rcity", "rstreet","rstateFIPS", "rzip", "dstateFIPS", "dplacelit", "dplacecode", "sex", "dthyr", "marital", "UCOD",  "educ", "MCOD", "occup", "military")
+
+WA0317 %<>% mutate_at(facvars_wa, funs(factor(.)))
+summary(WA0317$manner)
 ```
+
+    ##      A      C      H      N   NULL      P      S 
+    ##  42454   2824   3602 682226     97     58  14674
 
 #### 2. \_\_Deriving new features in preparation for exploratory data analysis
 
@@ -122,9 +133,6 @@ WA0317$age5cat[age>=18 & age<=29] <-"18-29yrs"
 WA0317$age5cat[age>=30 & age<=44] <- "30-44yrs"
 WA0317$age5cat[age>=45 & age<=64] <-"45-64yrs"
 WA0317$age5cat[age>=65] <- "65+ yrs"
-
-
-WA0317$UCOD <- str_replace_all(string = WA0317$UCOD, pattern = " ", replacement = "")
 
 #LEADING CAUSES OF DEATH (per National Center for Health Statistics)
 
@@ -170,16 +178,16 @@ WA0317$LCOD[grepl(liver, WA0317$UCOD)]<- "Chronic Liver dis./cirrh."
 flu <- "J09[0-9]?|J1[0-8][0-9]?"
 WA0317$LCOD[grepl(flu, WA0317$UCOD)]<- "Flu"
 
-####----------------------------------------
-### NOT SURE WHY THESE NEXT TWO SECTIONS AREN'T WORKING - NOT CREATING CATEGORIES CORRECTLY
-####-------------------------------------------
-
-# UNINTENTIONAL INJURIES - SUBCATEGORIES OF:  V01-X59,Y85-Y86
+# UNINTENTIONAL INJURIES - SELECT SUBCATEGORIES OF:  V01-X59,Y85-Y86
 
 WA0317$injury <- "No injury"
 
+##ACCIDENTS - V01-X59,Y85-Y86
+unintinj <- "V[0-9][0-9][0-9]?|W[0-9][0-9][0-9]?|X[0-5][0-9][0-9]?|Y8[5-6][0-9]?"
+WA0317$LCOD[grepl(unintinj, WA0317$UCOD)]<- "Other unint.injury"
+
 #Unintentional Poisoning - X40-49
-poisoninjury <- "X4[0-9][0-9]?"
+poisoninjury <- "^X4[0-9][0-9]?"
 WA0317$injury[grepl(poisoninjury, WA0317$UCOD)] <- "Unintentional poisoning"
 
 # Unintentional Firearm - W32-34
@@ -191,21 +199,13 @@ mvped <- "V0[2-3][0-9]?|V041|V049|V092"
 WA0317$injury[grepl(mvped, WA0317$UCOD)] <- "MV crash-pedestrian"
 
 # Unintentional Fall (W00–W19)
-fall <- "W0[0-9][0-9]?|W1[0-9][0-9]?"
+fall <- "W0[0-9][0-9]|W1[0-9][0-9]"
 WA0317$injury[grepl(fall, WA0317$UCOD)] <- "Unintentional fall"
 
-WA0317$injury[grepl(unintentionalinjury,WA0317$UCOD) & !grepl(fall,WA0317$UCOD) & !grepl(guninjury,WA0317$UCOD) & !grepl(poisoninjury,WA0317$UCOD) & !grepl(mvped, WA0317$UCOD)] <- "Other injury"
+##WA0317$injury[grepl(unintentionalinjury,WA0317$UCOD) & !grepl(fall,WA0317$UCOD) & !grepl(guninjury,WA0317$UCOD) & !grepl(poisoninjury,WA0317$UCOD) & !grepl(mvped, WA0317$UCOD)] <- "Other injury"
 
 WA0317$injury <- as.factor(WA0317$injury)
-summary(WA0317$injury)
-```
 
-    ##     MV crash-pedestrian               No injury            Other injury 
-    ##                    1238                  704818                   15406 
-    ##      Unintentional fall   Unintentional firearm Unintentional poisoning 
-    ##                   11884                      98                   12491
-
-``` r
 #SUBSTANCE ABUSE
 WA0317$substance <- "No Substance abuse"
 
@@ -219,22 +219,16 @@ WA0317$substance[grepl(alcohol, WA0317$UCOD)] <- "Alcohol-induced"
 #Drug-induced per NCHS - https://www.cdc.gov/nchs/data/nvsr/nvsr66/nvsr66_06.pdf 
 #Excludes unintentional injuries, homicides, other causes indirectly related to alcohol use, newborn deaths due to maternal drug use
 
-druginduced <- "D521|D590|D592|D611|D642|E064|E160|E231|E242|E273|E661|F11[1–5]|F11[7–9]|F12[1-5]|F12[7–9]|F13[1–5]|F13[7-9]|F14[1–5]|F14[7–9]|F15[1–5]|F15[7–9]|F16[1–5]|F16[7–9]|F17[3–5]|F17[7–9]|F18[1–5]||F18[7–9]|F19[1–5]|F19[7–9]|G211|G240|G251|G254|G256|G444|G620|G720|I952|J702|J703|J704|K853|L105|L270|L271|M102|M320|M804|M814|M835|M871|R502|R781|R782|R783|R784|R785|X4[0-4][0-9]?|X6[0–4][0-9]?|X85|Y1[0–4][0-9]?"
+drug <- "D521|D590|D592|D611|D642|E064|E160|E231|E242|E273|E661|F11[1–5]|F11[7–9]|F12[1-5]|F12[7–9]|F13[1–5]|F13[7-9]|F14[1–5]|F14[7–9]|F15[1–5]|F15[7–9]|F16[1–5]|F16[7–9]|F17[3–5]|F17[7–9]|F18[1–5]|F18[7–9]|F19[1–5]|F19[7–9]|G211|G240|G251|G254|G256|G444|G620|G720|I952|J702|J703|J704|K853|L105|L270|L271|M102|M320|M804|M814|M835|M871|R502|R781|R782|R783|R784|R785|X4[0-4][0-9]|X6[0–4][0-9]|X85|Y1[0–4][0-9]"
 
-WA0317$substance[grepl(druginduced, WA0317$UCOD)] <- "Drug-induced"
+WA0317$substance[grepl(drug, WA0317$UCOD)] <- "Drug-induced"
 
 # DRUG OD
-drugod <- "X4[0-4][0-9]?|X6[0-4][0-9]?|X85[0-9]?|Y1[0-4][0-9]?" #drug overdose - searching for any drug in UCOD only
-WA0317$substance[grepl(drugod, WA0317$UCOD)] <-"Drug OD"
+#drugod <- "X4[0-4][0-9]?|X6[0-4][0-9]?|X85[0-9]?|Y1[0-4][0-9]?" #drug overdose - searching for any drug in UCOD only
+#WA0317$substance[grepl(drugod, WA0317$UCOD)] <-"Drug OD"
 
 WA0317$substance <- as.factor(WA0317$substance)
-summary(WA0317$substance)
-```
 
-    ## Drug-induced      Drug OD 
-    ##       731422        14513
-
-``` r
 ## RESIDENCE
 
 WA0317$residence[rstateFIPS != "WA" & rstateFIPS !="ZZ"] <- "Out of state"
@@ -242,71 +236,120 @@ WA0317$residence[rstateFIPS == "WA"] <- "WA resident"
 
 ## RACE AND ETHNICITY
 ## remember that the original ethnicity variable was named "HISPNICNO" i.e. a "yes" means they are NOT hispanic
-WA0317$raceethnic <- "Other"
-WA0317$raceethnic[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
-WA0317$raceethnic[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
-WA0317$raceethnic[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
-WA0317$raceethnic[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10","11","12","13","15") & hispanic=="Y"] <- "Asian/PI NH"
-WA0317$raceethnic[hispanic=="N"] <- "Hispanic"
-WA0317$raceethnic[is.na(brgrace)] <- "Unknown"
 
-WA0317$raceethnic <- as.factor(WA0317$raceethnic)
+##5 groups with Hispanic as race
+WA0317$raceethnic5 <- "Other"
+WA0317$raceethnic5[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
+WA0317$raceethnic5[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
+WA0317$raceethnic5[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
+WA0317$raceethnic5[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10","11","12","13","14","15") & hispanic=="Y"] <- "Asian/PI NH"
+WA0317$raceethnic5[hispanic=="N"] <- "Hispanic"
+WA0317$raceethnic5[is.na(brgrace)] <- "Unknown"
 
-WA0317 %<>% mutate_at(c("age5cat", "residence", "LCOD", "injury", "substance", "raceethnic"), funs(factor(.)))
+WA0317$raceethnic5 <- as.factor(WA0317$raceethnic5)
 
+## 6 groups with Hispanic as race and separating Asians and NHOPI
+WA0317$raceethnic6 <- "Other"
+WA0317$raceethnic6[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
+WA0317$raceethnic6[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
+WA0317$raceethnic6[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
+WA0317$raceethnic6[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10") & hispanic=="Y"] <- "Asian"
+WA0317$raceethnic6[brgrace %in% c("11","12","13","14","15") & hispanic=="Y"] <- "NHOPI"
+WA0317$raceethnic6[hispanic=="N"] <- "Hispanic"
+WA0317$raceethnic6[is.na(brgrace)] <- "Unknown"
+
+WA0317$raceethnic6 <- as.factor(WA0317$raceethnic6)
+
+
+WA0317 %<>% mutate_at(c("age5cat", "residence", "LCOD", "injury", "substance", "raceethnic5", "raceethnic6"), funs(factor(.)))
+
+## Labeling manner of death
+
+WA0317$manner <- factor(WA0317$manner,
+                        levels = c("A", "C", "H", "N", "NULL", "P", "S"),
+                        labels = c("Accident", "Undetermined", "Homicide", "Natural", "Unk.","Pending", "Suicide"))
+
+##Labeling educational attainment
+
+WA0317$educ <- factor(WA0317$educ,
+                        levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9"),
+                        labels = c("<=8th grade", "9-12th gr., no diploma", "H.S. grad/GED", "Some college", "Associate's","Bachelors", "Masters", "Doctorate/Professional", "Unknown"))
+
+detach(WA0317)
 
 head(WA0317)
 ```
 
-    ##       certno        dob        dod     lname   fname     mname sex
-    ## 1 2003000001 1917-01-17 2003-01-01    HARRIS  VICTOR     ALLEN   M
-    ## 2 2003000002 1912-04-06 2003-01-01 WELLSANDT MILDRED         M   F
-    ## 3 2003000003 1962-12-11 2003-01-11   BUTCHER  THOMAS   CHARLES   M
-    ## 4 2003000004 1904-01-18 2003-01-16 RASMUSSEN CRYRENE         N   F
-    ## 5 2003000005 1930-08-23 2003-01-20   RAMIREZ  RAQUEL VILLICANA   F
-    ## 6 2003000006 1922-10-11 2003-01-01   FRANCIS RICHARD    BENARD   M
-    ##         ssn attclass brgrace hispanic manner rcounty     rcity
-    ## 1 503127873        1    NULL        N      N   ADAMS   OTHELLO
-    ## 2 539380620        1    NULL        N      N   ADAMS RITZVILLE
-    ## 3 533726769        1    NULL        N      N   ADAMS   OTHELLO
-    ## 4 531187976        1    NULL        N      N   ADAMS RITZVILLE
-    ## 5 534466920        1    NULL        N      N   ADAMS   OTHELLO
-    ## 6 531186019        1    NULL        N      N  BENTON KENNEWICK
-    ##                          rstreet resmatchcode rstateFIPS  rzip dstreet
-    ## 1                1035 E LARCH ST          100         WA 99344    NULL
-    ## 2       406 S CASCADE ST APT 104          100         WA 99169    NULL
-    ## 3                2702 W BENCH RD          100         WA 99344    NULL
-    ## 4               506 S JACKSON ST          100         WA 99169    NULL
-    ## 5                 1346 E PINE ST          100         WA 99344    NULL
-    ## 6 7901 W CLEARWATER AVE UNIT 104          100         WA 99336    NULL
-    ##       dcity dzip dcounty dstateFIPS                   dplacelit dplacecode
-    ## 1   OTHELLO NULL   ADAMS         WA        Hospital (inpatient)          4
-    ## 2 RITZVILLE NULL   ADAMS         WA        Hospital (inpatient)          4
-    ## 3   OTHELLO NULL   ADAMS         WA        Hospital (inpatient)          4
-    ## 4 RITZVILLE NULL   ADAMS         WA Nursing home/long term care          5
-    ## 5   OTHELLO NULL   ADAMS         WA        Hospital (inpatient)          4
-    ## 6 KENNEWICK NULL  BENTON         WA Nursing home/long term care          5
-    ##   dthyr MEcasenum UCOD                          MCOD educ marital occup
-    ## 1  2003      NULL C349 C349 F179 I251 I500 J189 J449    9       M   716
-    ## 2  2003      NULL I219                     I219 I461    9       W   183
-    ## 3  2003  AD200301 I251                     I251 I499    9       M   201
-    ## 4  2003      NULL  I10             F03 G409 I10 I461    9       W   908
-    ## 5  2003      NULL E149                     E149 I518    9       M   908
-    ## 6  2003      NULL J449      E119 G473 I251 J449 J969    9       M   255
-    ##       age  age5cat                  LCOD    injury    substance
-    ## 1 86 days  65+ yrs                Cancer No injury Drug-induced
-    ## 2 91 days  65+ yrs            Heart Dis. No injury Drug-induced
-    ## 3 40 days 30-44yrs            Heart Dis. No injury Drug-induced
-    ## 4 99 days  65+ yrs                 Other No injury Drug-induced
-    ## 5 72 days  65+ yrs              Diabetes No injury Drug-induced
-    ## 6 80 days  65+ yrs Chronic Lwr Resp Dis. No injury Drug-induced
-    ##     residence raceethnic
-    ## 1 WA resident   Hispanic
-    ## 2 WA resident   Hispanic
-    ## 3 WA resident   Hispanic
-    ## 4 WA resident   Hispanic
-    ## 5 WA resident   Hispanic
-    ## 6 WA resident   Hispanic
+    ##       certno        dob        dod    lname    fname   mname sex       ssn
+    ## 1 2003002743 1928-06-04 2003-01-01     LOVE  CHESTER   JAMES   M 539260170
+    ## 2 2003003284 1910-05-30 2003-01-01  CARLSON    HELEN FRANCES   F 536441312
+    ## 3 2003000755 1908-08-22 2003-01-01 MCDONALD MARGARET   MARIE   F 167073319
+    ## 4 2003003071 1925-05-26 2003-01-01 LINDBERG  LUCILLE    RUTH   F 531240169
+    ## 5 2003002215 1923-07-03 2003-01-01   BAGLEY MARCELLA   MARIE   F 534240660
+    ## 6 2003000770 1927-03-21 2003-01-01       VO     NGOC     THI   F 457578487
+    ##   attclass brgrace hispanic  manner   rcounty      rcity
+    ## 1        1    NULL        N Natural SNOHOMISH    EVERETT
+    ## 2        1    NULL        N Natural  THURSTON   TUMWATER
+    ## 3        1    NULL        N Natural      KING    SEATTLE
+    ## 4        1    NULL        N Natural   SPOKANE    SPOKANE
+    ## 5        1    NULL        N Natural    PIERCE GIG HARBOR
+    ## 6        1    NULL        N Natural      KING       KENT
+    ##                    rstreet resmatchcode rstateFIPS  rzip dstreet
+    ## 1  1915 HEWITT AVE APT 209          100         WA 98201    NULL
+    ## 2       1400 TROSPER RD SW          100         WA 98512    NULL
+    ## 3         7304 44TH AVE NE          100         WA 98115    NULL
+    ## 4          1816 E 13TH AVE          100         WA 99202    NULL
+    ## 5      8807 DANFORTH ST NW          100         WA 98329    NULL
+    ## 6 24510 64TH AVE S APT 133          100         WA 98032    NULL
+    ##        dcity dzip   dcounty dstateFIPS                   dplacelit
+    ## 1  SNOHOMISH NULL SNOHOMISH         WA Nursing home/long term care
+    ## 2   TUMWATER NULL  THURSTON         WA Nursing home/long term care
+    ## 3    SEATTLE NULL      KING         WA        Hospital (inpatient)
+    ## 4    SPOKANE NULL   SPOKANE         WA                        Home
+    ## 5 GIG HARBOR NULL    PIERCE         WA Nursing home/long term care
+    ## 6     RENTON NULL      KING         WA        Hospital (inpatient)
+    ##   dplacecode dthyr UCOD                     MCOD                   educ
+    ## 1          5  2003 G200                      G20                Unknown
+    ## 2          5  2003 G309                     G309                Unknown
+    ## 3          4  2003 C349 C349 C782 C795 J969 Q211 Doctorate/Professional
+    ## 4          0  2003 I640                 C349 I64                Unknown
+    ## 5          5  2003 E149           E149 I251 N189                Unknown
+    ## 6          4  2003 I613  I10 I613 I959 J960 K729                Unknown
+    ##   marital occup military
+    ## 1       M   425        N
+    ## 2       W   908        N
+    ## 3       W   908        N
+    ## 4       D   363        N
+    ## 5       W   875        N
+    ## 6       W   908        N
+    ##                                                                                                             codlit
+    ## 1                                                                                           PARKINSONS DISEASE    
+    ## 2                                                                                           ALZHEIMERS DISEASE    
+    ## 3 RESPIRATORY FAILURE METASTATIC SMALL CELL CA TO BONE, LUNG, PLEURA PRIMARY LUNG  ATRIAL SEPTAL DEFECT WITH SHUNT
+    ## 4                                                                           STROKE WITH UNDERLYING LUNG CANCER    
+    ## 5                                                                                   CHRONIC RENAL FAILURE DM   CAD
+    ## 6                                                           HYPOTENSION PONTINE HEMORRHAGE HTN  ARF, LIVER FAILURE
+    ##       age age5cat       LCOD    injury          substance   residence
+    ## 1 75 days 65+ yrs      Other No injury No Substance abuse WA resident
+    ## 2 93 days 65+ yrs Alzheimers No injury No Substance abuse WA resident
+    ## 3 94 days 65+ yrs     Cancer No injury No Substance abuse WA resident
+    ## 4 78 days 65+ yrs     Stroke No injury No Substance abuse WA resident
+    ## 5 80 days 65+ yrs   Diabetes No injury No Substance abuse WA resident
+    ## 6 76 days 65+ yrs     Stroke No injury No Substance abuse WA resident
+    ##   raceethnic5 raceethnic6
+    ## 1    Hispanic    Hispanic
+    ## 2    Hispanic    Hispanic
+    ## 3    Hispanic    Hispanic
+    ## 4    Hispanic    Hispanic
+    ## 5    Hispanic    Hispanic
+    ## 6    Hispanic    Hispanic
+
+``` r
+summary(WA0317$substance)
+```
+
+    ##    Alcohol-induced       Drug-induced No Substance abuse 
+    ##              13004              14427             718504
 
 #### 3. **Creating a training data set of decedents who had permanent homes at time of death**
 
@@ -316,75 +359,99 @@ I defined "permanent home" as decedents whose death certificates indicate that t
 
 Another restriction on the sampling frame was that all decedents had to be King County deaths (i.e. deaths that occurred in King count regardless of place of residence) so that they matched the homeless decedents in this respect.
 
+I added the suffix ".k" to the column names to identify easily the source data set for these features. This will be helpful in the next step when I merge homeless registry data with their corresponding death records.
+
 From this set of King County deaths among persons with permanent homes I selected a random sample of 1,200 records to match the size of the homeless death record data set.
 
 ``` r
 KC0317<- subset(WA0317, dcounty=="KING")
 
+KC <- KC0317
 
-KC1617wh <- subset(KC0317, (KC0317$dplacecode==0 | KC0317$dplacecode==5 | KC0317$dplacecode==7) & (dthyr=="2016"|dthyr=="2017") & KC0317$resmatchcode >=95)
+colnames(KC)<-c("certno.k", "dob.k", "dod.k", "lname.k", "fname.k", "mname.k", "sex.k","ssn.k", "attclass.k", "brgrace.k", "hispanic.k", "manner.k",  "rcounty.k", "rcity.k",  "rstreet.k","resmatchcode.k","rstateFIPS.k", "rzip.k",  "dstreet.k", "dcity.k", "dzip.k", "dcounty.k","dstateFIPS.k",  "dplacelit.k","dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "military.k","codlit.k","age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k")
 
+KC0317_wh <- subset(KC, (KC$dplacecode.k==0 | KC$dplacecode.k==5 | KC$dplacecode.k==7) & KC$resmatchcode.k >= 95)
 
-KC1617wh <- select(KC1617wh, -"resmatchcode")
 
 ##RANDOMLY SELECT 1,200 persons from permhome
 
 set.seed(1)
-sample <- sample(1:nrow(KC1617wh), 1200)
-KC1617whsample <- KC1617wh[sample, ]
+sample <- sample(1:nrow(KC0317_wh), 1200)
+KC0317whsample <- KC0317_wh[sample, ]
 
-head(KC1617whsample)
+head(KC0317whsample)
 ```
 
-    ##            certno        dob        dod    lname    fname   mname sex
-    ## 574919 2017021140 1927-06-17 2017-05-07  WATKINS   MARIAN       R   F
-    ## 601177 2017026611 1920-11-10 2017-06-13    BLEHA BERNIECE  VIVIAN   F
-    ## 649019 2017037675 1968-01-13 2017-08-21   MILLER  RICHARD   JAMES   M
-    ## 725322 2017055584 1963-03-21 2017-12-05   BRIGGS   RONALD       L   M
-    ## 555997 2017017416 1946-09-24 2017-04-11     ROSE MARGARET     ANN   F
-    ## 722989 2017053486 1947-12-01 2017-12-02 LANGRELL    LINDA STATHES   F
-    ##              ssn attclass brgrace hispanic manner rcounty   rcity
-    ## 574919 537226706        1      01        Y      N    KING SEATTLE
-    ## 601177 540180082        1      01        Y      N    KING SEATTLE
-    ## 649019 531944713        2      01        Y      N    KING SEATTLE
-    ## 725322 564533301        1      01        Y      N    KING    KENT
-    ## 555997 532440096        1      01        Y      N    KING SEATTLE
-    ## 722989 573766443        7      01        N      N    KING  RENTON
-    ##                        rstreet rstateFIPS       rzip
-    ## 574919   12505 GREENWOOD AVE N         WA 98133-8040
-    ## 601177     4831 35TH AVENUE SW         WA      98126
-    ## 649019          116 STEWART ST         WA      98101
-    ## 725322       12640 SE 282ND ST         WA      98030
-    ## 555997 8538 ASHWORTH AVE NORTH         WA      98103
-    ## 722989      1906 EDMONDS DR SE         WA      98055
-    ##                             dstreet   dcity  dzip dcounty dstateFIPS
-    ## 574919         IDA CULVER BROADVIEW SEATTLE 98133    KING         WA
-    ## 601177 PROVIDENCE MOUNT ST. VINCENT SEATTLE 98126    KING         WA
-    ## 649019         116 STEWART ST. #712 SEATTLE 98101    KING         WA
-    ## 725322            12640 SE 282ND ST    KENT 98030    KING         WA
-    ## 555997      8538 ASHWORTH AVE NORTH SEATTLE 98103    KING         WA
-    ## 722989           1906 EDMONDS DR SE  RENTON 98055    KING         WA
-    ##                                   dplacelit dplacecode dthyr MEcasenum
-    ## 574919 NURSING HOME/LONG TERM CARE FACILITY          5  2017      NULL
-    ## 601177 NURSING HOME/LONG TERM CARE FACILITY          5  2017      NULL
-    ## 649019                      DECEDENT'S HOME          0  2017   17-1655
-    ## 725322                      DECEDENT'S HOME          0  2017      NULL
-    ## 555997                      DECEDENT'S HOME          0  2017      NULL
-    ## 722989                      DECEDENT'S HOME          0  2017      NULL
-    ##        UCOD MCOD educ marital occup     age  age5cat       LCOD    injury
-    ## 574919 G309 NULL    3       W   342 90 days  65+ yrs Alzheimers No injury
-    ## 601177 C679 NULL    3       W   842 97 days  65+ yrs     Cancer No injury
-    ## 649019 I250 NULL    2       S   982 50 days 45-64yrs Heart Dis. No injury
-    ## 725322 C329 NULL    2       U   472 55 days 45-64yrs     Cancer No injury
-    ## 555997  C64 NULL    5       W   674 71 days  65+ yrs     Cancer No injury
-    ## 722989  I10 NULL    6       W   822 70 days  65+ yrs      Other No injury
-    ##           substance   residence raceethnic
-    ## 574919 Drug-induced WA resident   White NH
-    ## 601177 Drug-induced WA resident   White NH
-    ## 649019 Drug-induced WA resident   White NH
-    ## 725322 Drug-induced WA resident   White NH
-    ## 555997 Drug-induced WA resident   White NH
-    ## 722989 Drug-induced WA resident   Hispanic
+    ##          certno.k      dob.k      dod.k   lname.k fname.k   mname.k sex.k
+    ## 574919 2017021394 1947-03-25 2017-05-07       DAY    RORY    STEVEN     M
+    ## 601167 2017026700 1929-09-10 2017-06-13       LIU SHUHWEN      NULL     M
+    ## 649011 2017037182 1934-03-01 2017-08-21   NYQUIST  DONALD    IRVING     M
+    ## 725340 2017052644 1931-01-06 2017-12-05 TOLLEFSON  LOUISE ELIZABETH     F
+    ## 556027 2017017664 1920-06-10 2017-04-11      HUFF  VIVIAN       MAE     F
+    ## 722968 2017052972 1939-08-01 2017-12-02   KORESKI CHARLES    ARTHUR     M
+    ##            ssn.k attclass.k brgrace.k hispanic.k manner.k rcounty.k
+    ## 574919 531440792          1        01          Y  Natural      KING
+    ## 601167 534824636          1        05          Y  Natural      KING
+    ## 649011 516369255          1        01          Y  Natural      KING
+    ## 725340 534320933          1        01          Y  Natural      KING
+    ## 556027 574105788          1        01          Y  Natural      KING
+    ## 722968 537344709          2        01          Y  Natural      KING
+    ##            rcity.k              rstreet.k resmatchcode.k rstateFIPS.k
+    ## 574919    BELLEVUE      1836 155TH AVE SE           NULL           WA
+    ## 601167      RENTON   64 MONTEREY PLACE NE           NULL           WA
+    ## 649011 WOODINVILLE      12915 NE 146TH PL           NULL           WA
+    ## 725340     SEATTLE 5311 PHINNEY AVENUE N.           NULL           WA
+    ## 556027 WOODINVILLE   23310 NE 152ND PLACE           NULL           WA
+    ## 722968    KIRKLAND   12234 NE 73RD STREET           NULL           WA
+    ##            rzip.k                              dstreet.k     dcity.k
+    ## 574919      98007                      1836 155TH AVE SE    BELLEVUE
+    ## 601167      98056                   64 MONTEREY PLACE NE      RENTON
+    ## 649011 98072-4632            LAWRENCE AND MICHELLE'S AFH WOODINVILLE
+    ## 725340      98103          RICHMOND BEACH REHABILITATION   SHORELINE
+    ## 556027      98077                   23310 NE 152ND PLACE WOODINVILLE
+    ## 722968      98033 EVERGREEN HOSPICE, 12822 124TH LANE NE    KIRKLAND
+    ##        dzip.k dcounty.k dstateFIPS.k                          dplacelit.k
+    ## 574919  98007      KING           WA                      DECEDENT'S HOME
+    ## 601167  98056      KING           WA                      DECEDENT'S HOME
+    ## 649011  98072      KING           WA NURSING HOME/LONG TERM CARE FACILITY
+    ## 725340  98177      KING           WA NURSING HOME/LONG TERM CARE FACILITY
+    ## 556027  98077      KING           WA                      DECEDENT'S HOME
+    ## 722968  98034      KING           WA                     HOSPICE FACILITY
+    ##        dplacecode.k dthyr.k UCOD.k MCOD.k        educ.k marital.k occup.k
+    ## 574919            0    2017   C189   NULL  Some college         M     177
+    ## 601167            0    2017   C189   NULL     Bachelors         M     890
+    ## 649011            5    2017   G200   NULL     Bachelors         M     393
+    ## 725340            5    2017   I100   NULL  Some college         D     370
+    ## 556027            0    2017   G309   NULL H.S. grad/GED         W     908
+    ## 722968            7    2017   M628   NULL     Bachelors         M     393
+    ##        military.k
+    ## 574919          N
+    ## 601167          N
+    ## 649011          Y
+    ## 725340          Y
+    ## 556027          N
+    ## 722968          N
+    ##                                                                                                                                           codlit.k
+    ## 574919                                                                                                                 METASTATIC COLON CANCER    
+    ## 601167                                                                                                                            COLON CANCER    
+    ## 649011                                                                       RESPIRATORY ARREST PARKINSON'S DISEASE   PARKINSON'S DISEASE DEMENTIA
+    ## 725340                                        CARDIORESPIRATORY FAILURE SECONDARY TO HYPERTENSION CONGESTIVE HEART FAILURE ATRIAL FIBRILLATION    
+    ## 556027                                                              INANITION ALZHEIMER'S DEMENTIA   CHRONIC ASPIRATION, GASTROINTESTINAL BLEEDING
+    ## 722968 RHABDOMYOLYSIS PROLONGED IMMOBILITY AFTER NONTRAUMATIC COLLAPSE MYELOFIBROSIS AND GENERAL DEBILITY  DEMENTIA; HISTORY OF CHRONIC ALCOHOLISM
+    ##          age.k age5cat.k     LCOD.k  injury.k        substance.k
+    ## 574919 70 days   65+ yrs      Other No injury No Substance abuse
+    ## 601167 88 days   65+ yrs      Other No injury No Substance abuse
+    ## 649011 84 days   65+ yrs      Other No injury No Substance abuse
+    ## 725340 87 days   65+ yrs      Other No injury No Substance abuse
+    ## 556027 97 days   65+ yrs Alzheimers No injury No Substance abuse
+    ## 722968 78 days   65+ yrs      Other No injury No Substance abuse
+    ##        residence.k raceethnic5.k raceethnic6.k
+    ## 574919 WA resident      White NH      White NH
+    ## 601167 WA resident   Asian/PI NH         Asian
+    ## 649011 WA resident      White NH      White NH
+    ## 725340 WA resident      White NH      White NH
+    ## 556027 WA resident      White NH      White NH
+    ## 722968 WA resident      White NH      White NH
 
 ### C. King County Medical Examiner\`s Homeless Death Registry data - November 2003 to September 2017
 
@@ -510,21 +577,7 @@ miss_var_summary(homeless)
     ## 15 lname.h             0    0    
     ## 16 age.h               0    0
 
-#### 2. **Cleaning King County death certification information prior to linking with homeless death registry data**
-
-I added the suffix ".k" to the column names to identify easily the source data set for these features. This will be helpful in the next step when I merge homeless registry data with their corresponding death records.
-
-This data set is the full King County 2003-17 data set rather than the King County sample data set.
-
-``` r
-KC <- KC0317
-
-colnames(KC)<-c("certno.k", "dob.k", "dod.k", "lname.k", "fname.k", "mname.k", "sex.k","ssn.k", "attclass.k", "brgrace.k", "hispanic.k", "manner.k",  "rcounty.k", "rcity.k",  "rstreet.k","resmatchcode.k","rstateFIPS.k", "rzip.k",  "dstreet.k", "dcity.k", "dzip.k", "dcounty.k","dstateFIPS.k",  "dplacelit.k","dplacecode.k", "dthyr.k", "MEcasenum.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
-
-KC0317_wh <- subset(KC, (KC$dplacecode.k==0 | KC$dplacecode.k==5 | KC$dplacecode.k==7) & KC$resmatchcode.k >= 95)
-```
-
-#### 3. **Linking HDR with WAMD**
+#### 2. **Linking HDR with WAMD**
 
 The HDR contains name, date of birth, date of death, place of death (address), and social security number. There is no additional information on cause of death, or other attributes that might be used in machine learning to classify persons as homeless or with a permanent home. For this reason, the HDR data must first be linked to full death certificate data to add the relevant attributes that can be found in the death certificate.
 
@@ -535,6 +588,9 @@ In this situation it is possible to use deterministic linkage to link HDR record
 Pre-processing of the HDR and death data sets includes standardizing the values in the attributes to be used in the linkage, and creating the derived variable (concatenation of the above variables) in both data sets. The following steps use multiple combinations of key variables to link the homeless death registry records with their corresponding death certificates. The linking variables were selected based on the proportion that were missing values. Variables with low proportions of missing values were selected to complete the linkage.
 
 ``` r
+# 'homeless' data set contains all homeless decedents who died in King County between late 2003 and late 2017.
+# 'KC' data set contains all persons who died in King County between 2003 and 2017 (inclusive) at the time of death and includes all place of death types.
+
 ## left join homeless data with King County death certificate data
 ## joining variables are last name, first name and date of birth of homeless decedents as these attributes have the least missing values.
 miss_var_summary(homeless)
@@ -568,7 +624,7 @@ homelessa <- distinct(homelessa, lname.h, dob.h, .keep_all = TRUE)
 miss_var_summary(homelessa)
 ```
 
-    ## # A tibble: 52 x 3
+    ## # A tibble: 54 x 3
     ##    variable    n_miss pct_miss
     ##    <chr>        <int>    <dbl>
     ##  1 rescity.h      613     54.2
@@ -581,7 +637,7 @@ miss_var_summary(homelessa)
     ##  8 mname.k        122     10.8
     ##  9 sex.k          122     10.8
     ## 10 ssn.k          122     10.8
-    ## # ... with 42 more rows
+    ## # ... with 44 more rows
 
 ``` r
 # This first pass resulted in 1,008 homeless records being linked to their respective death certificate information.
@@ -600,7 +656,7 @@ homelessb <- distinct(homelessb, lname.h, dob.h, .keep_all = TRUE)
 miss_var_summary(homelessb)
 ```
 
-    ## # A tibble: 54 x 3
+    ## # A tibble: 56 x 3
     ##    variable    n_miss pct_miss
     ##    <chr>        <int>    <dbl>
     ##  1 rescity.h       75     61.5
@@ -613,7 +669,7 @@ miss_var_summary(homelessb)
     ##  8 mname.k         60     49.2
     ##  9 sex.k           60     49.2
     ## 10 attclass.k      60     49.2
-    ## # ... with 44 more rows
+    ## # ... with 46 more rows
 
 ``` r
 #This second link (with ssn) yielded an additional 61 linked records leaving 60 unmatched
@@ -629,7 +685,7 @@ homelessc <- distinct(homelessc, lname.h, dob.h, .keep_all = TRUE)
 miss_var_summary(homelessc)
 ```
 
-    ## # A tibble: 53 x 3
+    ## # A tibble: 55 x 3
     ##    variable    n_miss pct_miss
     ##    <chr>        <int>    <dbl>
     ##  1 rescity.h       44     73.3
@@ -642,7 +698,7 @@ miss_var_summary(homelessc)
     ##  8 mname.k         41     68.3
     ##  9 sex.k           41     68.3
     ## 10 ssn.k           41     68.3
-    ## # ... with 43 more rows
+    ## # ... with 45 more rows
 
 ``` r
 homeless4 <-filter(homelessc, is.na(certno.k))
@@ -655,7 +711,7 @@ homelessd <- distinct(homelessd, lname.h, dob.h, .keep_all = TRUE)
 miss_var_summary(homelessd)
 ```
 
-    ## # A tibble: 52 x 3
+    ## # A tibble: 54 x 3
     ##    variable    n_miss pct_miss
     ##    <chr>        <int>    <dbl>
     ##  1 rescity.h       34     82.9
@@ -668,13 +724,13 @@ miss_var_summary(homelessd)
     ##  8 sex.k           24     58.5
     ##  9 ssn.k           24     58.5
     ## 10 attclass.k      24     58.5
-    ## # ... with 42 more rows
+    ## # ... with 44 more rows
 
 ``` r
 homeless5 <-filter(homelessd, is.na(certno.k))
 homelessd1 <- filter(homelessd, !is.na(certno.k))
 
-keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "dod.h", "placeofdeath.h", "deathaddr.h", "deathcity.h", "dzip.h", "eventaddr.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstreet.k", "rstateFIPS.k","rzip.k", "dcity.k","dplacelit.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
+keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "dod.h", "placeofdeath.h", "deathaddr.h", "deathcity.h", "dzip.h", "eventaddr.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstreet.k", "rstateFIPS.k","rzip.k", "dcity.k","dplacelit.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "codlit.k", "military.k")
 
 homelessa1 <- select(homelessa1, keepvar_h)
 homelessb1 <- select(homelessb1, keepvar_h)
@@ -682,9 +738,6 @@ homelessc1 <- select(homelessc1, keepvar_h)
 homelessd1 <- select(homelessd1, keepvar_h)
 
 homelessfinal <- rbind(homelessa1, homelessb1, homelessc1, homelessd1)
-
-
-homelessfinal %<>% mutate_at(c("placeofdeath.h", "deathcity.h", "dzip.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k","rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k","age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k"), funs(factor(.)))
 
 homelessfinal$age.h <- as.integer(homelessfinal$age.h)
 
@@ -712,13 +765,13 @@ head(homelessfinal)
     ## 4  98027          23605 SE EVANS ST.    ISSAQUAH      KING          2
     ## 5  98115 7500 BLOCK LAKE CITY WAY NE     SEATTLE      KING          2
     ## 6  98133       11758 GREENWOOD AVE N     SEATTLE      KING          2
-    ##   sex.k brgrace.k hispanic.k manner.k rcounty.k           rcity.k
-    ## 1     M        02          Y        A    YAKIMA            YAKIMA
-    ## 2     M        01          Y        C      KING              KENT
-    ## 3     M        01          N        A      KING           SEATTLE
-    ## 4     F        01          Y        A   UNKNOWN           UNKNOWN
-    ## 5     M        02          Y        A SNOHOMISH MOUNTLAKE TERRACE
-    ## 6     F        08          Y        A      KING           SEATTLE
+    ##   sex.k brgrace.k hispanic.k     manner.k rcounty.k           rcity.k
+    ## 1     M        02          Y     Accident    YAKIMA            YAKIMA
+    ## 2     M        01          Y Undetermined      KING              KENT
+    ## 3     M        01          N     Accident      KING           SEATTLE
+    ## 4     F        01          Y     Accident   UNKNOWN           UNKNOWN
+    ## 5     M        02          Y     Accident SNOHOMISH MOUNTLAKE TERRACE
+    ## 6     F        08          Y     Accident      KING           SEATTLE
     ##                 rstreet.k rstateFIPS.k rzip.k  dcity.k
     ## 1            909 S 6TH ST           WA  98901  SEATTLE
     ## 2    NO PERMANENT ADDRESS           WA  98032     KENT
@@ -727,39 +780,53 @@ head(homelessfinal)
     ## 5        4601 237TH PL SW           WA  98043  SEATTLE
     ## 6                 UNKNOWN           WA  99999  SEATTLE
     ##                dplacelit.k dplacecode.k dthyr.k UCOD.k
-    ## 1                    OTHER            1    2017    X44
-    ## 2              Other place            1    2014    R99
-    ## 3 OTHER PERSON'S RESIDENCE            8    2017    X41
-    ## 4              Other place            1    2010    X44
+    ## 1                    OTHER            1    2017   X440
+    ## 2              Other place            1    2014   R990
+    ## 3 OTHER PERSON'S RESIDENCE            8    2017   X410
+    ## 4              Other place            1    2010   X440
     ## 5              Other place            1    2016   V476
-    ## 6                     Home            0    2015    X44
-    ##                              MCOD.k educ.k marital.k occup.k   age.k
-    ## 1                              NULL      3         S     015 30 days
-    ## 2                               R99      9         U     999 43 days
-    ## 3                              NULL      5         S     401 49 days
-    ## 4 X44 I119 I250 I258 T436 T483 T509      9         D     999 52 days
-    ## 5          V476 S029 S062 S066 S099      3         A     196 42 days
-    ## 6      X44 T401 T406 T436 T449 T509      4         S     997 32 days
-    ##   age5cat.k        LCOD.k                injury.k  substance.k residence.k
-    ## 1  30-44yrs Injury-unint. Unintentional poisoning      Drug OD WA resident
-    ## 2  30-44yrs         Other               No injury Drug-induced WA resident
-    ## 3  45-64yrs Injury-unint. Unintentional poisoning      Drug OD WA resident
-    ## 4  45-64yrs Injury-unint. Unintentional poisoning      Drug OD        <NA>
-    ## 5  30-44yrs Injury-unint.            Other injury Drug-induced WA resident
-    ## 6  30-44yrs Injury-unint. Unintentional poisoning      Drug OD WA resident
-    ##   raceethnic.k
-    ## 1     Black NH
-    ## 2     White NH
-    ## 3     Hispanic
-    ## 4     White NH
-    ## 5     Black NH
-    ## 6  Asian/PI NH
+    ## 6                     Home            0    2015   X440
+    ##                              MCOD.k        educ.k marital.k occup.k
+    ## 1                              NULL H.S. grad/GED         S     015
+    ## 2                               R99       Unknown         U     999
+    ## 3                              NULL   Associate's         S     401
+    ## 4 X44 I119 I250 I258 T436 T483 T509       Unknown         D     999
+    ## 5          V476 S029 S062 S066 S099 H.S. grad/GED         A     196
+    ## 6      X44 T401 T406 T436 T449 T509  Some college         S     997
+    ##     age.k age5cat.k             LCOD.k                injury.k
+    ## 1 30 days  30-44yrs Other unint.injury Unintentional poisoning
+    ## 2 43 days  30-44yrs              Other               No injury
+    ## 3 49 days  45-64yrs Other unint.injury Unintentional poisoning
+    ## 4 52 days  45-64yrs Other unint.injury Unintentional poisoning
+    ## 5 42 days  30-44yrs Other unint.injury               No injury
+    ## 6 32 days  30-44yrs Other unint.injury Unintentional poisoning
+    ##          substance.k residence.k raceethnic5.k raceethnic6.k
+    ## 1       Drug-induced WA resident      Black NH      Black NH
+    ## 2 No Substance abuse WA resident      White NH      White NH
+    ## 3       Drug-induced WA resident      Hispanic      Hispanic
+    ## 4       Drug-induced        <NA>      White NH      White NH
+    ## 5 No Substance abuse WA resident      Black NH      Black NH
+    ## 6       Drug-induced WA resident   Asian/PI NH         Asian
+    ##                                                                                                                                      codlit.k
+    ## 1                                                             COMBINED OPIATE (HEROIN), METHAMPHETAMINE, AND DIPHENHYDRAMINE INTOXICATION    
+    ## 2                                                                                                                            UNDETERMINED    
+    ## 3                                               ACUTE METHAMPHETAMINE INTOXICATION    HYPERTENSIVE AND ATHEROSCLEROTIC CARDIOVASCULAR DISEASE
+    ## 4 ACUTE COMBINED METHAMPHETAMINE AND DEXTROMETHORPHAN INTOXICATION    ATHEROSCLEROTIC AND HYPERTENSIVE CARDIOVASCULAR DISEASE WITH SCARRED MI
+    ## 5                                          SKULL FRACTURES, SUBARACHNOID HEMORRHAGE AND CEREBRAL CONTUSIONS BLUNT FORCE INJURY OF THE HEAD   
+    ## 6                                              ACUTE COMBINED OPIATE (PROBABLE HEROIN), METHAMPHETAMINE, AND PSEUDOEPHEDRINE INTOXICATION    
+    ##   military.k
+    ## 1          N
+    ## 2          U
+    ## 3          N
+    ## 4          N
+    ## 5          N
+    ## 6          N
 
 ``` r
 miss_var_summary(homelessfinal)
 ```
 
-    ## # A tibble: 40 x 3
+    ## # A tibble: 43 x 3
     ##    variable       n_miss pct_miss
     ##    <chr>           <int>    <dbl>
     ##  1 residence.k       153   13.8  
@@ -772,7 +839,7 @@ miss_var_summary(homelessfinal)
     ##  8 deathaddr.h         2    0.181
     ##  9 deathcity.h         2    0.181
     ## 10 age.k               2    0.181
-    ## # ... with 30 more rows
+    ## # ... with 33 more rows
 
 #### 4. **Creating combined dataset for exploratory data analysis**
 
@@ -786,7 +853,7 @@ wh <- KC0317_wh
 
 ## STANDARDIZE COLUMN NAMES AND MERGE FINAL HOMELESS AND KING COUNTY 2003-17 "WITH HOME" DEATH DATA 
 
-keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
+keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "military.k")
 
 h %<>% select(keepvars_eda)
 h$status <- "Homeless"
@@ -794,12 +861,16 @@ h$status <- "Homeless"
 wh %<>% select(keepvars_eda)
 wh$status <- "With home"
 
-stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic", "status")
+stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6", "military","status")
 
 colnames(h) <- stdnames
 colnames(wh) <- stdnames
 
 EDAdf<- rbind(h, wh)
+EDAdf$status <- as.factor(EDAdf$status)
+EDAdf$dplacecode <- factor(EDAdf$dplacecode,
+                           levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
+                           labels = c("Home", "Other", "In transport", "ER", "Hospital inpatient", "Nursing home/Longterm care", "Hospital", "Hospice", "Other person's home", "Unknown"))
 ```
 
 III. EXPLORATORY DATA ANALYSIS
@@ -814,7 +885,7 @@ Missing values in any of the attributes in either HDR or death certificate data 
 miss_var_summary(h)
 ```
 
-    ## # A tibble: 25 x 3
+    ## # A tibble: 27 x 3
     ##    variable  n_miss pct_miss
     ##    <chr>      <int>    <dbl>
     ##  1 residence    153   13.8  
@@ -827,14 +898,14 @@ miss_var_summary(h)
     ##  8 brgrace        0    0    
     ##  9 hispanic       0    0    
     ## 10 manner         0    0    
-    ## # ... with 15 more rows
+    ## # ... with 17 more rows
 
 ``` r
 #with home sample data
 miss_var_summary(wh)
 ```
 
-    ## # A tibble: 25 x 3
+    ## # A tibble: 27 x 3
     ##    variable  n_miss pct_miss
     ##    <chr>      <int>    <dbl>
     ##  1 residence      2   0.0315
@@ -847,11 +918,31 @@ miss_var_summary(wh)
     ##  8 manner         0   0     
     ##  9 rcounty        0   0     
     ## 10 rcity          0   0     
-    ## # ... with 15 more rows
+    ## # ... with 17 more rows
 
 ### B. Distribution of key variables
 
 -   combine homeless registry and the with home sample into one data set to facilitate comparison. Add an attribute that indicates whether record is for homeless or with home.
+
+#### **By place of death type**
+
+This plot shows that, for the majority of cases, homeless individuals died in different locations compared with decedents who died with a permanent home. Homeless decedents were more likely to die in hospital inpatient setting, ER, or "other" location. The "with home" group was previously restricted to those who died in their own homes, in a nursing home/longterm care facility, or in a hospice facility. Interestingly, about 9% of those classfied as "homeless" by the King County Medical Examiner's office are also reported to have died "at home" on their death certificate. I will need to investigate the reason for this.
+
+``` r
+theme_set(theme_cowplot(font_size = 10))
+plotplace <- ggplot(EDAdf, aes(x=dplacecode, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Place of death type", title = "Place of death type by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.0)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
+```
+
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 #### 1.**Age group**
 
@@ -863,15 +954,15 @@ theme_set(theme_cowplot(font_size = 10))
 plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Age groups", title = "Age distribution by homeless status") +
+  labs(y="Percent", x = "Age groups", title = "Age distribution by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotage
+plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 #### 2.**Gender**
 
@@ -882,35 +973,53 @@ theme_set(theme_cowplot(font_size = 10))
 plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Gender", title = "Gender distribution by homeless status") +
+  labs(y="Percent", x = "Gender", title = "Gender distribution by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotsex
+plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
-\#\#\#\#. 3.**Race**
+#### 3a.**Race - 5 grps**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
-plotraceeth <- ggplot(EDAdf, aes(x=raceethnic, group = status, fill = status)) +
+plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
-  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution by homeless status") +
+  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (5 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
   guides(fill=FALSE)
 
-plotraceeth
+plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-\#\#\#\#. 4\_\_Manner of death\_\_
+#### 3b.**Race - 6 grps**
+
+``` r
+theme_set(theme_cowplot(font_size = 10))
+plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (6 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  coord_flip() +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  guides(fill=FALSE)
+
+plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
+```
+
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+#### 4.**Manner of death**
 
 -   Over 45% of homeless deaths were accidental deaths compared to less than 5% of deaths to those with permanent homes. In contrast the vast majority of deaths among those with homes (almost 93%) were natural deaths.
 
@@ -920,25 +1029,26 @@ plotraceeth
 theme_set(theme_cowplot(font_size = 10))
 plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Manner of death", title = "Distribution of manner of death by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Manner of death", title = "Distribution of manner of death by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.1)) +
+  coord_flip() +
   guides(fill=FALSE)
 
-plotmanner
+plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-\#\#\#\#. **Leading causes of death**
+#### 5.**Leading causes of death**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
 plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", x = "Leading Cause of Death", title = "Leading cause of death by homeless status") +
+  labs(y="Percent", x = "Leading Cause of Death", title = "Leading cause of death by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
   coord_flip() +
@@ -947,82 +1057,92 @@ plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
 plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
-\#\#\#\#. **Unintentional injury sub-groups**
+#### 6.**Unintentional injury sub-groups**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
 plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", x = "Unintentional injury type", title = "Leading unintentional injury deaths by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.20, size=3) +
+  labs(y="Percent", x = "Unintentional injury type", title = "Leading unintentional injury deaths by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.4)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   coord_flip() +
   guides(fill=FALSE)
 
-plotinjury + theme(panel.spacing.x = unit(2.5, "lines"))
+plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 ```
 
-    ## Warning: Removed 2 rows containing missing values (geom_bar).
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-    ## Warning: Removed 2 rows containing missing values (geom_text).
-
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
-
-\#\#\#\#. **Substance abuse sub-groups**
+#### 7.**Substance abuse sub-groups**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
 plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", title = "Alcohol-related and drug-induced deaths by homeless status") +
+  labs(y="Percent", title = "Alcohol-related and drug-induced deaths by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   coord_flip() +
   guides(fill=FALSE)
 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-    ## Warning: Removed 2 rows containing missing values (geom_bar).
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
-    ## Warning: Removed 2 rows containing missing values (geom_text).
-
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png)
-
-\#\#\#\#. **By education**
+#### 8.**By education**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
 ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Educational attainment", title = "Educational attainment by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
+  labs(y="Percent", x = "Educational attainment", title = "Educational attainment by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  coord_flip() +
   guides(fill=FALSE)
 
-ploteduc
+ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
-\#\#\#\#. **by residence status**
+#### 10.**by residence status**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
 plotresid <- ggplot(EDAdf, aes(x=residence, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Resident status", title = "State of Residence by homeless status") +
+  labs(y="Percent", x = "Resident status", title = "State of Residence by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotresid
+plotresid + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-21-1.png)
+
+#### 11.**by military service**
+
+``` r
+theme_set(theme_cowplot(font_size = 10))
+plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
+  labs(y="Percent", x = "Armed Forces participation", title = "Armed Forces participation by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill=FALSE)
+
+plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
+```
+
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-22-1.png)
