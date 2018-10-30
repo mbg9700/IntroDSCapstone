@@ -37,12 +37,29 @@ The data sets used for this project include Washington State final annual death 
 
 ### A. Overview
 
+The following diagram provides an overview of the data pre-processing steps.
 
-                                    INSERT DIAGRAM TO SHOW DATA PROCESSING FLOW
+```{r, echo=FALSE}
 
+mermaid("
+        graph TD
+        A(WA DEATH DATA 2003-17)-->B(CLEAN )
+        B-->C(DERIVE VARIABLES)
+        C-->D(TEXT ANALYSIS <br> ID frequent terms in COD*, address fields)
+        D-->E(SUBSET DEATHS OCCURRING IN KING CO.)
+        E-->F(SAMPLE SELECTION <br> random, n=1,200)
+        G(HOMELESS DEATH 2003-17)-->H(CLEAN )
+        H-->I(LINK HOMELESS & DEATH CERTS. <br> add death cert. variables <br> to homeless reg. data)
+        E-->I
+        I-->J(APPEND 'HOMELESS' & 'WITH HOME' <br> including variable with homeless status <br> of each record)
+        E-->J
+        J-->K{EDA}
 
+style A font-size: 50px
+        ")
+```
 
-####  1. Data cleaning and standardization
+####  __ 1. Data cleaning and standardization __
 
 This step includes:
 
@@ -54,7 +71,7 @@ This step includes:
     
     d.  Deriving new features that group the records by agegroup, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
 
-####  2. Homeless decedents - linking homeless death data to their death certificates  
+####  __ 2. Homeless decedents - linking homeless death data to their death certificates __
 
 This step will add the additional attributes from WAMD to each of the records in HDR so that they have the necessary attributes to train the model. In its raw form, HDR contains very limited information about the homeless individuals who died including their names, dates of birth, dates of death, and places (address) of death.
 
@@ -101,11 +118,6 @@ I coerced specific features into factors and dates as they were read in as chara
 
 ```{r}
 
-## COERCE VARIABLES TO FACTOR
-facvars_wa <- c("dcounty", "dzip", "dcity", "attclass", "brgrace", "hispanic", "sex","manner", "rcounty", "rcity", "rstreet","rstateFIPS", "rzip", "dstateFIPS", "dplacelit", "dplacecode", "sex", "dthyr", "marital", "UCOD",  "educ", "MCOD", "occup")
-
-WA0317 %<>% mutate_at(facvars_wa, funs(factor(.)))
-
 ## COERCE VARIABLES TO DATES
 
 WA0317$dob <- as.Date(WA0317$dob, "%m/%d/%Y")
@@ -127,6 +139,14 @@ WA0317$fname <- str_replace_all(WA0317$fname, pattern = "-", replacement = "")
 
 WA0317$ssn <- str_replace_all(WA0317$ssn, pattern= "-", replacement = "")
 
+WA0317$UCOD <- ifelse((nchar(WA0317$UCOD)) < 4, paste(WA0317$UCOD, "0", sep = ""), WA0317$UCOD)
+WA0317$UCOD <- str_replace_all(string = WA0317$UCOD, pattern = " ", replacement = "")
+
+## COERCE VARIABLES TO FACTOR
+facvars_wa <- c("dcounty", "dzip", "dcity", "attclass", "brgrace", "hispanic", "sex","manner", "rcounty", "rcity", "rstreet","rstateFIPS", "rzip", "dstateFIPS", "dplacelit", "dplacecode", "sex", "dthyr", "marital", "UCOD",  "educ", "MCOD", "occup", "military")
+
+WA0317 %<>% mutate_at(facvars_wa, funs(factor(.)))
+summary(WA0317$manner)
 
 ```
 
@@ -153,9 +173,6 @@ WA0317$age5cat[age>=18 & age<=29] <-"18-29yrs"
 WA0317$age5cat[age>=30 & age<=44] <- "30-44yrs"
 WA0317$age5cat[age>=45 & age<=64] <-"45-64yrs"
 WA0317$age5cat[age>=65] <- "65+ yrs"
-
-
-WA0317$UCOD <- str_replace_all(string = WA0317$UCOD, pattern = " ", replacement = "")
 
 #LEADING CAUSES OF DEATH (per National Center for Health Statistics)
 
@@ -201,16 +218,16 @@ WA0317$LCOD[grepl(liver, WA0317$UCOD)]<- "Chronic Liver dis./cirrh."
 flu <- "J09[0-9]?|J1[0-8][0-9]?"
 WA0317$LCOD[grepl(flu, WA0317$UCOD)]<- "Flu"
 
-####----------------------------------------
-### NOT SURE WHY THESE NEXT TWO SECTIONS AREN'T WORKING - NOT CREATING CATEGORIES CORRECTLY
-####-------------------------------------------
-
-# UNINTENTIONAL INJURIES - SUBCATEGORIES OF:  V01-X59,Y85-Y86
+# UNINTENTIONAL INJURIES - SELECT SUBCATEGORIES OF:  V01-X59,Y85-Y86
 
 WA0317$injury <- "No injury"
 
+##ACCIDENTS - V01-X59,Y85-Y86
+unintinj <- "V[0-9][0-9][0-9]?|W[0-9][0-9][0-9]?|X[0-5][0-9][0-9]?|Y8[5-6][0-9]?"
+WA0317$LCOD[grepl(unintinj, WA0317$UCOD)]<- "Other unint.injury"
+
 #Unintentional Poisoning - X40-49
-poisoninjury <- "X4[0-9][0-9]?"
+poisoninjury <- "^X4[0-9][0-9]?"
 WA0317$injury[grepl(poisoninjury, WA0317$UCOD)] <- "Unintentional poisoning"
 
 # Unintentional Firearm - W32-34
@@ -222,14 +239,12 @@ mvped <- "V0[2-3][0-9]?|V041|V049|V092"
 WA0317$injury[grepl(mvped, WA0317$UCOD)] <- "MV crash-pedestrian"
 
 # Unintentional Fall (W00–W19)
-fall <- "W0[0-9][0-9]?|W1[0-9][0-9]?"
+fall <- "W0[0-9][0-9]|W1[0-9][0-9]"
 WA0317$injury[grepl(fall, WA0317$UCOD)] <- "Unintentional fall"
 
-WA0317$injury[grepl(unintentionalinjury,WA0317$UCOD) & !grepl(fall,WA0317$UCOD) & !grepl(guninjury,WA0317$UCOD) & !grepl(poisoninjury,WA0317$UCOD) & !grepl(mvped, WA0317$UCOD)] <- "Other injury"
+##WA0317$injury[grepl(unintentionalinjury,WA0317$UCOD) & !grepl(fall,WA0317$UCOD) & !grepl(guninjury,WA0317$UCOD) & !grepl(poisoninjury,WA0317$UCOD) & !grepl(mvped, WA0317$UCOD)] <- "Other injury"
 
 WA0317$injury <- as.factor(WA0317$injury)
-summary(WA0317$injury)
-
 
 #SUBSTANCE ABUSE
 WA0317$substance <- "No Substance abuse"
@@ -244,16 +259,15 @@ WA0317$substance[grepl(alcohol, WA0317$UCOD)] <- "Alcohol-induced"
 #Drug-induced per NCHS - https://www.cdc.gov/nchs/data/nvsr/nvsr66/nvsr66_06.pdf 
 #Excludes unintentional injuries, homicides, other causes indirectly related to alcohol use, newborn deaths due to maternal drug use
 
-druginduced <- "D521|D590|D592|D611|D642|E064|E160|E231|E242|E273|E661|F11[1–5]|F11[7–9]|F12[1-5]|F12[7–9]|F13[1–5]|F13[7-9]|F14[1–5]|F14[7–9]|F15[1–5]|F15[7–9]|F16[1–5]|F16[7–9]|F17[3–5]|F17[7–9]|F18[1–5]||F18[7–9]|F19[1–5]|F19[7–9]|G211|G240|G251|G254|G256|G444|G620|G720|I952|J702|J703|J704|K853|L105|L270|L271|M102|M320|M804|M814|M835|M871|R502|R781|R782|R783|R784|R785|X4[0-4][0-9]?|X6[0–4][0-9]?|X85|Y1[0–4][0-9]?"
+drug <- "D521|D590|D592|D611|D642|E064|E160|E231|E242|E273|E661|F11[1–5]|F11[7–9]|F12[1-5]|F12[7–9]|F13[1–5]|F13[7-9]|F14[1–5]|F14[7–9]|F15[1–5]|F15[7–9]|F16[1–5]|F16[7–9]|F17[3–5]|F17[7–9]|F18[1–5]|F18[7–9]|F19[1–5]|F19[7–9]|G211|G240|G251|G254|G256|G444|G620|G720|I952|J702|J703|J704|K853|L105|L270|L271|M102|M320|M804|M814|M835|M871|R502|R781|R782|R783|R784|R785|X4[0-4][0-9]|X6[0–4][0-9]|X85|Y1[0–4][0-9]"
 
-WA0317$substance[grepl(druginduced, WA0317$UCOD)] <- "Drug-induced"
+WA0317$substance[grepl(drug, WA0317$UCOD)] <- "Drug-induced"
 
 # DRUG OD
-drugod <- "X4[0-4][0-9]?|X6[0-4][0-9]?|X85[0-9]?|Y1[0-4][0-9]?" #drug overdose - searching for any drug in UCOD only
-WA0317$substance[grepl(drugod, WA0317$UCOD)] <-"Drug OD"
+#drugod <- "X4[0-4][0-9]?|X6[0-4][0-9]?|X85[0-9]?|Y1[0-4][0-9]?" #drug overdose - searching for any drug in UCOD only
+#WA0317$substance[grepl(drugod, WA0317$UCOD)] <-"Drug OD"
 
 WA0317$substance <- as.factor(WA0317$substance)
-summary(WA0317$substance)
 
 ## RESIDENCE
 
@@ -262,22 +276,50 @@ WA0317$residence[rstateFIPS == "WA"] <- "WA resident"
 
 ## RACE AND ETHNICITY
 ## remember that the original ethnicity variable was named "HISPNICNO" i.e. a "yes" means they are NOT hispanic
-WA0317$raceethnic <- "Other"
-WA0317$raceethnic[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
-WA0317$raceethnic[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
-WA0317$raceethnic[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
-WA0317$raceethnic[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10","11","12","13","15") & hispanic=="Y"] <- "Asian/PI NH"
-WA0317$raceethnic[hispanic=="N"] <- "Hispanic"
-WA0317$raceethnic[is.na(brgrace)] <- "Unknown"
 
-WA0317$raceethnic <- as.factor(WA0317$raceethnic)
+##5 groups with Hispanic as race
+WA0317$raceethnic5 <- "Other"
+WA0317$raceethnic5[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
+WA0317$raceethnic5[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
+WA0317$raceethnic5[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
+WA0317$raceethnic5[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10","11","12","13","14","15") & hispanic=="Y"] <- "Asian/PI NH"
+WA0317$raceethnic5[hispanic=="N"] <- "Hispanic"
+WA0317$raceethnic5[is.na(brgrace)] <- "Unknown"
 
-WA0317 %<>% mutate_at(c("age5cat", "residence", "LCOD", "injury", "substance", "raceethnic"), funs(factor(.)))
+WA0317$raceethnic5 <- as.factor(WA0317$raceethnic5)
 
+## 6 groups with Hispanic as race and separating Asians and NHOPI
+WA0317$raceethnic6 <- "Other"
+WA0317$raceethnic6[brgrace %in% c("01", "1") & hispanic=="Y"] <- "White NH"
+WA0317$raceethnic6[brgrace %in% c("02","2") & hispanic=="Y"] <- "Black NH"
+WA0317$raceethnic6[brgrace %in% c("03","3") & hispanic=="Y"] <- "AIAN NH"
+WA0317$raceethnic6[brgrace %in% c("04","4","05","5","06","6","07","7","08","8","09","9","10") & hispanic=="Y"] <- "Asian"
+WA0317$raceethnic6[brgrace %in% c("11","12","13","14","15") & hispanic=="Y"] <- "NHOPI"
+WA0317$raceethnic6[hispanic=="N"] <- "Hispanic"
+WA0317$raceethnic6[is.na(brgrace)] <- "Unknown"
+
+WA0317$raceethnic6 <- as.factor(WA0317$raceethnic6)
+
+
+WA0317 %<>% mutate_at(c("age5cat", "residence", "LCOD", "injury", "substance", "raceethnic5", "raceethnic6"), funs(factor(.)))
+
+## Labeling manner of death
+
+WA0317$manner <- factor(WA0317$manner,
+                        levels = c("A", "C", "H", "N", "NULL", "P", "S"),
+                        labels = c("Accident", "Undetermined", "Homicide", "Natural", "Unk.","Pending", "Suicide"))
+
+##Labeling educational attainment
+
+WA0317$educ <- factor(WA0317$educ,
+                        levels = c("1", "2", "3", "4", "5", "6", "7", "8", "9"),
+                        labels = c("<=8th grade", "9-12th gr., no diploma", "H.S. grad/GED", "Some college", "Associate's","Bachelors", "Masters", "Doctorate/Professional", "Unknown"))
+
+detach(WA0317)
 
 head(WA0317)
 
-
+summary(WA0317$substance)
 ```
 
 ####  3.  __Creating a training data set of decedents who had permanent homes at time of death__
@@ -298,24 +340,27 @@ I defined "permanent home" as decedents whose death certificates indicate that t
 
 Another restriction on the sampling frame was that all decedents had to be King County deaths (i.e. deaths that occurred in King count regardless of place of residence) so that they matched the homeless decedents in this respect.
 
+I added the suffix ".k" to the column names to identify easily the source data set for these features.  This will be helpful in the next step when I merge homeless registry data with their corresponding death records.
+
 From this set of King County deaths among persons with permanent homes I selected a random sample of 1,200 records to match the size of the homeless death record data set.
 
 ```{r}
 KC0317<- subset(WA0317, dcounty=="KING")
 
+KC <- KC0317
 
-KC1617wh <- subset(KC0317, (KC0317$dplacecode==0 | KC0317$dplacecode==5 | KC0317$dplacecode==7) & (dthyr=="2016"|dthyr=="2017") & KC0317$resmatchcode >=95)
+colnames(KC)<-c("certno.k", "dob.k", "dod.k", "lname.k", "fname.k", "mname.k", "sex.k","ssn.k", "attclass.k", "brgrace.k", "hispanic.k", "manner.k",  "rcounty.k", "rcity.k",  "rstreet.k","resmatchcode.k","rstateFIPS.k", "rzip.k",  "dstreet.k", "dcity.k", "dzip.k", "dcounty.k","dstateFIPS.k",  "dplacelit.k","dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "military.k","codlit.k","age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k")
 
+KC0317_wh <- subset(KC, (KC$dplacecode.k==0 | KC$dplacecode.k==5 | KC$dplacecode.k==7) & KC$resmatchcode.k >= 95)
 
-KC1617wh <- select(KC1617wh, -"resmatchcode")
 
 ##RANDOMLY SELECT 1,200 persons from permhome
 
 set.seed(1)
-sample <- sample(1:nrow(KC1617wh), 1200)
-KC1617whsample <- KC1617wh[sample, ]
+sample <- sample(1:nrow(KC0317_wh), 1200)
+KC0317whsample <- KC0317_wh[sample, ]
 
-head(KC1617whsample)
+head(KC0317whsample)
 
 
 ```
@@ -416,25 +461,7 @@ miss_var_summary(homeless)
 ```
 
 
-#### 2. __Cleaning King County death certification information prior to linking with homeless death registry data__
-
-I added the suffix ".k" to the column names to identify easily the source data set for these features.  This will be helpful in the next step when I merge homeless registry data with their corresponding death records.
-
-This data set is the full King County 2003-17 data set rather than the King County sample data set.
-
-```{r}
-
-KC <- KC0317
-
-colnames(KC)<-c("certno.k", "dob.k", "dod.k", "lname.k", "fname.k", "mname.k", "sex.k","ssn.k", "attclass.k", "brgrace.k", "hispanic.k", "manner.k",  "rcounty.k", "rcity.k",  "rstreet.k","resmatchcode.k","rstateFIPS.k", "rzip.k",  "dstreet.k", "dcity.k", "dzip.k", "dcounty.k","dstateFIPS.k",  "dplacelit.k","dplacecode.k", "dthyr.k", "MEcasenum.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
-
-KC0317_wh <- subset(KC, (KC$dplacecode.k==0 | KC$dplacecode.k==5 | KC$dplacecode.k==7) & KC$resmatchcode.k >= 95)
-
-
-```
-
-
-####  3.  __Linking HDR with WAMD__
+####  2.  __Linking HDR with WAMD__
 
 The HDR contains name, date of birth, date of death, place of death (address), and social security number. There is no additional information on cause of death, or other attributes that might be used in machine learning to classify persons as homeless or with a permanent home.  For this reason, the HDR data must first be linked to full death certificate data to add the relevant attributes that can be found in the death certificate.  
 
@@ -446,6 +473,9 @@ Pre-processing of the HDR and death data sets includes standardizing the values 
 
 
 ```{r}
+
+# 'homeless' data set contains all homeless decedents who died in King County between late 2003 and late 2017.
+# 'KC' data set contains all persons who died in King County between 2003 and 2017 (inclusive) at the time of death and includes all place of death types.
 
 ## left join homeless data with King County death certificate data
 ## joining variables are last name, first name and date of birth of homeless decedents as these attributes have the least missing values.
@@ -495,7 +525,7 @@ miss_var_summary(homelessd)
 homeless5 <-filter(homelessd, is.na(certno.k))
 homelessd1 <- filter(homelessd, !is.na(certno.k))
 
-keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "dod.h", "placeofdeath.h", "deathaddr.h", "deathcity.h", "dzip.h", "eventaddr.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstreet.k", "rstateFIPS.k","rzip.k", "dcity.k","dplacelit.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
+keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "dod.h", "placeofdeath.h", "deathaddr.h", "deathcity.h", "dzip.h", "eventaddr.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstreet.k", "rstateFIPS.k","rzip.k", "dcity.k","dplacelit.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "codlit.k", "military.k")
 
 homelessa1 <- select(homelessa1, keepvar_h)
 homelessb1 <- select(homelessb1, keepvar_h)
@@ -503,9 +533,6 @@ homelessc1 <- select(homelessc1, keepvar_h)
 homelessd1 <- select(homelessd1, keepvar_h)
 
 homelessfinal <- rbind(homelessa1, homelessb1, homelessc1, homelessd1)
-
-
-homelessfinal %<>% mutate_at(c("placeofdeath.h", "deathcity.h", "dzip.h", "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k","rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k","age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k"), funs(factor(.)))
 
 homelessfinal$age.h <- as.integer(homelessfinal$age.h)
 
@@ -528,7 +555,7 @@ wh <- KC0317_wh
 
 ## STANDARDIZE COLUMN NAMES AND MERGE FINAL HOMELESS AND KING COUNTY 2003-17 "WITH HOME" DEATH DATA 
 
-keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic.k")
+keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "military.k")
 
 h %<>% select(keepvars_eda)
 h$status <- "Homeless"
@@ -536,13 +563,16 @@ h$status <- "Homeless"
 wh %<>% select(keepvars_eda)
 wh$status <- "With home"
 
-stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic", "status")
+stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6", "military","status")
 
 colnames(h) <- stdnames
 colnames(wh) <- stdnames
 
 EDAdf<- rbind(h, wh)
-
+EDAdf$status <- as.factor(EDAdf$status)
+EDAdf$dplacecode <- factor(EDAdf$dplacecode,
+                           levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
+                           labels = c("Home", "Other", "In transport", "ER", "Hospital inpatient", "Nursing home/Longterm care", "Hospital", "Hospice", "Other person's home", "Unknown"))
 ```
 
 
@@ -569,6 +599,25 @@ miss_var_summary(wh)
  - combine homeless registry and the with home sample into one data set to facilitate comparison.  Add an attribute that indicates whether record is for homeless or with home.
  
 
+#### __By place of death type__
+
+This plot shows that, for the majority of cases, homeless individuals died in different locations compared with decedents who died with a permanent home.  Homeless decedents were more likely to die in hospital inpatient setting, ER, or "other" location.  The "with home" group was previously restricted to those who died in their own homes, in a nursing home/longterm care facility, or in a hospice facility.  Interestingly, about 9% of those classfied as "homeless" by the King County Medical Examiner's office are also reported to have died "at home" on their death certificate.  I will need to investigate the reason for this.
+
+```{r}
+
+theme_set(theme_cowplot(font_size = 10))
+plotplace <- ggplot(EDAdf, aes(x=dplacecode, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Place of death type", title = "Place of death type by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.0)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
+
+```
 
 
 ####  1.__Age group__
@@ -582,12 +631,12 @@ theme_set(theme_cowplot(font_size = 10))
 plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Age groups", title = "Age distribution by homeless status") +
+  labs(y="Percent", x = "Age groups", title = "Age distribution by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotage
+plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
@@ -601,35 +650,50 @@ theme_set(theme_cowplot(font_size = 10))
 plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Gender", title = "Gender distribution by homeless status") +
+  labs(y="Percent", x = "Gender", title = "Gender distribution by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotsex
+plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-####. 3.__Race__
-
+#### 3a.__Race - 5 grps__
 
 
 ```{r}
 
 theme_set(theme_cowplot(font_size = 10))
-plotraceeth <- ggplot(EDAdf, aes(x=raceethnic, group = status, fill = status)) +
+plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
-  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution by homeless status") +
+  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (5 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
   guides(fill=FALSE)
 
-plotraceeth
+plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
+#### 3b.__Race - 6 grps__
 
-####. 4__Manner of death__
+```{r}
+
+theme_set(theme_cowplot(font_size = 10))
+plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (6 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  coord_flip() +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  guides(fill=FALSE)
+
+plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
+```
+
+#### 4.__Manner of death__
 
 - Over 45% of homeless deaths were accidental deaths compared to less than 5% of deaths to those with permanent homes.  In contrast the vast majority of deaths among those with homes (almost 93%) were natural deaths.
 
@@ -640,20 +704,21 @@ plotraceeth
 theme_set(theme_cowplot(font_size = 10))
 plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Manner of death", title = "Distribution of manner of death by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Manner of death", title = "Distribution of manner of death by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.1)) +
+  coord_flip() +
   guides(fill=FALSE)
 
-plotmanner
+plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
 ```
 
 
-####. __Leading causes of death__
+#### 5.__Leading causes of death__
 
 ```{r}
 
@@ -661,7 +726,7 @@ theme_set(theme_cowplot(font_size = 10))
 plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", x = "Leading Cause of Death", title = "Leading cause of death by homeless status") +
+  labs(y="Percent", x = "Leading Cause of Death", title = "Leading cause of death by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
   coord_flip() +
@@ -673,7 +738,7 @@ plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-####. __Unintentional injury sub-groups__
+#### 6.__Unintentional injury sub-groups__
 
 
 ```{r}
@@ -681,18 +746,18 @@ plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 theme_set(theme_cowplot(font_size = 10))
 plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", x = "Unintentional injury type", title = "Leading unintentional injury deaths by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.20, size=3) +
+  labs(y="Percent", x = "Unintentional injury type", title = "Leading unintentional injury deaths by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.4)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   coord_flip() +
   guides(fill=FALSE)
 
-plotinjury + theme(panel.spacing.x = unit(2.5, "lines"))
+plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 
 ```
 
-####. __Substance abuse sub-groups__
+#### 7.__Substance abuse sub-groups__
 
 
 ```{r}
@@ -701,9 +766,9 @@ theme_set(theme_cowplot(font_size = 10))
 plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
-  labs(y="Percent", title = "Alcohol-related and drug-induced deaths by homeless status") +
+  labs(y="Percent", title = "Alcohol-related and drug-induced deaths by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   coord_flip() +
   guides(fill=FALSE)
 
@@ -715,11 +780,7 @@ plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
-
-
-
-
-####. __By education__
+#### 8.__By education__
 
 
 ```{r}
@@ -727,29 +788,45 @@ plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 theme_set(theme_cowplot(font_size = 10))
 ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
-  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Educational attainment", title = "Educational attainment by homeless status") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", hjust = -0.25, size=3) +
+  labs(y="Percent", x = "Educational attainment", title = "Educational attainment by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  coord_flip() +
   guides(fill=FALSE)
 
-ploteduc
+ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-####. __by residence status__
+#### 10.__by residence status__
 
 ```{r}
 theme_set(theme_cowplot(font_size = 10))
 plotresid <- ggplot(EDAdf, aes(x=residence, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Resident status", title = "State of Residence by homeless status") +
+  labs(y="Percent", x = "Resident status", title = "State of Residence by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent) +
   guides(fill=FALSE)
 
-plotresid
+plotresid + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
+#### 11.__by military service__
+
+```{r}
+theme_set(theme_cowplot(font_size = 10))
+plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", vjust = -0.5, size=3) +
+  labs(y="Percent", x = "Armed Forces participation", title = "Armed Forces participation by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill=FALSE)
+
+plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
+
+```
