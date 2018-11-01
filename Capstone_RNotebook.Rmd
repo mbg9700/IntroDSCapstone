@@ -20,7 +20,8 @@ library(stringr)
 library(scales)
 library(DiagrammeR)
 library(cowplot)
-
+library(quanteda)
+library(tm)
 
 opts_chunk$set(message = FALSE, error=FALSE)
 ```
@@ -39,25 +40,7 @@ The data sets used for this project include Washington State final annual death 
 
 The following diagram provides an overview of the data pre-processing steps.
 
-```{r, echo=FALSE}
-
-mermaid("
-        graph TD
-        A(WA DEATH DATA 2003-17)-->B(CLEAN )
-        B-->C(DERIVE VARIABLES)
-        C-->D(TEXT ANALYSIS <br> ID frequent terms in COD*, address fields)
-        D-->E(SUBSET DEATHS OCCURRING IN KING CO.)
-        E-->F(SAMPLE SELECTION <br> random, n=1,200)
-        G(HOMELESS DEATH 2003-17)-->H(CLEAN )
-        H-->I(LINK HOMELESS & DEATH CERTS. <br> add death cert. variables <br> to homeless reg. data)
-        E-->I
-        I-->J(APPEND 'HOMELESS' & 'WITH HOME' <br> including variable with homeless status <br> of each record)
-        E-->J
-        J-->K{EDA}
-
-style A font-size: 50px
-        ")
-```
+----- INSERT SCHEMATIC------
 
 ####  __ 1. Data cleaning and standardization __
 
@@ -555,7 +538,7 @@ wh <- KC0317_wh
 
 ## STANDARDIZE COLUMN NAMES AND MERGE FINAL HOMELESS AND KING COUNTY 2003-17 "WITH HOME" DEATH DATA 
 
-keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "military.k")
+keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k","codlit.k", "military.k")
 
 h %<>% select(keepvars_eda)
 h$status <- "Homeless"
@@ -563,7 +546,7 @@ h$status <- "Homeless"
 wh %<>% select(keepvars_eda)
 wh$status <- "With home"
 
-stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6", "military","status")
+stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "occupcode","age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6","CODliteral", "military","status")
 
 colnames(h) <- stdnames
 colnames(wh) <- stdnames
@@ -573,6 +556,8 @@ EDAdf$status <- as.factor(EDAdf$status)
 EDAdf$dplacecode <- factor(EDAdf$dplacecode,
                            levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
                            labels = c("Home", "Other", "In transport", "ER", "Hospital inpatient", "Nursing home/Longterm care", "Hospital", "Hospice", "Other person's home", "Unknown"))
+
+head(EDAdf)
 ```
 
 
@@ -670,7 +655,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) 
   labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (5 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
@@ -687,7 +672,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) 
   labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (6 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
@@ -828,5 +813,44 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
   guides(fill=FALSE)
 
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
+
+```
+
+
+### __C. Text analysis of cause of death text fields__
+
+
+- Are there frequent terms in text fields and see if they can be used to classify homeless vs. with home.  Specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields)
+
+This part is looking at concatenated cause of death fields.
+
+```{r}
+
+T <- EDAdf
+
+T$doc_id <-as.character(T$certno)
+T$text <- T$CODliteral
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced")
+
+
+T <- select(T, doc_id, text, everything())
+
+T$text <- tolower(T$text)
+T$text <- removeWords(T$text, CODstop)
+  
+T.corpus <- corpus(T)
+
+T.dtm <- dfm(T.corpus, 
+           tolower = TRUE, 
+           language = "english",
+           stem = TRUE, 
+           remove_punct=TRUE, 
+           groups = "status", 
+           remove_numbers = TRUE)
+
+
+T.keyness = textstat_keyness(T.dtm, target = "Homeless")
+textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L)
 
 ```

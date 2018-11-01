@@ -11,6 +11,7 @@ Fall 2018
 -   [III. EXPLORATORY DATA ANALYSIS](#iii.-exploratory-data-analysis)
     -   [A. Missing values](#a.-missing-values)
     -   [B. Distribution of key variables](#b.-distribution-of-key-variables)
+    -   [**C. Text analysis of cause of death text fields**](#c.-text-analysis-of-cause-of-death-text-fields)
 
 I. Overview
 -----------
@@ -26,10 +27,8 @@ II. Data pre-processing
 
 The following diagram provides an overview of the data pre-processing steps.
 
-<!--html_preserve-->
+----- INSERT SCHEMATIC------
 
-<script type="application/json" data-for="htmlwidget-49bb32fdde3f0093854a">{"x":{"diagram":"\n        graph TD\n        A(WA DEATH DATA 2003-17)-->B(CLEAN )\n        B-->C(DERIVE VARIABLES)\n        C-->D(TEXT ANALYSIS ID frequent terms in COD*, address fields)\n        D-->E(SUBSET DEATHS OCCURRING IN KING CO.)\n        E-->F(SAMPLE SELECTION  random, n=1,200)\n        G(HOMELESS DEATH 2003-17)-->H(CLEAN )\n        H-->I(LINK HOMELESS & DEATH CERTS. add death cert. variables to homeless reg. data)\n        E-->I\n        I-->J(APPEND 'HOMELESS' & 'WITH HOME' including variable with homeless status of each record)\n        E-->J\n        J-->K{EDA}\n\nstyle A font-size: 50px\n        "},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 #### \_\_ 1. Data cleaning and standardization \_\_
 
 This step includes:
@@ -853,7 +852,7 @@ wh <- KC0317_wh
 
 ## STANDARDIZE COLUMN NAMES AND MERGE FINAL HOMELESS AND KING COUNTY 2003-17 "WITH HOME" DEATH DATA 
 
-keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k", "military.k")
+keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k","rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k", "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", "raceethnic5.k", "raceethnic6.k","codlit.k", "military.k")
 
 h %<>% select(keepvars_eda)
 h$status <- "Homeless"
@@ -861,7 +860,7 @@ h$status <- "Homeless"
 wh %<>% select(keepvars_eda)
 wh$status <- "With home"
 
-stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6", "military","status")
+stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr", "UCOD", "educ", "marital", "occupcode","age", "age5cat", "LCOD", "injury", "substance", "residence", "raceethnic5", "raceethnic6","CODliteral", "military","status")
 
 colnames(h) <- stdnames
 colnames(wh) <- stdnames
@@ -871,7 +870,59 @@ EDAdf$status <- as.factor(EDAdf$status)
 EDAdf$dplacecode <- factor(EDAdf$dplacecode,
                            levels = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
                            labels = c("Home", "Other", "In transport", "ER", "Hospital inpatient", "Nursing home/Longterm care", "Hospital", "Hospice", "Other person's home", "Unknown"))
+
+head(EDAdf)
 ```
+
+    ##       certno dcounty attclass sex brgrace hispanic       manner   rcounty
+    ## 1 2017019289    KING        2   M      02        Y     Accident    YAKIMA
+    ## 2 2014057047    KING        2   M      01        Y Undetermined      KING
+    ## 3 2017016040    KING        2   M      01        N     Accident      KING
+    ## 4 2010070278    KING        2   F      01        Y     Accident   UNKNOWN
+    ## 5 2016052688    KING        2   M      02        Y     Accident SNOHOMISH
+    ## 6 2015064867    KING        2   F      08        Y     Accident      KING
+    ##               rcity rstateFIPS  rzip    dcity          dplacecode dthyr
+    ## 1            YAKIMA         WA 98901  SEATTLE               Other  2017
+    ## 2              KENT         WA 98032     KENT               Other  2014
+    ## 3           SEATTLE         WA 98104  SEATTLE Other person's home  2017
+    ## 4           UNKNOWN         ZZ 99999 ISSAQUAH               Other  2010
+    ## 5 MOUNTLAKE TERRACE         WA 98043  SEATTLE               Other  2016
+    ## 6           SEATTLE         WA 99999  SEATTLE                Home  2015
+    ##   UCOD          educ marital occupcode     age  age5cat               LCOD
+    ## 1 X440 H.S. grad/GED       S       015 30 days 30-44yrs Other unint.injury
+    ## 2 R990       Unknown       U       999 43 days 30-44yrs              Other
+    ## 3 X410   Associate's       S       401 49 days 45-64yrs Other unint.injury
+    ## 4 X440       Unknown       D       999 52 days 45-64yrs Other unint.injury
+    ## 5 V476 H.S. grad/GED       A       196 42 days 30-44yrs Other unint.injury
+    ## 6 X440  Some college       S       997 32 days 30-44yrs Other unint.injury
+    ##                    injury          substance   residence raceethnic5
+    ## 1 Unintentional poisoning       Drug-induced WA resident    Black NH
+    ## 2               No injury No Substance abuse WA resident    White NH
+    ## 3 Unintentional poisoning       Drug-induced WA resident    Hispanic
+    ## 4 Unintentional poisoning       Drug-induced        <NA>    White NH
+    ## 5               No injury No Substance abuse WA resident    Black NH
+    ## 6 Unintentional poisoning       Drug-induced WA resident Asian/PI NH
+    ##   raceethnic6
+    ## 1    Black NH
+    ## 2    White NH
+    ## 3    Hispanic
+    ## 4    White NH
+    ## 5    Black NH
+    ## 6       Asian
+    ##                                                                                                                                    CODliteral
+    ## 1                                                             COMBINED OPIATE (HEROIN), METHAMPHETAMINE, AND DIPHENHYDRAMINE INTOXICATION    
+    ## 2                                                                                                                            UNDETERMINED    
+    ## 3                                               ACUTE METHAMPHETAMINE INTOXICATION    HYPERTENSIVE AND ATHEROSCLEROTIC CARDIOVASCULAR DISEASE
+    ## 4 ACUTE COMBINED METHAMPHETAMINE AND DEXTROMETHORPHAN INTOXICATION    ATHEROSCLEROTIC AND HYPERTENSIVE CARDIOVASCULAR DISEASE WITH SCARRED MI
+    ## 5                                          SKULL FRACTURES, SUBARACHNOID HEMORRHAGE AND CEREBRAL CONTUSIONS BLUNT FORCE INJURY OF THE HEAD   
+    ## 6                                              ACUTE COMBINED OPIATE (PROBABLE HEROIN), METHAMPHETAMINE, AND PSEUDOEPHEDRINE INTOXICATION    
+    ##   military   status
+    ## 1        N Homeless
+    ## 2        U Homeless
+    ## 3        N Homeless
+    ## 4        N Homeless
+    ## 5        N Homeless
+    ## 6        N Homeless
 
 III. EXPLORATORY DATA ANALYSIS
 ------------------------------
@@ -885,7 +936,7 @@ Missing values in any of the attributes in either HDR or death certificate data 
 miss_var_summary(h)
 ```
 
-    ## # A tibble: 27 x 3
+    ## # A tibble: 29 x 3
     ##    variable  n_miss pct_miss
     ##    <chr>      <int>    <dbl>
     ##  1 residence    153   13.8  
@@ -898,14 +949,14 @@ miss_var_summary(h)
     ##  8 brgrace        0    0    
     ##  9 hispanic       0    0    
     ## 10 manner         0    0    
-    ## # ... with 17 more rows
+    ## # ... with 19 more rows
 
 ``` r
 #with home sample data
 miss_var_summary(wh)
 ```
 
-    ## # A tibble: 27 x 3
+    ## # A tibble: 29 x 3
     ##    variable  n_miss pct_miss
     ##    <chr>      <int>    <dbl>
     ##  1 residence      2   0.0315
@@ -918,7 +969,7 @@ miss_var_summary(wh)
     ##  8 manner         0   0     
     ##  9 rcounty        0   0     
     ## 10 rcity          0   0     
-    ## # ... with 17 more rows
+    ## # ... with 19 more rows
 
 ### B. Distribution of key variables
 
@@ -942,7 +993,7 @@ plotplace <- ggplot(EDAdf, aes(x=dplacecode, group = status, fill = status)) +
 plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 #### 1.**Age group**
 
@@ -962,7 +1013,7 @@ plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
 plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 #### 2.**Gender**
 
@@ -981,7 +1032,7 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 #### 3a.**Race - 5 grps**
 
@@ -993,13 +1044,13 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) 
   labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (5 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
 #### 3b.**Race - 6 grps**
 
@@ -1011,13 +1062,13 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) 
   labs(y="Percent", x = "Race/Ethnicity", title = "Racial/Ethnic distribution (6 grps) by homeless status", caption = "Homeless: n=1,106; With permanent home: n = 6,350") +
   coord_flip() +
   facet_grid(.~status) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,0.9)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 #### 4.**Manner of death**
 
@@ -1039,7 +1090,7 @@ plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
 plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
 #### 5.**Leading causes of death**
 
@@ -1057,7 +1108,7 @@ plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
 plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 #### 6.**Unintentional injury sub-groups**
 
@@ -1075,7 +1126,7 @@ plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
 plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 #### 7.**Substance abuse sub-groups**
 
@@ -1093,7 +1144,7 @@ plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
 #### 8.**By education**
 
@@ -1111,7 +1162,7 @@ ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
 ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
 #### 10.**by residence status**
 
@@ -1128,7 +1179,7 @@ plotresid <- ggplot(EDAdf, aes(x=residence, group = status, fill = status)) +
 plotresid + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
 #### 11.**by military service**
 
@@ -1143,6 +1194,48 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
   guides(fill=FALSE)
 
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
+```
+
+![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-21-1.png)
+
+### **C. Text analysis of cause of death text fields**
+
+-   Are there frequent terms in text fields and see if they can be used to classify homeless vs. with home. Specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields)
+
+This part is looking at concatenated cause of death fields.
+
+``` r
+T <- EDAdf
+
+T$doc_id <-as.character(T$certno)
+T$text <- T$CODliteral
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced")
+
+
+T <- select(T, doc_id, text, everything())
+
+T$text <- tolower(T$text)
+T$text <- removeWords(T$text, CODstop)
+  
+T.corpus <- corpus(T)
+
+T.dtm <- dfm(T.corpus, 
+           tolower = TRUE, 
+           language = "english",
+           stem = TRUE, 
+           remove_punct=TRUE, 
+           groups = "status", 
+           remove_numbers = TRUE)
+```
+
+    ## Warning: Argument language not used.
+
+    ## Warning: Argument language not used.
+
+``` r
+T.keyness = textstat_keyness(T.dtm, target = "Homeless")
+textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L)
 ```
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-22-1.png)
