@@ -1,10 +1,10 @@
 ---
 title: "Classifying deaths in Washington State by homelessness status"
-author: Maya Bhat-Gregerson
-date: Fall 2018
+author: "Maya Bhat-Gregerson"
+date: "Fall 2018"
 output:
   github_document:
-    toc: true
+    toc: yes
 ---
 
 ```{r echo=FALSE, message = FALSE }
@@ -42,7 +42,7 @@ The following diagram provides an overview of the data pre-processing steps.
 
 ----- INSERT SCHEMATIC------
 
-####  __ 1. Data cleaning and standardization __
+####  __1. Data cleaning and standardization__
 
 This step includes:
 
@@ -54,7 +54,7 @@ This step includes:
     
     d.  Deriving new features that group the records by agegroup, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
 
-####  __ 2. Homeless decedents - linking homeless death data to their death certificates __
+####  __2. Homeless decedents - linking homeless death data to their death certificates__
 
 This step will add the additional attributes from WAMD to each of the records in HDR so that they have the necessary attributes to train the model. In its raw form, HDR contains very limited information about the homeless individuals who died including their names, dates of birth, dates of death, and places (address) of death.
 
@@ -64,7 +64,7 @@ Due to the incomplete nature of HDR data the linkage will be performed in multip
   -iteration 3 (starting with only unmatched records from iteration 2): date of death and date of birth
   -iteration 4 (starting with only unmatched records from iteration 3): last name, first name, date of death
 
-####  3. Decedents with permanent homes - Creating a sample for machine learning model
+####  __3. Decedents with permanent homes - Creating a sample for machine learning model__
 
 This subset will be limited to approximately 1,200 randomly selected records from the 2016 WAMD data file for decedents who had permanent homes at the time of death (as indicated by the facility type and place of death variables). Only decedents who died in King County will be included to match the residence of the homeless decedents.   
   
@@ -78,7 +78,7 @@ The size of each annual file has increased over the years, both in terms of numb
 
 This section addresses cleaning and limiting the data sets (in terms of number of attributes).
   
-####  1.  __Cleaning and standardizing WAMD annual data 2003-2017__
+####  __1.  Cleaning and standardizing WAMD annual data 2003-2017__
 
 Read death certificate data in three groups as one combined dataset slowed R down too much. I created the three datasets using a SQL query in our vital statistics database and restricted the results to the desired features in the SQL query including:
 
@@ -133,7 +133,7 @@ summary(WA0317$manner)
 
 ```
 
-####  2.  __Deriving new features in preparation for exploratory data analysis
+####  __2.  Deriving new features in preparation for exploratory data analysis__
 
 I created a few derived variables including calculated age (at time of death), 5-category age group, leading causes of death categories (by grouping codes in the "UCOD" feature which contains International Classification of Disease, 10th edition, codes indicating the underlying cause of death), race/ethnicity (applying U.S. Office of Management and Budget and Washington State Department of Health guidelines), resident status (Washington state vs. out of state resident), unintentional injury cause of death groups, and substance abuse related cause of death groups.  
 
@@ -305,7 +305,7 @@ head(WA0317)
 summary(WA0317$substance)
 ```
 
-####  3.  __Creating a training data set of decedents who had permanent homes at time of death__
+####  __3.  Creating a training data set of decedents who had permanent homes at time of death__
 
 I started by creating a subset of the Washington State data set that included only King County resident deaths where the decedent had a permanent home.  The death data set contains a feature called "Place of Death Type", a factor with the following levels:
     0 = Home
@@ -358,7 +358,7 @@ The King County Medical Examiner`s Office (KCMEO) established a given decedent`s
 KCMEO defines `homelessness` based on the Chief Medical Examiner`s criteria rather than standard federal Department of Housing and Urban Development (HUD) or Department of Social and Health Services (DSHS) criteria.  
 
 
-####  1.  __Cleaning KCMEO homeless registry__
+####  __1.  Cleaning KCMEO homeless registry__
   
 I followed similar cleaning steps as with the Washington State annual death data sets including:
   - renaming variables, 
@@ -444,7 +444,7 @@ miss_var_summary(homeless)
 ```
 
 
-####  2.  __Linking HDR with WAMD__
+####  __2.  Linking HDR with WAMD__
 
 The HDR contains name, date of birth, date of death, place of death (address), and social security number. There is no additional information on cause of death, or other attributes that might be used in machine learning to classify persons as homeless or with a permanent home.  For this reason, the HDR data must first be linked to full death certificate data to add the relevant attributes that can be found in the death certificate.  
 
@@ -526,7 +526,7 @@ miss_var_summary(homelessfinal)
 
 
 
-####  4.  __Creating combined dataset for exploratory data analysis__
+####  __3.  Creating combined dataset for exploratory data analysis__
 
 Here I remove all the suffixes I added earlier in the record linkage proces to standardize the column names for the final/linked homeless data set and the King County 2003-17 death data set containing records of all decedents with permanent homes.  Note that this is not the sample data set that will be used to train the machine learning model later.  For exploratory data analysis I chose to look at the full set of data of King County decedents with homes to compare with the homeless group.
 
@@ -584,7 +584,7 @@ miss_var_summary(wh)
  - combine homeless registry and the with home sample into one data set to facilitate comparison.  Add an attribute that indicates whether record is for homeless or with home.
  
 
-#### __By place of death type__
+#### __1. By place of death type__
 
 This plot shows that, for the majority of cases, homeless individuals died in different locations compared with decedents who died with a permanent home.  Homeless decedents were more likely to die in hospital inpatient setting, ER, or "other" location.  The "with home" group was previously restricted to those who died in their own homes, in a nursing home/longterm care facility, or in a hospice facility.  Interestingly, about 9% of those classfied as "homeless" by the King County Medical Examiner's office are also reported to have died "at home" on their death certificate.  I will need to investigate the reason for this.
 
@@ -605,7 +605,7 @@ plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-####  1.__Age group__
+####  __2.  By age group__
 
  - homeless die at younger ages with greatest proportion of deaths among the 45 to 64 year olds
  - those with permanent homes tend to be mostly 65 
@@ -625,7 +625,7 @@ plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-####  2.__Gender__
+####  __3.  By gender__
 
 - Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes
 
@@ -643,7 +643,7 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### 3a.__Race - 5 grps__
+#### __4a.  By race/ethnicity - 5 groups with Hispanic as race__
 
 
 ```{r}
@@ -661,7 +661,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### 3b.__Race - 6 grps__
+#### __4b.  By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race__
 
 ```{r}
 
@@ -678,7 +678,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) 
 plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### 4.__Manner of death__
+#### __5. By manner of death__
 
 - Over 45% of homeless deaths were accidental deaths compared to less than 5% of deaths to those with permanent homes.  In contrast the vast majority of deaths among those with homes (almost 93%) were natural deaths.
 
@@ -703,7 +703,7 @@ plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-#### 5.__Leading causes of death__
+#### __6. By leading causes of death__
 
 ```{r}
 
@@ -723,7 +723,7 @@ plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-#### 6.__Unintentional injury sub-groups__
+#### __7. By unintentional injury sub-groups__
 
 
 ```{r}
@@ -742,7 +742,7 @@ plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 
 ```
 
-#### 7.__Substance abuse sub-groups__
+#### __8. By substance abuse sub-groups__
 
 
 ```{r}
@@ -765,7 +765,7 @@ plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
-#### 8.__By education__
+#### __9. By education__
 
 
 ```{r}
@@ -784,7 +784,7 @@ ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-#### 10.__by residence status__
+#### __11. By residence status__
 
 ```{r}
 theme_set(theme_cowplot(font_size = 10))
@@ -800,7 +800,7 @@ plotresid + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-#### 11.__by military service__
+#### __12. By military service__
 
 ```{r}
 theme_set(theme_cowplot(font_size = 10))
