@@ -24,7 +24,7 @@ library(quanteda)
 library(tm)
 library(tinytex)
 
-knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 8, fig.height = 8)
+knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 8, fig.align = "center")
 
 ```
 

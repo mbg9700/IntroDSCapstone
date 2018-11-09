@@ -1258,7 +1258,7 @@ plotplace <- ggplot(EDAdf, aes(x=dplacecode, group = status, fill = status)) +
 plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-4-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 ### **2. By age group**
 
@@ -1281,7 +1281,7 @@ plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
 plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-5-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
 ### **3. By gender**
 
@@ -1303,7 +1303,7 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ### **4a. By race/ethnicity - 5 groups with Hispanic as race**
 
@@ -1324,7 +1324,7 @@ plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status))
 plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 ### **4b. By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race**
 
@@ -1345,7 +1345,7 @@ plotraceeth6 <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status))
 plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 ### **5. By manner of death**
 
@@ -1370,7 +1370,7 @@ plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
 plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
 ### **6. By leading causes of death**
 
@@ -1391,7 +1391,7 @@ plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
 plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 ### **7. By unintentional injury sub-groups**
 
@@ -1412,7 +1412,7 @@ plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
 plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 ### **8. By substance abuse sub-groups**
 
@@ -1433,7 +1433,7 @@ plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
 
 ### **9. By education**
 
@@ -1454,7 +1454,7 @@ ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
 ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
 
 ### **10. By military service**
 
@@ -1474,7 +1474,7 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
 
 C. Text analysis of cause of death text fields
 ----------------------------------------------
@@ -1517,7 +1517,7 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
 
 Same plot with ngrams=2
 
@@ -1554,4 +1554,4 @@ textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, 
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
