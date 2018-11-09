@@ -24,7 +24,7 @@ library(quanteda)
 library(tm)
 library(tinytex)
 
-opts_chunk$set(message = FALSE, error=FALSE, fig.width = 8)
+knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 8, fig.height = 8)
 
 ```
 
@@ -582,8 +582,7 @@ summary(homelessfinal)
 #miss_var_summary(homelessfinal)
 ```
 
-
-####  __3.  Creating combined dataset for exploratory data analysis__
+###  __3.  Creating combined dataset for exploratory data analysis__
 
 Here I remove all the suffixes I added earlier in the record linkage proces to standardize the column names for the final/linked homeless data set and the King County 2003-17 death data set containing records of all decedents with permanent homes.  Note that this is not the sample data set that will be used to train the machine learning model later.  For exploratory data analysis I chose to look at the full set of data of King County decedents with homes to compare with the homeless group.
 
@@ -634,9 +633,9 @@ table (EDAdf$status)
 ```
 
 
-##  III. EXPLORATORY DATA ANALYSIS
+#  III. EXPLORATORY DATA ANALYSIS
 
-###  A. Missing values 
+##  A. Missing values 
 
 
 Missing values in any of the attributes in either HDR or death certificate data may be useful in the upcoming machine learning phase as it is very likely that a key distinction between decedents who were homeless vs. those who had permanent homes is that their records cannot be completed due to lack of information from family members or other "informants".
@@ -654,12 +653,12 @@ str(wh)
 ```
 
 
-### B. Distribution of key variables
+## B. Distribution of key variables
 
  - combine homeless registry and the with home sample into one data set to facilitate comparison.  Add an attribute that indicates whether record is for homeless or with home.
  
 
-#### __1. By place of death type__
+### __1. By place of death type__
 
 This plot shows that, for the majority of cases, homeless individuals died in different locations compared with decedents who died with a permanent home.  Homeless decedents were more likely to die in hospital inpatient setting, ER, or "other" location.  The "with home" group was previously restricted to those who died in their own homes, in a nursing home/longterm care facility, or in a hospice facility.  Interestingly, about 9% of those classfied as "homeless" by the King County Medical Examiner's office are also reported to have died "at home" on their death certificate.  I will need to investigate the reason for this.
 
@@ -683,7 +682,7 @@ plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-####  __2.  By age group__
+###  __2.  By age group__
 
  - homeless die at younger ages with greatest proportion of deaths among the 45 to 64 year olds
  - those with permanent homes tend to be mostly 65 
@@ -706,7 +705,7 @@ plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-####  __3.  By gender__
+###  __3.  By gender__
 
 - Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes
 
@@ -727,7 +726,7 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### __4a.  By race/ethnicity - 5 groups with Hispanic as race__
+### __4a.  By race/ethnicity - 5 groups with Hispanic as race__
 
 
 ```{r}
@@ -748,7 +747,7 @@ plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status))
 plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### __4b.  By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race__
+### __4b.  By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race__
 
 ```{r}
 
@@ -768,7 +767,7 @@ plotraceeth6 <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status))
 plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-#### __5. By manner of death__
+### __5. By manner of death__
 
 - Over 45% of homeless deaths were accidental deaths compared to less than 5% of deaths to those with permanent homes.  In contrast the vast majority of deaths among those with homes (almost 93%) were natural deaths.
 
@@ -796,7 +795,7 @@ plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 
-#### __6. By leading causes of death__
+### __6. By leading causes of death__
 
 ```{r}
 
@@ -819,7 +818,7 @@ plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ```
 
-#### __7. By unintentional injury sub-groups__
+### __7. By unintentional injury sub-groups__
 
 
 ```{r}
@@ -841,7 +840,7 @@ plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 
 ```
 
-#### __8. By substance abuse sub-groups__
+### __8. By substance abuse sub-groups__
 
 
 ```{r}
@@ -867,7 +866,7 @@ plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
-#### __9. By education__
+### __9. By education__
 
 
 ```{r}
@@ -891,7 +890,7 @@ ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
-#### __10. By military service__
+### __10. By military service__
 
 ```{r}
 theme_set(theme_cowplot(font_size = 10))
@@ -912,7 +911,7 @@ plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
 
-### C. Text analysis of cause of death text fields
+## C. Text analysis of cause of death text fields
 
 
 - Are there frequent terms in text fields and see if they can be used to classify homeless vs. with home.  Specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields)
@@ -923,7 +922,7 @@ Method - bag of words.
 
 The keyness plot below compares relative frequence of cause of death terms for decedents with homes vs. without homes. The chi square test shows the strength of the relationship between home status and dying of a particular cause of death.
 
-```{r}
+```{r fig.width=10, fig.height=7}
 
 T <- EDAdf
 
@@ -951,9 +950,7 @@ T.dtm <- dfm(T.corpus,
 
 T.keyness = textstat_keyness(T.dtm, target = "Homeless")
 textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
-                 color = c("#009999","#CC3366"))
-
-
+                 color = c("#EC7063","#4DB6AC"))
 
 ```
 
@@ -962,7 +959,7 @@ Same plot with ngrams=2
 
 Interesting to see the deaths due to environmental exposure/hypothermia.  Need to compare month of death for homeless vs. with home.
 
-```{r}
+```{r fig.width=10, fig.height=7}
 
 T <- EDAdf
 
@@ -991,7 +988,7 @@ T.dtm3 <- dfm(T.corpus,
 
 T.keyness3 = textstat_keyness(T.dtm3, target = "Homeless")
 textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
-                 color = c("#009999","#CC3366"))
+                 color = c("#EC7063","#4DB6AC"))
 
 
 ```

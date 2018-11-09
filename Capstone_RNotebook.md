@@ -16,10 +16,22 @@ Fall 2018
         -   [**3. Creating a training data set of decedents who had permanent homes at time of death**](#creating-a-training-data-set-of-decedents-who-had-permanent-homes-at-time-of-death)
     -   [C. King County Medical Examiner\`s Homeless Death Registry data - November 2003 to September 2017](#c.-king-county-medical-examiners-homeless-death-registry-data---november-2003-to-september-2017)
         -   [**1. Cleaning KCMEO homeless registry**](#cleaning-kcmeo-homeless-registry)
-    -   [III. EXPLORATORY DATA ANALYSIS](#iii.-exploratory-data-analysis)
-        -   [A. Missing values](#a.-missing-values)
-        -   [B. Distribution of key variables](#b.-distribution-of-key-variables)
-        -   [C. Text analysis of cause of death text fields](#c.-text-analysis-of-cause-of-death-text-fields)
+        -   [**3. Creating combined dataset for exploratory data analysis**](#creating-combined-dataset-for-exploratory-data-analysis)
+-   [III. EXPLORATORY DATA ANALYSIS](#iii.-exploratory-data-analysis)
+    -   [A. Missing values](#a.-missing-values)
+    -   [B. Distribution of key variables](#b.-distribution-of-key-variables)
+        -   [**1. By place of death type**](#by-place-of-death-type)
+        -   [**2. By age group**](#by-age-group)
+        -   [**3. By gender**](#by-gender)
+        -   [**4a. By race/ethnicity - 5 groups with Hispanic as race**](#a.-by-raceethnicity---5-groups-with-hispanic-as-race)
+        -   [**4b. By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race**](#b.-by-raceethnicity---6-groups-with-asian-separated-from-native-hawaiianpacific-islander-and-hispanic-as-race)
+        -   [**5. By manner of death**](#by-manner-of-death)
+        -   [**6. By leading causes of death**](#by-leading-causes-of-death)
+        -   [**7. By unintentional injury sub-groups**](#by-unintentional-injury-sub-groups)
+        -   [**8. By substance abuse sub-groups**](#by-substance-abuse-sub-groups)
+        -   [**9. By education**](#by-education)
+        -   [**10. By military service**](#by-military-service)
+    -   [C. Text analysis of cause of death text fields](#c.-text-analysis-of-cause-of-death-text-fields)
 
 I. Overview
 ===========
@@ -975,7 +987,7 @@ summary(homelessfinal)
 #miss_var_summary(homelessfinal)
 ```
 
-#### **3. Creating combined dataset for exploratory data analysis**
+### **3. Creating combined dataset for exploratory data analysis**
 
 Here I remove all the suffixes I added earlier in the record linkage proces to standardize the column names for the final/linked homeless data set and the King County 2003-17 death data set containing records of all decedents with permanent homes. Note that this is not the sample data set that will be used to train the machine learning model later. For exploratory data analysis I chose to look at the full set of data of King County decedents with homes to compare with the homeless group.
 
@@ -1105,9 +1117,10 @@ table (EDAdf$status)
     ##      1093    174292
 
 III. EXPLORATORY DATA ANALYSIS
-------------------------------
+==============================
 
-### A. Missing values
+A. Missing values
+-----------------
 
 Missing values in any of the attributes in either HDR or death certificate data may be useful in the upcoming machine learning phase as it is very likely that a key distinction between decedents who were homeless vs. those who had permanent homes is that their records cannot be completed due to lack of information from family members or other "informants".
 
@@ -1219,11 +1232,12 @@ str(wh)
     ##  $ military   : Factor w/ 3 levels "N","U","Y": 1 1 1 1 3 1 1 1 1 1 ...
     ##  $ status     : chr  "With home" "With home" "With home" "With home" ...
 
-### B. Distribution of key variables
+B. Distribution of key variables
+--------------------------------
 
 -   combine homeless registry and the with home sample into one data set to facilitate comparison. Add an attribute that indicates whether record is for homeless or with home.
 
-#### **1. By place of death type**
+### **1. By place of death type**
 
 This plot shows that, for the majority of cases, homeless individuals died in different locations compared with decedents who died with a permanent home. Homeless decedents were more likely to die in hospital inpatient setting, ER, or "other" location. The "with home" group was previously restricted to those who died in their own homes, in a nursing home/longterm care facility, or in a hospice facility. Interestingly, about 9% of those classfied as "homeless" by the King County Medical Examiner's office are also reported to have died "at home" on their death certificate. I will need to investigate the reason for this.
 
@@ -1246,7 +1260,7 @@ plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
-#### **2. By age group**
+### **2. By age group**
 
 -   homeless die at younger ages with greatest proportion of deaths among the 45 to 64 year olds
 -   those with permanent homes tend to be mostly 65
@@ -1269,7 +1283,7 @@ plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
-#### **3. By gender**
+### **3. By gender**
 
 -   Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes
 
@@ -1291,7 +1305,7 @@ plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
-#### **4a. By race/ethnicity - 5 groups with Hispanic as race**
+### **4a. By race/ethnicity - 5 groups with Hispanic as race**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1312,7 +1326,7 @@ plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
-#### **4b. By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race**
+### **4b. By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1333,7 +1347,7 @@ plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
-#### **5. By manner of death**
+### **5. By manner of death**
 
 -   Over 45% of homeless deaths were accidental deaths compared to less than 5% of deaths to those with permanent homes. In contrast the vast majority of deaths among those with homes (almost 93%) were natural deaths.
 
@@ -1358,7 +1372,7 @@ plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
-#### **6. By leading causes of death**
+### **6. By leading causes of death**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1379,7 +1393,7 @@ plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
-#### **7. By unintentional injury sub-groups**
+### **7. By unintentional injury sub-groups**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1400,7 +1414,7 @@ plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
-#### **8. By substance abuse sub-groups**
+### **8. By substance abuse sub-groups**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1421,7 +1435,7 @@ plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
-#### **9. By education**
+### **9. By education**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1442,7 +1456,7 @@ ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
-#### **10. By military service**
+### **10. By military service**
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
@@ -1462,7 +1476,8 @@ plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
-### C. Text analysis of cause of death text fields
+C. Text analysis of cause of death text fields
+----------------------------------------------
 
 -   Are there frequent terms in text fields and see if they can be used to classify homeless vs. with home. Specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields)
 
@@ -1499,7 +1514,7 @@ T.dtm <- dfm(T.corpus,
 
 T.keyness = textstat_keyness(T.dtm, target = "Homeless")
 textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
-                 color = c("#009999","#CC3366"))
+                 color = c("#EC7063","#4DB6AC"))
 ```
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png)
@@ -1536,7 +1551,7 @@ T.dtm3 <- dfm(T.corpus,
 
 T.keyness3 = textstat_keyness(T.dtm3, target = "Homeless")
 textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
-                 color = c("#009999","#CC3366"))
+                 color = c("#EC7063","#4DB6AC"))
 ```
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png)
