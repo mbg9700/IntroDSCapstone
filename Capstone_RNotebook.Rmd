@@ -136,11 +136,11 @@ facvars_wa <- c("dcounty", "dzip", "dcity", "attclass", "brgrace", "hispanic", "
 
 WA0317 %<>% mutate_at(facvars_wa, funs(factor(.)))
 
-
 # convert character to numeric
 
 WA0317$resmatchcode <- as.numeric(WA0317$resmatchcode)
-summary(WA0317)
+
+head(WA0317)
 
 ```
 
@@ -387,7 +387,6 @@ Finally, I added the suffix ".h" to the variables in the homeless data set to id
 
 homeless <- read_csv("Data/HomelessRegistryKingCo.csv")
 
-
 homeless <- rename(homeless, 
          lname = namelast,
          fname = namefirst,
@@ -402,7 +401,6 @@ homeless <- rename(homeless,
 
 # CHANGE VALUES TO UPPER CASE
 homeless<- mutate_all(homeless, funs(toupper))
-
 
 # THE FOLLOWING CHANGES TO THE TWO DATE FIELDS (DATE OF BIRTH AND DATE OF DEATH) HAVE BEEN 
 # IMPLEMENTED TO MAKE THEM CONSISTENT WITH THE FORMAT IN THE DEATH CERTIFICATE DATA SET.  
@@ -434,7 +432,6 @@ homeless$dod <- dmy(homeless$dod)
 
 homeless %<>% mutate_at(c("rescity", "married", "placeofdeath", "deathcity", "dzip",
                           "eventcity"), funs(factor(.)))
-
 
 # change 'age' to numeric
 homeless$age <- as.integer(homeless$age)
@@ -473,7 +470,7 @@ homeless$fname.h <- str_replace_all(string = homeless$fname.h, pattern = " ",
 homeless$fname.h <- str_replace_all(string = homeless$fname.h, pattern = "-", 
                                     replacement = "")
 
-#summary(homeless)
+summary(homeless)
 #miss_var_summary(homeless)
 
 ```
@@ -567,7 +564,7 @@ keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "d
                "eventcity.h", "dcounty.k", "attclass.k", "sex.k","brgrace.k", 
                "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstreet.k", 
                "rstateFIPS.k","rzip.k", "dcity.k","dplacelit.k", "dplacecode.k", 
-               "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", "age.k", 
+               "dthyr.k", "UCOD.k", "MCOD.k", "educ.k", "marital.k", "occup.k", 
                "age5cat.k", "LCOD.k", "injury.k", "substance.k", "residence.k", 
                "raceethnic5.k", "raceethnic6.k", "codlit.k", "military.k")
 
@@ -581,10 +578,9 @@ homelessfinal <- distinct(homelessfinal, certno.k, .keep_all = TRUE)
 
 # total linked = 1,093
 
-#summary(homelessfinal)
+summary(homelessfinal)
 #miss_var_summary(homelessfinal)
 ```
-
 
 
 ####  __3.  Creating combined dataset for exploratory data analysis__
@@ -607,7 +603,7 @@ wh <- KC0317_wh
 keepvars_eda <- c("certno.k", "dcounty.k", "attclass.k", "sex.k","brgrace.k", 
                   "hispanic.k", "manner.k", "rcounty.k", "rcity.k", "rstateFIPS.k",
                   "rzip.k", "dcity.k", "dplacecode.k", "dthyr.k", "UCOD.k",
-                  "educ.k", "marital.k", "occup.k", "age.k", "age5cat.k", "LCOD.k",
+                  "educ.k", "marital.k", "occup.k", "age5cat.k", "LCOD.k",
                   "injury.k", "substance.k", "residence.k", "raceethnic5.k", 
                   "raceethnic6.k","codlit.k", "military.k")
 
@@ -619,7 +615,7 @@ wh$status <- "With home"
 
 stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "manner", 
               "rcounty", "rcity", "rstateFIPS","rzip", "dcity", "dplacecode", "dthyr",
-              "UCOD", "educ", "marital", "occupcode","age", "age5cat", "LCOD", 
+              "UCOD", "educ", "marital", "occupcode", "age5cat", "LCOD", 
               "injury", "substance", "residence", "raceethnic5", "raceethnic6",
               "CODliteral", "military","status")
 
@@ -634,7 +630,7 @@ EDAdf$dplacecode <- factor(EDAdf$dplacecode,
                                       "Hospital inpatient", "Nursing home/Longterm care", 
                                       "Hospital", "Hospice", "Other person's home", "Unknown"))
 summary(EDAdf)
-table(EDAdf$status, EDAdf$sex)
+table (EDAdf$status)
 ```
 
 
@@ -650,6 +646,7 @@ Missing values in any of the attributes in either HDR or death certificate data 
 #homeless data
 miss_var_summary(h)
 str(h)
+
 #with home sample data
 miss_var_summary(wh)
 str(wh)
@@ -933,11 +930,7 @@ T <- EDAdf
 T$doc_id <-as.character(T$certno)
 T$text <- T$CODliteral
 
-CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", 
-             "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication",
-             "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force",
-             "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", 
-             "coronary", "congestive", "history", "diastolic", "advanced")
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse" )
 
 
 T <- select(T, doc_id, text, everything())
@@ -949,7 +942,7 @@ T.corpus <- corpus(T)
 
 T.dtm <- dfm(T.corpus, 
            tolower = TRUE, 
-           language = "english",
+           remove = stopwords("english"),
            stem = TRUE, 
            remove_punct=TRUE, 
            groups = "status", 
@@ -963,7 +956,7 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
 ```
 
 
-Same plot with ngrams=3
+Same plot with ngrams=2
 
 ```{r}
 
@@ -972,11 +965,7 @@ T <- EDAdf
 T$doc_id <-as.character(T$certno)
 T$text <- T$CODliteral
 
-CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined",
-             "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication",
-             "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force",
-             "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation",
-             "coronary", "congestive", "history", "diastolic", "advanced")
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "unknown", "if", "cause", "death" )
 
 
 T <- select(T, doc_id, text, everything())
@@ -986,18 +975,18 @@ T$text <- removeWords(T$text, CODstop)
   
 T.corpus <- corpus(T)
 
-T.dtm <- dfm(T.corpus, 
+T.dtm3 <- dfm(T.corpus, 
            tolower = TRUE, 
-           language = "english",
+           remove = stopwords("english"),
            stem = TRUE, 
            remove_punct=TRUE, 
            groups = "status", 
            remove_numbers = TRUE,
-           ngrams=3)
+           ngrams=2)
 
 
-T.keyness = textstat_keyness(T.dtm, target = "Homeless")
-textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
+T.keyness3 = textstat_keyness(T.dtm3, target = "Homeless")
+textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 2, n=25L,
                  color = c("#009999","#CC3366"))
 
 
