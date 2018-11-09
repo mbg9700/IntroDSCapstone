@@ -950,7 +950,9 @@ T.dtm <- dfm(T.corpus,
 
 
 T.keyness = textstat_keyness(T.dtm, target = "Homeless")
-textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L)
+textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
+                 color = c("#009999","#CC3366"))
+
 
 
 ```
