@@ -1505,6 +1505,8 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
 
 Same plot with ngrams=2
 
+Interesting to see the deaths due to environmental exposure/hypothermia. Need to compare month of death for homeless vs. with home.
+
 ``` r
 T <- EDAdf
 
@@ -1532,7 +1534,7 @@ T.dtm3 <- dfm(T.corpus,
 
 
 T.keyness3 = textstat_keyness(T.dtm3, target = "Homeless")
-textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 2, n=25L,
+textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
                  color = c("#009999","#CC3366"))
 ```
 
