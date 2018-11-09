@@ -1295,7 +1295,7 @@ plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
-plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) +
+plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
             hjust = -0.5, size=3) +
@@ -1307,7 +1307,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) 
   scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
-plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
+plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png)
@@ -1316,7 +1316,7 @@ plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
 
 ``` r
 theme_set(theme_cowplot(font_size = 10))
-plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) +
+plotraceeth6 <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
             hjust = -0.5, size=3) +
@@ -1328,7 +1328,7 @@ plotraceeth <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status)) 
   scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
   guides(fill=FALSE)
 
-plotraceeth + theme(panel.spacing.x = unit(2.5, "lines"))
+plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
 ![](Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png)
