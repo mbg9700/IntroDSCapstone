@@ -1479,13 +1479,15 @@ plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 C. Text analysis of cause of death text fields
 ----------------------------------------------
 
--   Are there frequent terms in text fields and see if they can be used to classify homeless vs. with home. Specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields)
+Examining literal fields in death certificates may provide some insight into whether death certifiers used these fields to identify homeless individuals or whether there are certain recurring themes that are not captured by the underlying cause of death ICD 10 codes. I'm specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields).
 
 This part is looking at concatenated cause of death fields.
 
 Method - bag of words.
 
 The keyness plot below compares relative frequence of cause of death terms for decedents with homes vs. without homes. The chi square test shows the strength of the relationship between home status and dying of a particular cause of death.
+
+The first plot looks at the differences between homeless and with home decedents by the 25 most commonly used individual words in the cause of death fields.
 
 ``` r
 T <- EDAdf
@@ -1519,9 +1521,11 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
 
-Same plot with ngrams=2
+In the following plot, I repeat the above text analysis and plot two word combinations that show up most frequently by homeless status i.e. ngrams=2
 
-Interesting to see the deaths due to environmental exposure/hypothermia. Need to compare month of death for homeless vs. with home.
+Interesting to see that there are so many deaths due to environmental exposure/hypothermia and substance use among the homeless compared with mostly chronic illness among the 'with home' decedents.
+
+Need to compare month of death for homeless vs. with home to understand when the environmental exposure deaths occurred.
 
 ``` r
 T <- EDAdf
