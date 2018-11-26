@@ -1283,6 +1283,29 @@ plotage + theme(panel.spacing.x = unit(2.5, "lines"))
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
+``` r
+agegrptble <- table(EDAdf$age5cat, EDAdf$status)
+
+# Chi square test of independence 
+agegrpchi<-chisq.test(agegrptble)
+agegrpchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  agegrptble
+    ## X-squared = 2936.9, df = 4, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+agegrp.res<-round(agegrpchi$residuals, 3)
+
+corrplot::corrplot(agegrp.res, title = "Pearson residuals for home status and age group", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+
 ### **3. By gender**
 
 -   Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes
@@ -1303,7 +1326,36 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+
+``` r
+gendertable <- table(EDAdf$sex, EDAdf$status)
+
+# Chi square test of independence 
+genderchi<-chisq.test(gendertable)
+```
+
+    ## Warning in chisq.test(gendertable): Chi-squared approximation may be
+    ## incorrect
+
+``` r
+genderchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  gendertable
+    ## X-squared = 500.89, df = 2, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+gender.res<-round(genderchi$residuals, 3)
+
+corrplot::corrplot(gender.res, title = "Pearson residuals for home status and gender", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
 
 ### **4a. By race/ethnicity - 5 groups with Hispanic as race**
 
@@ -1324,7 +1376,30 @@ plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status))
 plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+
+``` r
+raceth5table <- table(EDAdf$raceethnic5, EDAdf$status)
+
+# Chi square test of independence 
+raceth5chi<-chisq.test(raceth5table)
+raceth5chi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  raceth5table
+    ## X-squared = 697.73, df = 5, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+raceth5.res<-round(raceth5chi$residuals, 3)
+
+corrplot::corrplot(raceth5.res, title = "Pearson residuals for home status and Race/Ethnicity (5 grps)", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 ### **4b. By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race**
 
@@ -1345,7 +1420,7 @@ plotraceeth6 <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status))
 plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 ### **5. By manner of death**
 
@@ -1370,7 +1445,36 @@ plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
 plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
+
+``` r
+mannertable <- table(EDAdf$manner, EDAdf$status)
+
+# Chi square test of independence 
+mannerchi<-chisq.test(mannertable)
+```
+
+    ## Warning in chisq.test(mannertable): Chi-squared approximation may be
+    ## incorrect
+
+``` r
+mannerchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  mannertable
+    ## X-squared = 4611.6, df = 6, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+manner.res<-round(mannerchi$residuals, 3)
+
+corrplot::corrplot(manner.res, title = "Pearson residuals for home status and manner of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
 
 ### **6. By leading causes of death**
 
@@ -1391,7 +1495,36 @@ plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
 plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+
+``` r
+lcodtable <- table(EDAdf$LCOD, EDAdf$status)
+
+# Chi square test of independence 
+lcodchi<-chisq.test(lcodtable)
+```
+
+    ## Warning in chisq.test(lcodtable): Chi-squared approximation may be
+    ## incorrect
+
+``` r
+lcodchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  lcodtable
+    ## X-squared = 3627.2, df = 11, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+lcod.res<-round(lcodchi$residuals, 3)
+
+corrplot::corrplot(lcod.res, title = "Pearson residuals for home status and 10 leading causes of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
 
 ### **7. By unintentional injury sub-groups**
 
@@ -1412,7 +1545,36 @@ plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
 plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+
+``` r
+injurytable <- table(EDAdf$injury, EDAdf$status)
+
+# Chi square test of independence 
+injurychi<-chisq.test(injurytable)
+```
+
+    ## Warning in chisq.test(injurytable): Chi-squared approximation may be
+    ## incorrect
+
+``` r
+injurychi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  injurytable
+    ## X-squared = 6089.7, df = 4, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+injury.res<-round(injurychi$residuals, 3)
+
+corrplot::corrplot(injury.res, title = "Pearson residuals for home status and type of unintentional injury death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
 
 ### **8. By substance abuse sub-groups**
 
@@ -1433,7 +1595,30 @@ plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
+
+``` r
+substtable <- table(EDAdf$substance, EDAdf$status)
+
+# Chi square test of independence 
+substchi<-chisq.test(substtable)
+substchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  substtable
+    ## X-squared = 5342.7, df = 2, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+subst.res<-round(substchi$residuals, 3)
+
+corrplot::corrplot(subst.res, title = "Pearson residuals for home status and type of unintentional subst death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
 
 ### **9. By education**
 
@@ -1454,7 +1639,30 @@ ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
 ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+
+``` r
+eductable <- table(EDAdf$educ, EDAdf$status)
+
+# Chi square test of independence 
+educchi<-chisq.test(eductable)
+educchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  eductable
+    ## X-squared = 917.82, df = 8, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+educ.res<-round(educchi$residuals, 3)
+
+corrplot::corrplot(educ.res, title = "Pearson residuals for home status and educational attainment", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
 
 ### **10. By military service**
 
@@ -1474,7 +1682,7 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-22-1.png" style="display: block; margin: auto;" />
 
 C. Text analysis of cause of death text fields
 ----------------------------------------------
@@ -1519,7 +1727,7 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
 
 In the following plot, I repeat the above text analysis and plot two word combinations that show up most frequently by homeless status i.e. ngrams=2
 
@@ -1558,4 +1766,4 @@ textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, 
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-24-1.png" style="display: block; margin: auto;" />

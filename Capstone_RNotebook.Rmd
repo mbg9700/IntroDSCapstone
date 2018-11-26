@@ -27,7 +27,6 @@ library(tinytex)
 knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 9, fig.align = "center")
 
 
-
 ```
 
 
@@ -681,6 +680,7 @@ plotplace <- ggplot(EDAdf, aes(x=dplacecode, group = status, fill = status)) +
 
 plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 
+
 ```
 
 
@@ -688,6 +688,9 @@ plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
 
  - homeless die at younger ages with greatest proportion of deaths among the 45 to 64 year olds
  - those with permanent homes tend to be mostly 65 
+ 
+
+ 
 
 ```{r}
 
@@ -704,7 +707,27 @@ plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
   guides(fill=FALSE)
 
 plotage + theme(panel.spacing.x = unit(2.5, "lines"))
+
+
 ```
+
+
+```{r, fig.height=4.5, fig.width=10}
+agegrptble <- table(EDAdf$age5cat, EDAdf$status)
+
+# Chi square test of independence 
+agegrpchi<-chisq.test(agegrptble)
+agegrpchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+agegrp.res<-round(agegrpchi$residuals, 3)
+
+corrplot::corrplot(agegrp.res, title = "Pearson residuals for home status and age group", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+```
+
+
 
 
 ###  __3.  By gender__
@@ -726,7 +749,25 @@ plotsex <- ggplot(EDAdf, aes(x=sex, group = status, fill = status)) +
   guides(fill=FALSE)
 
 plotsex + theme(panel.spacing.x = unit(2.5, "lines"))
+
+
 ```
+
+
+```{r, fig.height=4.5, fig.width=10}
+gendertable <- table(EDAdf$sex, EDAdf$status)
+
+# Chi square test of independence 
+genderchi<-chisq.test(gendertable)
+genderchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+gender.res<-round(genderchi$residuals, 3)
+
+corrplot::corrplot(gender.res, title = "Pearson residuals for home status and gender", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
 
 ### __4a.  By race/ethnicity - 5 groups with Hispanic as race__
 
@@ -747,7 +788,26 @@ plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status))
   guides(fill=FALSE)
 
 plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
+
 ```
+
+
+```{r, fig.height=4.5, fig.width=10}
+raceth5table <- table(EDAdf$raceethnic5, EDAdf$status)
+
+# Chi square test of independence 
+raceth5chi<-chisq.test(raceth5table)
+raceth5chi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+raceth5.res<-round(raceth5chi$residuals, 3)
+
+corrplot::corrplot(raceth5.res, title = "Pearson residuals for home status and Race/Ethnicity (5 grps)", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+```
+
+
 
 ### __4b.  By race/ethnicity - 6 groups with Asian separated from Native Hawaiian/Pacific Islander, and Hispanic as race__
 
@@ -767,7 +827,12 @@ plotraceeth6 <- ggplot(EDAdf, aes(x=raceethnic6, group = status, fill = status))
   guides(fill=FALSE)
 
 plotraceeth6 + theme(panel.spacing.x = unit(2.5, "lines"))
+
 ```
+
+
+
+
 
 ### __5. By manner of death__
 
@@ -792,6 +857,19 @@ plotmanner <- ggplot(EDAdf, aes(x=manner, group = status, fill = status)) +
 
 plotmanner + theme(panel.spacing.x = unit(2.5, "lines"))
 
+```
+
+```{r, fig.height=4.5, fig.width=10}
+mannertable <- table(EDAdf$manner, EDAdf$status)
+
+# Chi square test of independence 
+mannerchi<-chisq.test(mannertable)
+mannerchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+manner.res<-round(mannerchi$residuals, 3)
+
+corrplot::corrplot(manner.res, title = "Pearson residuals for home status and manner of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
 
 
 ```
@@ -816,9 +894,24 @@ plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
 
 plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
 
+```
+
+
+```{r, fig.height=4.5, fig.width=10}
+lcodtable <- table(EDAdf$LCOD, EDAdf$status)
+
+# Chi square test of independence 
+lcodchi<-chisq.test(lcodtable)
+lcodchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+lcod.res<-round(lcodchi$residuals, 3)
+
+corrplot::corrplot(lcod.res, title = "Pearson residuals for home status and 10 leading causes of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
 
 
 ```
+
 
 ### __7. By unintentional injury sub-groups__
 
@@ -840,7 +933,24 @@ plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
 
 plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 
+
 ```
+
+
+```{r, fig.height=4.5, fig.width=10}
+injurytable <- table(EDAdf$injury, EDAdf$status)
+
+# Chi square test of independence 
+injurychi<-chisq.test(injurytable)
+injurychi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+injury.res<-round(injurychi$residuals, 3)
+
+corrplot::corrplot(injury.res, title = "Pearson residuals for home status and type of unintentional injury death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
 
 ### __8. By substance abuse sub-groups__
 
@@ -863,10 +973,25 @@ plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 
 
-
 ```
 
 
+
+```{r, fig.height=4.5, fig.width=10}
+
+substtable <- table(EDAdf$substance, EDAdf$status)
+
+# Chi square test of independence 
+substchi<-chisq.test(substtable)
+substchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+subst.res<-round(substchi$residuals, 3)
+
+corrplot::corrplot(subst.res, title = "Pearson residuals for home status and type of unintentional subst death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+```
 
 ### __9. By education__
 
@@ -887,6 +1012,23 @@ ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
   guides(fill=FALSE)
 
 ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
+
+
+```
+
+
+```{r, fig.height=4.5, fig.width=10}
+eductable <- table(EDAdf$educ, EDAdf$status)
+
+# Chi square test of independence 
+educchi<-chisq.test(eductable)
+educchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+educ.res<-round(educchi$residuals, 3)
+
+corrplot::corrplot(educ.res, title = "Pearson residuals for home status and educational attainment", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
 
 ```
 
@@ -909,8 +1051,8 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
 
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 
-```
 
+```
 
 
 ## C. Text analysis of cause of death text fields
@@ -954,6 +1096,7 @@ T.dtm <- dfm(T.corpus,
 T.keyness = textstat_keyness(T.dtm, target = "Homeless")
 textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
                  color = c("#EC7063","#4DB6AC"))
+
 
 ```
 
