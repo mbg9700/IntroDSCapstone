@@ -6,31 +6,32 @@ Fall 2018
 -   [I. Overview](#i.-overview)
 -   [II. Data pre-processing](#ii.-data-pre-processing)
     -   [A. Overview](#a.-overview)
-        -   [**1. Data cleaning and standardization**](#data-cleaning-and-standardization)
-        -   [**2. Homeless decedents - linking homeless death data to their death certificates**](#homeless-decedents---linking-homeless-death-data-to-their-death-certificates)
-        -   [**3. Decedents with homes - creating a subset with King County deaths to decedents with permanent homes**](#decedents-with-homes---creating-a-subset-with-king-county-deaths-to-decedents-with-permanent-homes)
-        -   [**4. Appending homeless and with home data sets**](#appending-homeless-and-with-home-data-sets)
+        -   [1. Data cleaning and standardization](#data-cleaning-and-standardization)
+        -   [2. Homeless decedents - linking homeless death data to their death certificates](#homeless-decedents---linking-homeless-death-data-to-their-death-certificates)
+        -   [3. Decedents with homes - creating a subset with King County deaths to decedents with permanent homes](#decedents-with-homes---creating-a-subset-with-king-county-deaths-to-decedents-with-permanent-homes)
+        -   [4. Appending homeless and with home data sets](#appending-homeless-and-with-home-data-sets)
     -   [B. Washington State mortality data - pre-processing](#b.-washington-state-mortality-data---pre-processing)
-        -   [**1. Cleaning and standardizing WAMD annual data 2003-2017**](#cleaning-and-standardizing-wamd-annual-data-2003-2017)
-        -   [**2. Deriving new features in preparation for exploratory data analysis**](#deriving-new-features-in-preparation-for-exploratory-data-analysis)
-        -   [**3. Creating a training data set of decedents who had permanent homes at time of death**](#creating-a-training-data-set-of-decedents-who-had-permanent-homes-at-time-of-death)
+        -   [1. Cleaning and standardizing WAMD annual data 2003-2017](#cleaning-and-standardizing-wamd-annual-data-2003-2017)
+        -   [2. Deriving new features in preparation for exploratory data analysis](#deriving-new-features-in-preparation-for-exploratory-data-analysis)
+        -   [3. Creating a training data set of decedents who had permanent homes at time of death](#creating-a-training-data-set-of-decedents-who-had-permanent-homes-at-time-of-death)
     -   [C. King County Medical Examiner\`s Homeless Death Registry data - November 2003 to September 2017](#c.-king-county-medical-examiners-homeless-death-registry-data---november-2003-to-september-2017)
-        -   [**1. Cleaning KCMEO homeless registry**](#cleaning-kcmeo-homeless-registry)
-        -   [**3. Creating combined dataset for exploratory data analysis**](#creating-combined-dataset-for-exploratory-data-analysis)
+        -   [1. Cleaning KCMEO homeless registry](#cleaning-kcmeo-homeless-registry)
+        -   [3. Creating combined dataset for exploratory data analysis](#creating-combined-dataset-for-exploratory-data-analysis)
 -   [III. EXPLORATORY DATA ANALYSIS](#iii.-exploratory-data-analysis)
     -   [A. Missing values](#a.-missing-values)
-    -   [B. Distribution of key variables](#b.-distribution-of-key-variables)
-        -   [**1. By place of death type**](#by-place-of-death-type)
-        -   [**2. By age group**](#by-age-group)
-        -   [**3. By gender**](#by-gender)
-        -   [**4a. By race/ethnicity - 5 groups with Hispanic as race**](#a.-by-raceethnicity---5-groups-with-hispanic-as-race)
-        -   [**5. By manner of death**](#by-manner-of-death)
-        -   [**6. By leading causes of death**](#by-leading-causes-of-death)
-        -   [**7. By unintentional injury sub-groups**](#by-unintentional-injury-sub-groups)
-        -   [**8. By substance abuse sub-groups**](#by-substance-abuse-sub-groups)
-        -   [**9. By education**](#by-education)
-        -   [**10. By military service**](#by-military-service)
+    -   [B. Analysis of select variables](#b.-analysis-of-select-variables)
+        -   [1. Place of death type](#place-of-death-type)
+        -   [2. Age group](#age-group)
+        -   [3. Gender](#gender)
+        -   [4a. Race/ethnicity - 5 groups with Hispanic as race](#a.-raceethnicity---5-groups-with-hispanic-as-race)
+        -   [5. Manner of death](#manner-of-death)
+        -   [6. Leading causes of death](#leading-causes-of-death)
+        -   [7. Unintentional injury sub-groups](#unintentional-injury-sub-groups)
+        -   [8. Drug and alcohol induced causes of death](#drug-and-alcohol-induced-causes-of-death)
+        -   [9. Educational attainment](#educational-attainment)
+        -   [10. Military service](#military-service)
     -   [C. Text analysis of cause of death text fields](#c.-text-analysis-of-cause-of-death-text-fields)
+    -   [D. Discussion of findings from exploratory data analysis](#d.-discussion-of-findings-from-exploratory-data-analysis)
 
 I. Overview
 ===========
@@ -56,7 +57,7 @@ include_graphics(schematic)
 
 <img src="Data preprocessing schematic.png" style="display: block; margin: auto;" />
 
-### **1. Data cleaning and standardization**
+### 1. Data cleaning and standardization
 
 This step includes:
 
@@ -68,17 +69,17 @@ This step includes:
 
 4.  Deriving new features that group the records by agegroup, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
 
-### **2. Homeless decedents - linking homeless death data to their death certificates**
+### 2. Homeless decedents - linking homeless death data to their death certificates
 
 This step will add the additional attributes from WAMD to each of the records in HDR so that they have the necessary attributes to train the model. In its raw form, HDR contains very limited information about the homeless individuals who died including their names, dates of birth, dates of death, and places (address) of death.
 
 Due to the incomplete nature of HDR data the linkage will be performed in multiple iterations using different combinations of key variables to arrive at linked homeless-death certificate data sets that will then be merged. The key variables used are as follows: -iteration 1: last name, first name, date of birth -iteration 2 (starting with only unmatched records from iteration 1): social security number -iteration 3 (starting with only unmatched records from iteration 2): date of death, last name, first name -iteration 4 (starting with only unmatched records from iteration 3): date of death, date of birth, last name
 
-### **3. Decedents with homes - creating a subset with King County deaths to decedents with permanent homes**
+### 3. Decedents with homes - creating a subset with King County deaths to decedents with permanent homes
 
 In this step the Washington annual mortality data set (2003-17 combined) is restricted to deaths occurring in King County with a residential geocode match score of at least 95% i.e. with a 95% or greater degree of certainty that the residential address provided on the death certificate matches a street address validated by the Census Bureau.
 
-### **4. Appending homeless and with home data sets**
+### 4. Appending homeless and with home data sets
 
 The final data preparation step involves appending the homeless and "with home" data sets with standardized features and feature names to allow exploratory data analysis and training a machine learning model.
 
@@ -91,7 +92,7 @@ The size of each annual file has increased over the years, both in terms of numb
 
 This section addresses cleaning and limiting the data sets (in terms of number of attributes).
 
-### **1. Cleaning and standardizing WAMD annual data 2003-2017**
+### 1. Cleaning and standardizing WAMD annual data 2003-2017
 
 Read death certificate data in three groups as one combined dataset slowed R down too much. I created the three datasets using a SQL query in our vital statistics database and restricted the results to the desired features in the SQL query including:
 
@@ -311,7 +312,7 @@ str(WA0317)
     ##  $ military    : Factor w/ 3 levels "N","U","Y": 1 1 1 1 1 1 3 1 1 3 ...
     ##  $ codlit      : chr  "PARKINSONS DISEASE    " "ALZHEIMERS DISEASE    " "RESPIRATORY FAILURE METASTATIC SMALL CELL CA TO BONE, LUNG, PLEURA PRIMARY LUNG  ATRIAL SEPTAL DEFECT WITH SHUNT" "STROKE WITH UNDERLYING LUNG CANCER    " ...
 
-### **2. Deriving new features in preparation for exploratory data analysis**
+### 2. Deriving new features in preparation for exploratory data analysis
 
 I created a few derived variables including calculated age (at time of death), 5-category age group, leading causes of death categories (by grouping codes in the "UCOD" feature which contains International Classification of Disease, 10th edition, codes indicating the underlying cause of death), race/ethnicity (applying U.S. Office of Management and Budget and Washington State Department of Health guidelines), resident status (Washington state vs. out of state resident), unintentional injury cause of death groups, and substance abuse related cause of death groups.
 
@@ -352,7 +353,7 @@ WA0317$LCOD[grepl("G30", WA0317$UCOD)]<- "Alzheimers"
 
 ##ACCIDENTS - V01-X59,Y85-Y86
 unintentionalinjury <- "V[0-9][0-9][0-9]?|W[0-9][0-9][0-9]?|X[0-5][0-9][0-9]?|Y8[5-6][0-9]?"
-WA0317$LCOD[grepl(unintentionalinjury, WA0317$UCOD)]<- "Injury-unint."
+WA0317$LCOD[grepl(unintentionalinjury, WA0317$UCOD)]<- "Injury-unintentional"
 
 ##CHRONIC LOWER RESPIRATORY DISEASE - J40-J47
 CLRD <- "J4[0-7][0-9]?"
@@ -378,30 +379,39 @@ WA0317$LCOD[grepl(liver, WA0317$UCOD)]<- "Chronic Liver dis./cirrh."
 flu <- "J09[0-9]?|J1[0-8][0-9]?"
 WA0317$LCOD[grepl(flu, WA0317$UCOD)]<- "Flu"
 
-# UNINTENTIONAL INJURIES - SELECT SUBCATEGORIES OF:  V01-X59,Y85-Y86
+
+### UNINTENTIONAL INJURIES - SELECT SUBCATEGORIES OF:  V01-X59,Y85-Y86
 
 WA0317$injury <- "No injury"
-
-##UNINTENTIONAL INJURY - V01-X59,Y85-Y86
-unintinj <- "V[0-9][0-9][0-9]?|W[0-9][0-9][0-9]?|X[0-5][0-9][0-9]?|Y8[5-6]
-              [0-9]?"
-WA0317$LCOD[grepl(unintinj, WA0317$UCOD)]<- "All Unint.injury"
 
 #Unintentional Poisoning - X40-49
 poisoninjury <- "^X4[0-9][0-9]?"
 WA0317$injury[grepl(poisoninjury, WA0317$UCOD)] <- "Unintentional poisoning"
 
 # Unintentional Firearm - W32-34
-guninjury <- "W3[2-4][0-9]?"
-WA0317$injury[grepl(guninjury, WA0317$UCOD)] <- "Unintentional firearm"
+#guninjury <- "W3[2-4][0-9]?"
+#WA0317$injury[grepl(guninjury, WA0317$UCOD)] <- "Unintentional firearm"
+
+# Motor vehicle - pedestrian - (V01-V99, X82, Y03, Y32, Y36.1, *U01.1 )
+mvall <- "V[0-9][1-9][0-9]?|X82[0-9]?|Y03[0-9]?|Y32[0-9]?|Y361|U011"
+WA0317$injury[grepl(mvall, WA0317$UCOD)] <- "MV - all"
 
 # Motor vehicle - pedestrian - (V02–V04[.1,.9],V09.2)
-mvped <- "V0[2-3][0-9]?|V041|V049|V092"
-WA0317$injury[grepl(mvped, WA0317$UCOD)] <- "MV crash-pedestrian"
+#mvped <- "V021|V029|V031|V039|V041|V049|V092"
+#WA0317$injury[grepl(mvped, WA0317$UCOD)] <- "MV crash-pedestrian"
+
+# Motor Vehicle - bicycle - V12-V14 (.3-.9) , V19 (.4-.6)
+#mvbike <- "V1[2-4][3-9]?|V19[4-6]?"
+#WA0317$injury[grepl(mvbike, WA0317$UCOD)] <- "MV crash-bicyclist"
 
 # Unintentional Fall (W00–W19)
 fall <- "W0[0-9][0-9]|W1[0-9][0-9]"
 WA0317$injury[grepl(fall, WA0317$UCOD)] <- "Unintentional fall"
+
+#Other injury
+WA0317$injury[grepl(unintentionalinjury, WA0317$UCOD) & !grepl(poisoninjury, WA0317$UCOD) & !grepl(mvall, WA0317$UCOD) & !grepl(fall, WA0317$UCOD)] <- "Other injury"
+
+
 
 #SUBSTANCE ABUSE
 WA0317$substance <- "No Substance abuse"
@@ -519,8 +529,8 @@ str(WA0317)
     ##  $ codlit      : chr  "PARKINSONS DISEASE    " "ALZHEIMERS DISEASE    " "RESPIRATORY FAILURE METASTATIC SMALL CELL CA TO BONE, LUNG, PLEURA PRIMARY LUNG  ATRIAL SEPTAL DEFECT WITH SHUNT" "STROKE WITH UNDERLYING LUNG CANCER    " ...
     ##  $ age         : num  75 93 95 78 80 76 85 64 95 86 ...
     ##  $ age5cat     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 5 5 5 5 4 5 5 ...
-    ##  $ LCOD        : Factor w/ 12 levels "All Unint.injury",..: 10 2 3 11 6 11 3 12 8 3 ...
-    ##  $ injury      : Factor w/ 5 levels "MV crash-pedestrian",..: 2 2 2 2 2 2 2 2 2 2 ...
+    ##  $ LCOD        : Factor w/ 11 levels "Alzheimers","Cancer",..: 9 1 2 10 5 10 2 11 7 2 ...
+    ##  $ injury      : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ substance   : Factor w/ 3 levels "Alcohol-induced",..: 3 3 3 3 3 3 3 3 3 3 ...
     ##  $ residence   : Factor w/ 2 levels "Out of state",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ raceethnic5 : Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 4 4 4 4 4 4 4 4 4 4 ...
@@ -611,10 +621,10 @@ summary(WA0317)
     ##                     Max.   :114.00   NA's    :    74  
     ##                     NA's   :74                        
     ##                     LCOD                            injury      
-    ##  Other                :187543   MV crash-pedestrian    :  1238  
-    ##  Cancer               :162623   No injury              :720224  
-    ##  Heart Dis.           :161864   Unintentional fall     : 11884  
-    ##  Alzheimers           : 44973   Unintentional firearm  :    98  
+    ##  Other                :187543   MV - all               :  9533  
+    ##  Cancer               :162623   No injury              :704734  
+    ##  Heart Dis.           :161864   Other injury           :  7293  
+    ##  Alzheimers           : 44973   Unintentional fall     : 11884  
     ##  Chronic Lwr Resp Dis.: 43189   Unintentional poisoning: 12491  
     ##  Stroke               : 42143                                   
     ##  (Other)              :103600                                   
@@ -635,7 +645,7 @@ summary(WA0317)
     ##  Other   :  5767  
     ##  White NH:620796
 
-### **3. Creating a training data set of decedents who had permanent homes at time of death**
+### 3. Creating a training data set of decedents who had permanent homes at time of death
 
 I started by creating a subset of the Washington State data set that included only King County resident deaths where the decedent had a permanent home. The death data set contains a feature called "Place of Death Type", a factor with the following levels:
 
@@ -713,8 +723,8 @@ str(KC)
     ##  $ codlit.k      : chr  "RESPIRATORY FAILURE METASTATIC SMALL CELL CA TO BONE, LUNG, PLEURA PRIMARY LUNG  ATRIAL SEPTAL DEFECT WITH SHUNT" "HYPOTENSION PONTINE HEMORRHAGE HTN  ARF, LIVER FAILURE" "CAD    " "SEPSIS METASTATIC BREAST CANCER   " ...
     ##  $ age.k         : num  95 76 95 57 71 82 90 42 96 75 ...
     ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 3 5 5 ...
-    ##  $ LCOD.k        : Factor w/ 12 levels "All Unint.injury",..: 3 11 8 3 3 8 8 10 11 3 ...
-    ##  $ injury.k      : Factor w/ 5 levels "MV crash-pedestrian",..: 2 2 2 2 2 2 2 2 2 2 ...
+    ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 2 10 7 2 2 7 7 9 10 2 ...
+    ##  $ injury.k      : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ substance.k   : Factor w/ 3 levels "Alcohol-induced",..: 3 3 3 3 3 3 3 3 3 3 ...
     ##  $ residence.k   : Factor w/ 2 levels "Out of state",..: 2 2 2 2 2 2 2 2 2 1 ...
     ##  $ raceethnic5.k : Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 4 4 4 4 4 4 4 4 4 4 ...
@@ -760,14 +770,15 @@ str(KC0317_wh)
     ##  $ codlit.k      : chr  "RESPIRATORY FAILURE METASTATIC SMALL CELL CA TO BONE, LUNG, PLEURA PRIMARY LUNG  ATRIAL SEPTAL DEFECT WITH SHUNT" "HYPOTENSION PONTINE HEMORRHAGE HTN  ARF, LIVER FAILURE" "CAD    " "SEPSIS METASTATIC BREAST CANCER   " ...
     ##  $ age.k         : num  95 76 95 57 71 82 90 42 96 78 ...
     ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 3 5 5 ...
-    ##  $ LCOD.k        : Factor w/ 12 levels "All Unint.injury",..: 3 11 8 3 3 8 8 10 11 8 ...
-    ##  $ injury.k      : Factor w/ 5 levels "MV crash-pedestrian",..: 2 2 2 2 2 2 2 2 2 2 ...
+    ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 2 10 7 2 2 7 7 9 10 7 ...
+    ##  $ injury.k      : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ substance.k   : Factor w/ 3 levels "Alcohol-induced",..: 3 3 3 3 3 3 3 3 3 3 ...
     ##  $ residence.k   : Factor w/ 2 levels "Out of state",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ raceethnic5.k : Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 4 4 4 4 4 4 4 4 4 4 ...
     ##  $ raceethnic6.k : Factor w/ 7 levels "AIAN NH","Asian",..: 4 4 4 4 4 4 4 4 4 4 ...
 
 ``` r
+KC0317_wh$injury.k <- factor(KC0317_wh$injury.k)
 summary(KC0317_wh)
 ```
 
@@ -851,14 +862,14 @@ summary(KC0317_wh)
     ##                     3rd Qu.: 88.00   65+ yrs :128660  
     ##                     Max.   :113.00   NA's    :    18  
     ##                     NA's   :18                        
-    ##               LCOD.k                         injury.k     
-    ##  Other           :47410   MV crash-pedestrian    :   383  
-    ##  Cancer          :38589   No injury              :168014  
-    ##  Heart Dis.      :36218   Unintentional fall     :  2978  
-    ##  Alzheimers      :10659   Unintentional firearm  :    12  
-    ##  Stroke          :10358   Unintentional poisoning:  2905  
-    ##  All Unint.injury: 9211                                   
-    ##  (Other)         :21847                                   
+    ##                   LCOD.k                         injury.k     
+    ##  Other               :47410   MV - all               :  2022  
+    ##  Cancer              :38589   No injury              :164874  
+    ##  Heart Dis.          :36218   Other injury           :  1513  
+    ##  Alzheimers          :10659   Unintentional fall     :  2978  
+    ##  Stroke              :10358   Unintentional poisoning:  2905  
+    ##  Injury-unintentional: 9408                                   
+    ##  (Other)             :21650                                   
     ##              substance.k           residence.k         raceethnic5.k   
     ##  Alcohol-induced   :  2740   Out of state:    18   AIAN NH    :  1493  
     ##  Drug-induced      :  3336   WA resident :174274   Asian/PI NH: 12714  
@@ -885,7 +896,7 @@ The King County Medical Examiner`s Office (KCMEO) established a given decedent`s
 
 KCMEO defines `homelessness` based on the Chief Medical Examiner\`s criteria rather than standard federal Department of Housing and Urban Development (HUD) or Department of Social and Health Services (DSHS) criteria.
 
-### **1. Cleaning KCMEO homeless registry**
+### 1. Cleaning KCMEO homeless registry
 
 I followed similar cleaning steps as with the Washington State annual death data sets including: - renaming variables, - coercing variables to specific data types (factors, dates, numeric), - cleaning the values in the first and last name fields by removing white spaces, punctuation marks, suffixes like "Jr.", "Sr.", "II" etc., - and making all values uppercase to match death certificate data.
 
@@ -1050,7 +1061,7 @@ str(homeless)
 #miss_var_summary(homeless)
 ```
 
-#### **2. Linking King County Homeless Death Registry with Washington State Mortality Data**
+#### 2. Linking King County Homeless Death Registry with Washington State Mortality Data
 
 The HDR contains name, date of birth, date of death, place of death (address), and social security number. There is no additional information on cause of death, or other attributes that might be used in machine learning to classify persons as homeless or with a permanent home. For this reason, the HDR data must first be linked to full death certificate data to add the relevant attributes that can be found in the death certificate.
 
@@ -1127,6 +1138,8 @@ homelessd <- distinct(homelessd, lname.h, dob.h, .keep_all = TRUE)
 homeless5 <-filter(homelessd, is.na(certno.k))
 homelessd1 <- filter(homelessd, !is.na(certno.k))
 
+
+
 # Round 4 linkage yielded an additional 6 matched records 
 
 # Total matched records after 4 rounds of linkage = 1,106 out of a possible 1,131 homeless decedents
@@ -1148,7 +1161,9 @@ homelessd1 <- select(homelessd1, keepvar_h)
 homelessfinal <- rbind(homelessa1, homelessb1, homelessc1, homelessd1)
 homelessfinal <- distinct(homelessfinal, certno.k, .keep_all = TRUE)
 
-# total linked = 1,104
+homelessfinal$injury.k <- factor(homelessfinal$injury.k)
+
+# total linked = 1,093
 
 summary(homelessfinal)
 ```
@@ -1234,13 +1249,13 @@ summary(homelessfinal)
     ##  Bachelors             : 28   U:188     NULL   : 30   NA's    :  1  
     ##  (Other)               : 37   W: 22     (Other):576                 
     ##                        LCOD.k                       injury.k  
-    ##  All Unint.injury         :481   MV crash-pedestrian    : 34  
-    ##  Other                    :228   No injury              :685  
-    ##  Heart Dis.               :155   Unintentional fall     : 18  
-    ##  Suicide-all              : 81   Unintentional firearm  :  0  
+    ##  Injury-unintentional     :487   MV - all               : 57  
+    ##  Other                    :228   No injury              :604  
+    ##  Heart Dis.               :155   Other injury           : 58  
+    ##  Suicide-all              : 81   Unintentional fall     : 18  
     ##  Chronic Liver dis./cirrh.: 58   Unintentional poisoning:356  
     ##  Cancer                   : 28                                
-    ##  (Other)                  : 62                                
+    ##  (Other)                  : 56                                
     ##              substance.k        residence.k      raceethnic5.k
     ##  Alcohol-induced   : 91   Out of state: 56   AIAN NH    : 75  
     ##  Drug-induced      :357   WA resident :886   Asian/PI NH: 24  
@@ -1297,8 +1312,8 @@ str(homelessfinal)
     ##  $ marital.k     : Factor w/ 7 levels "A","D","M","P",..: 5 6 5 2 1 5 2 5 5 5 ...
     ##  $ occup.k       : Factor w/ 431 levels "`","000","007",..: 10 430 188 430 106 428 430 430 410 409 ...
     ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 3 3 4 4 3 3 3 4 2 4 ...
-    ##  $ LCOD.k        : Factor w/ 12 levels "All Unint.injury",..: 1 10 1 1 1 1 1 4 1 10 ...
-    ##  $ injury.k      : Factor w/ 5 levels "MV crash-pedestrian",..: 5 2 5 5 2 5 2 2 2 2 ...
+    ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 8 9 8 8 8 8 8 3 8 9 ...
+    ##  $ injury.k      : Factor w/ 5 levels "MV - all","No injury",..: 5 2 5 5 1 5 3 2 3 2 ...
     ##  $ substance.k   : Factor w/ 3 levels "Alcohol-induced",..: 2 3 2 2 3 2 3 1 3 3 ...
     ##  $ residence.k   : Factor w/ 2 levels "Out of state",..: 2 2 2 NA 2 2 1 2 2 2 ...
     ##  $ raceethnic5.k : Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 3 6 4 6 3 2 6 6 4 4 ...
@@ -1307,10 +1322,21 @@ str(homelessfinal)
     ##  $ military.k    : Factor w/ 3 levels "N","U","Y": 1 2 1 1 1 1 1 2 1 1 ...
 
 ``` r
+a <- table(homelessfinal$injury.k)
+a
+```
+
+    ## 
+    ##                MV - all               No injury            Other injury 
+    ##                      57                     604                      58 
+    ##      Unintentional fall Unintentional poisoning 
+    ##                      18                     356
+
+``` r
 #miss_var_summary(homelessfinal)
 ```
 
-### **3. Creating combined dataset for exploratory data analysis**
+### 3. Creating combined dataset for exploratory data analysis
 
 Here I remove all the suffixes I added earlier in the record linkage proces to standardize the column names for the final/linked homeless data set and the King County 2003-17 death data set containing records of all decedents with permanent homes. Note that this is not the sample data set that will be used to train the machine learning model later. For exploratory data analysis I chose to look at the full set of data of King County decedents with homes to compare with the homeless group.
 
@@ -1322,6 +1348,7 @@ I created a new feature to distinguish homeless from "with home" decedents and t
 
 h <- homelessfinal
 wh <- KC0317_wh
+
 
 # Standardize column names and merge final homeless with King Co 2003-17 "with home" 
 # death data 
@@ -1398,19 +1425,19 @@ summary(EDAdf)
     ##  <=8th grade           :12424   S:22544   NULL   :  3820  
     ##  9-12th gr., no diploma:11352   U: 1466   150    :  3470  
     ##  (Other)               :23887   W:59383   (Other):125772  
-    ##      age5cat                     LCOD      
-    ##  <18yrs  :  3076   Other           :47638  
-    ##  18-29yrs:  3083   Cancer          :38617  
-    ##  30-44yrs:  6741   Heart Dis.      :36373  
-    ##  45-64yrs: 33705   Alzheimers      :10659  
-    ##  65+ yrs :128761   Stroke          :10368  
-    ##  NA's    :    19   All Unint.injury: 9692  
-    ##                    (Other)         :22038  
+    ##      age5cat                         LCOD      
+    ##  <18yrs  :  3076   Other               :47638  
+    ##  18-29yrs:  3083   Cancer              :38617  
+    ##  30-44yrs:  6741   Heart Dis.          :36373  
+    ##  45-64yrs: 33705   Alzheimers          :10659  
+    ##  65+ yrs :128761   Stroke              :10368  
+    ##  NA's    :    19   Injury-unintentional: 9895  
+    ##                    (Other)             :21835  
     ##                      injury                    substance     
-    ##  MV crash-pedestrian    :   417   Alcohol-induced   :  2831  
-    ##  No injury              :168699   Drug-induced      :  3693  
-    ##  Unintentional fall     :  2996   No Substance abuse:168861  
-    ##  Unintentional firearm  :    12                              
+    ##  MV - all               :  2079   Alcohol-induced   :  2831  
+    ##  No injury              :165478   Drug-induced      :  3693  
+    ##  Other injury           :  1571   No Substance abuse:168861  
+    ##  Unintentional fall     :  2996                              
     ##  Unintentional poisoning:  3261                              
     ##                                                              
     ##                                                              
@@ -1430,14 +1457,6 @@ summary(EDAdf)
     ##                                                  
     ##                                                  
     ## 
-
-``` r
-table (EDAdf$status)
-```
-
-    ## 
-    ##  Homeless With home 
-    ##      1093    174292
 
 III. EXPLORATORY DATA ANALYSIS
 ==============================
@@ -1491,8 +1510,8 @@ str(h)
     ##  $ marital    : Factor w/ 7 levels "A","D","M","P",..: 5 6 5 2 1 5 2 5 5 5 ...
     ##  $ occupcode  : Factor w/ 431 levels "`","000","007",..: 10 430 188 430 106 428 430 430 410 409 ...
     ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 3 3 4 4 3 3 3 4 2 4 ...
-    ##  $ LCOD       : Factor w/ 12 levels "All Unint.injury",..: 1 10 1 1 1 1 1 4 1 10 ...
-    ##  $ injury     : Factor w/ 5 levels "MV crash-pedestrian",..: 5 2 5 5 2 5 2 2 2 2 ...
+    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 8 9 8 8 8 8 8 3 8 9 ...
+    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 5 2 5 5 1 5 3 2 3 2 ...
     ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 2 3 2 2 3 2 3 1 3 3 ...
     ##  $ residence  : Factor w/ 2 levels "Out of state",..: 2 2 2 NA 2 2 1 2 2 2 ...
     ##  $ raceethnic5: Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 3 6 4 6 3 2 6 6 4 4 ...
@@ -1545,8 +1564,8 @@ str(wh)
     ##  $ marital    : Factor w/ 7 levels "A","D","M","P",..: 7 7 7 3 7 7 7 5 7 3 ...
     ##  $ occupcode  : Factor w/ 431 levels "`","000","007",..: 407 407 264 96 237 173 407 380 96 407 ...
     ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 3 5 5 ...
-    ##  $ LCOD       : Factor w/ 12 levels "All Unint.injury",..: 3 11 8 3 3 8 8 10 11 8 ...
-    ##  $ injury     : Factor w/ 5 levels "MV crash-pedestrian",..: 2 2 2 2 2 2 2 2 2 2 ...
+    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 2 10 7 2 2 7 7 9 10 7 ...
+    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 3 3 3 3 3 3 3 3 3 3 ...
     ##  $ residence  : Factor w/ 2 levels "Out of state",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ raceethnic5: Factor w/ 6 levels "AIAN NH","Asian/PI NH",..: 4 4 4 4 4 4 4 4 4 4 ...
@@ -1555,12 +1574,12 @@ str(wh)
     ##  $ military   : Factor w/ 3 levels "N","U","Y": 1 1 1 1 3 1 1 1 1 1 ...
     ##  $ status     : chr  "With home" "With home" "With home" "With home" ...
 
-B. Distribution of key variables
---------------------------------
+B. Analysis of select variables
+-------------------------------
 
--   combine homeless registry and the with home sample into one data set to facilitate comparison. Add an attribute that indicates whether record is for homeless or with home.
+To conduct exploratory data analysis I appended the homeless and 'with home' death records after adding a new variable to the two data sets indicating the homeless status of each death.
 
-### **1. By place of death type**
+### 1. Place of death type
 
 Figure 1a below shows that homeless individuals were more likely to die in places marked as "other" on the death certificate or in emergency rooms compared with decedents who had permanent homes. Decedents with permanent homes were more likely to die in their own homes, or in long term care/nursing home facilities. Death certifiers who report "other" in the place of death variable have the option of entering literal text to provide additional details about the location. Analysis of this text field may shed some light on why a large proportion of homeless decedents have place of death marked as "other".
 
@@ -1605,7 +1624,7 @@ EDAdf$dplace2 <- ifelse(EDAdf$dplacecode=="Home", "Home",
                                              ifelse(EDAdf$dplacecode=="Nursing home/Longterm care","Nursing home/Longterm care",
                                                     ifelse(EDAdf$dplacecode== "Hospice", "Hospice", "Other"))))))
 
-EDAdf$dplace2 <- as.factor(EDAdf$dplace2)
+EDAdf$dplace2 <-factor(EDAdf$dplace2)
 
 placetable2 <- table(EDAdf$dplace2, EDAdf$status)
 p <- addmargins(placetable2)
@@ -1644,7 +1663,7 @@ plotplace <- ggplot(subset(EDAdf, !is.na(dplace2)), aes(x=dplace2, group = statu
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
             hjust = -0.5, size=3) +
   labs(y="Percent", x = "Place of death type 2", title = "Figure 1a. Place of death type by 
-       homeless status", caption = "Homeless: n=1,104; With home: 
+       homeless status", caption = "Homeless: n=1,093; With home: 
        n = 174,292") +
   facet_grid(.~status) + 
   scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.0)) +
@@ -1677,7 +1696,7 @@ corrplot::corrplot(place2.res, title = "Figure 1b. Pearson residuals for home st
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
 
-### **2. By age group**
+### 2. Age group
 
 Homeless decedents died at younger ages compared with decedents with homes. Almost 75% of decedents with homes were 65 years or older compared with almost 10% of the homeless decedent population. In contrast the highest proportion of deaths among homeless (almost 59%) occurred in the 45 to 64 year old population.
 
@@ -1738,7 +1757,7 @@ corrplot::corrplot(agegrp.res, title = "Figure 2b. Pearson residuals for home st
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
-### **3. By gender**
+### 3. Gender
 
 Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes. There is a statistically significant association between gender and homeless status (p &lt;0.05). It is possible that homeless shelters tend to prioritize women in providing temporary housing resulting in lower proportions of women in the homeless population, and consequently, deaths among homeless.
 
@@ -1766,7 +1785,7 @@ genderchi$expected
 EDAdf$sex2 <- NA
 EDAdf$sex2 <- ifelse(EDAdf$sex=="M", "Male", 
                         ifelse(EDAdf$sex=="F", "Female", NA))
-
+EDAdf <- mutate_at(EDAdf, vars(sex2), as.factor)
 
 theme_set(theme_cowplot(font_size = 10))
 plotsex2 <- ggplot(subset(EDAdf, !is.na(sex2)), aes(x=sex2, group = status, fill = status)) +
@@ -1807,7 +1826,7 @@ corrplot::corrplot(gender.res2, title = "Figure 3b. Pearson residuals for home s
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-7-2.png" style="display: block; margin: auto;" />
 
-### **4a. By race/ethnicity - 5 groups with Hispanic as race**
+### 4a. Race/ethnicity - 5 groups with Hispanic as race
 
 Homeless status among King County decedents is statistically significantly associated with race and ethnicity (p &lt; 0.05) with larger proportions of non-Hispanic Black and American Indian/American Native among homeless decedents compared with those who had permanent homes. Conversely, a smaller proportion of homeless decedents were non-Hispanic Asians or non-Hispanic Whites. The proportion of Hispanic deaths was the same regardless of homeless status.
 
@@ -1872,17 +1891,31 @@ corrplot::corrplot(raceth5.res, title = "Figure 4b. Pearson residuals for home s
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-8-2.png" style="display: block; margin: auto;" />
 
-### **5. By manner of death**
+### 5. Manner of death
 
 Manner of death refers to whether a person died as a result of natural causes, homicide, suicide, or an accident. In some instances where there is insufficient circumstantial evidence of intent the manner of death is marked as 'undetermined'. Manner of death is reported by medical providers completing death certificates via a check box with mutually exclusive options.
 
 Over 45% of homeless deaths were accidental deaths compared to less than 6% of deaths to those with permanent homes. In contrast the vast majority of deaths among those with homes (almost 92%) were natural deaths. 5.6% of homeless deaths were homicides compared to almost 0% among the decedents with permanent homes. Over 7% of homeless deaths were by suicide and another 5.8% were due to homicide compared with 2% and 0.5% respectively among decedents with homes.
 
-Unsurprisingly, manner of death is statistically significantly associated with homeless status (p &lt; 0.05).
+Manner of death is statistically significantly associated with homeless status (p &lt; 0.05).
 
 ``` r
 # Chi square - checking expected counts
 mannertable <- table(EDAdf$manner, EDAdf$status)
+mannertable
+```
+
+    ##               
+    ##                Homeless With home
+    ##   Accident          496      9942
+    ##   Undetermined       60       662
+    ##   Homicide           61       921
+    ##   Natural           394    159566
+    ##   Unk.                1        22
+    ##   Pending             0         1
+    ##   Suicide            81      3178
+
+``` r
 mannerchi<-chisq.test(mannertable)
 ```
 
@@ -1913,6 +1946,7 @@ EDAdf$manner2 <- ifelse(EDAdf$manner=="Accident", "Accident",
                                       ifelse(EDAdf$manner=="Natural", "Natural",
                                              ifelse(EDAdf$manner=="Suicide","Suicide",NA)))))
 
+EDAdf <- mutate_at(EDAdf, vars(manner2), as.factor)
 
 #bar plot
 theme_set(theme_cowplot(font_size = 10))
@@ -1944,6 +1978,18 @@ mannerchi2<-chisq.test(mannertable2)
     ## incorrect
 
 ``` r
+mannerchi2$expected
+```
+
+    ##               
+    ##                  Homeless   With home
+    ##   Accident      64.999036  10373.0010
+    ##   Homicide       6.115065    975.8849
+    ##   Natural      996.095597 158963.9044
+    ##   Suicide       20.294296   3238.7057
+    ##   Undetermined   4.496005    717.5040
+
+``` r
 mannerchi2
 ```
 
@@ -1962,39 +2008,33 @@ corrplot::corrplot(manner.res2, title = "Table 5b. Pearson residuals for home st
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-9-2.png" style="display: block; margin: auto;" />
 
-### **6. By leading causes of death**
+### 6. Leading causes of death
 
-There are clear differences in leading causes of death between decedents who were homeless and those with homes at the time of death. As we saw above, homeless decedents were more likely to die of accidental causes of death. Figure 6a. also indicates that homeless decedents were also more likely than decedents with homes to die of chronic liver disease/cirrhosis and suicide. Fewer homeless decedents had a chronic disease as the underlying cause of death compared to decedents with homes. As the majority of homeless decedents died at younger ages the relatively low proportions of death due to chronic illness (which tend to manifest and affect people in older age groups) is not surprising.
+There are clear differences in leading causes of death between decedents who were homeless and those with homes at the time of death. As we saw above in Figure 5a., homeless decedents were more likely to die of accidental manner of death. Figure 6a. shows that over 44% of homeless deaths were due to unintentional injury. The bar plot also indicates that homeless decedents were also more likely than decedents with homes to die of chronic liver disease/cirrhosis (5.3% vs. 1.5% respectively) and suicide (7.4% vs. 1.8% respectively). Fewer homeless decedents had a chronic disease as the underlying cause of death compared to decedents with homes. As the majority of homeless decedents died at younger ages the relatively low proportions of death due to chronic illness (which tend to manifest and affect people in older age groups) is not surprising.
 
 Unintended injury deaths, suicides, and chronic liver disease had the strongest positive associations with homeless status and contributed to a statistically significant association between the two variables (p &lt;0.05).
 
 ``` r
 # Chi square  - checking for expected cell size counts of < 5
+
 lcodtable<- table(EDAdf$LCOD, EDAdf$status)
 lcodchi<-chisq.test(lcodtable)
-```
-
-    ## Warning in chisq.test(lcodtable): Chi-squared approximation may be
-    ## incorrect
-
-``` r
 lcodchi$expected
 ```
 
     ##                            
-    ##                               Homeless  With home
-    ##   All Unint.injury           60.400582  9631.5994
-    ##   Alzheimers                 66.426929 10592.5731
-    ##   Cancer                    240.661294 38376.3387
-    ##   Chronic Liver dis./cirrh.  17.169171  2737.8308
-    ##   Chronic Lwr Resp Dis.      49.170511  7840.8295
-    ##   Diabetes                   31.166251  4969.8337
-    ##   Flu                        18.272235  2913.7278
-    ##   Heart Dis.                226.676677 36146.3233
-    ##   Injury-unint.               1.265097   201.7349
-    ##   Other                     296.880201 47341.1198
-    ##   Stroke                     64.613416 10303.3866
-    ##   Suicide-all                20.297637  3236.7024
+    ##                              Homeless With home
+    ##   Alzheimers                 66.42693 10592.573
+    ##   Cancer                    240.66129 38376.339
+    ##   Chronic Liver dis./cirrh.  17.16917  2737.831
+    ##   Chronic Lwr Resp Dis.      49.17051  7840.829
+    ##   Diabetes                   31.16625  4969.834
+    ##   Flu                        18.27224  2913.728
+    ##   Heart Dis.                226.67668 36146.323
+    ##   Injury-unintentional       61.66568  9833.334
+    ##   Other                     296.88020 47341.120
+    ##   Stroke                     64.61342 10303.387
+    ##   Suicide-all                20.29764  3236.702
 
 ``` r
 #bar plot
@@ -2025,7 +2065,7 @@ lcodchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  lcodtable
-    ## X-squared = 3627.2, df = 11, p-value < 2.2e-16
+    ## X-squared = 3614.2, df = 10, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2036,15 +2076,47 @@ corrplot::corrplot(lcod.res, title = "Pearson residuals for home status and 10 l
 
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-10-2.png" style="display: block; margin: auto;" />
 
-### **7. By unintentional injury sub-groups**
+### 7. Unintentional injury sub-groups
+
+A closer examination of unintentional injury deaths reveals that unintentional poisioning accounted for 32.6% of homeless deaths and motor vehicle related causes resulted in an additional 5.2% homeless deaths in King County. These proportions are far greater among the homeless compared with decedents with permanent homes. In stark contrast, relatively few decedents with permanent homes died of any unintended injury (5.4%).
+
+Unintentional injury and homeless status are statistically signficantly associations (p &lt; 0.05) with unintentional poisoning having a strong positive correlation with homeless status.
 
 ``` r
+# Chi square  - checking if expected cell size counts are < 5
+injurytable <- table(EDAdf$injury, EDAdf$status)
+injurychi<-chisq.test(injurytable)
+injurychi$observed
+```
+
+    ##                          
+    ##                           Homeless With home
+    ##   MV - all                      57      2022
+    ##   No injury                    604    164874
+    ##   Other injury                  58      1513
+    ##   Unintentional fall            18      2978
+    ##   Unintentional poisoning      356      2905
+
+``` r
+injurychi$expected
+```
+
+    ##                          
+    ##                              Homeless  With home
+    ##   MV - all                  12.956336   2066.044
+    ##   No injury               1031.259538 164446.740
+    ##   Other injury               9.790478   1561.210
+    ##   Unintentional fall        18.671084   2977.329
+    ##   Unintentional poisoning   20.322565   3240.677
+
+``` r
+#bar plot
 theme_set(theme_cowplot(font_size = 10))
 plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
             hjust = -0.20, size=3) +
-  labs(y="Percent", x = "Unintentional injury type", title = "Leading unintentional 
+  labs(y="Percent", x = "Unintentional injury type", title = "Figure 7a. Leading unintentional 
        injury deaths by homeless status", caption = "Homeless: n=1,093; With home: 
        n = 174,292") +
   facet_grid(.~status) + 
@@ -2058,45 +2130,60 @@ plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
 <img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
 
 ``` r
-injurytable <- table(EDAdf$injury, EDAdf$status)
-
-# Chi square test of independence 
-injurychi<-chisq.test(injurytable)
+# Chi square test of independence
+injurychi
 ```
 
-    ## Warning in chisq.test(injurytable): Chi-squared approximation may be
-    ## incorrect
-
-``` r
-injurychi$expected
-```
-
-    ##                          
-    ##                               Homeless    With home
-    ##   MV crash-pedestrian     2.598746e+00    414.40125
-    ##   No injury               1.051333e+03 167647.66718
-    ##   Unintentional fall      1.867108e+01   2977.32892
-    ##   Unintentional firearm   7.478405e-02     11.92522
-    ##   Unintentional poisoning 2.032256e+01   3240.67744
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  injurytable
+    ## X-squared = 6147, df = 4, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
 injury.res<-round(injurychi$residuals, 3)
 
-corrplot::corrplot(injury.res, title = "Pearson residuals for home status and type of unintentional injury death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+corrplot::corrplot(injury.res, title = "Figure 7b. Pearson residuals for home status and unintentional injury death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-11-2.png" style="display: block; margin: auto;" />
 
-### **8. By substance abuse sub-groups**
+### 8. Drug and alcohol induced causes of death
+
+Unintentional poisoning is often associated with substance abuse and alcohol or drug-related deaths. Figure 8a shows more details about specific causes that contributed to unintentional poisoning deaths among homeless decedents. Drug-induced causes contributed over 32% of homeless deaths (compared with 1.9% of deaths to decedents with homes). In addition, alcohol-induced causes contributed over 8% of homeless deaths compared with 1.6% of deaths among decedents with homes. Drug and alcohol induced deaths were statistically significantly associated with homeless status (p &lt; 0.05) with drug-induced causes of death having the strongest positive correlation with homeless status.
 
 ``` r
+# Chi square  - checking if expected cell size counts are < 5
+satable <- table(EDAdf$substance, EDAdf$status)
+sachi<-chisq.test(satable)
+sachi$observed
+```
+
+    ##                     
+    ##                      Homeless With home
+    ##   Alcohol-induced          91      2740
+    ##   Drug-induced            357      3336
+    ##   No Substance abuse      645    168216
+
+``` r
+sachi$expected
+```
+
+    ##                     
+    ##                        Homeless  With home
+    ##   Alcohol-induced      17.64280   2813.357
+    ##   Drug-induced         23.01479   3669.985
+    ##   No Substance abuse 1052.34241 167808.658
+
+``` r
+#bar plot
 theme_set(theme_cowplot(font_size = 10))
 plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
             hjust = -0.25, size=3) +
-  labs(y="Percent", title = "Alcohol-related and drug-induced deaths by homeless
+  labs(y="Percent", title = "Table 8a. Alcohol-related and drug-induced deaths by homeless
        status", caption = "Homeless: n=1,093; With home: 
        n = 174,292") +
   facet_grid(.~status) + 
@@ -2107,40 +2194,74 @@ plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) 
 plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
 
 ``` r
-substtable <- table(EDAdf$substance, EDAdf$status)
-
 # Chi square test of independence 
-substchi<-chisq.test(substtable)
-substchi$expected
+
+sachi
 ```
 
-    ##                     
-    ##                        Homeless  With home
-    ##   Alcohol-induced      17.64280   2813.357
-    ##   Drug-induced         23.01479   3669.985
-    ##   No Substance abuse 1052.34241 167808.658
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  satable
+    ## X-squared = 5342.7, df = 2, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
-subst.res<-round(substchi$residuals, 3)
+sa.res<-round(sachi$residuals, 3)
 
-corrplot::corrplot(subst.res, title = "Pearson residuals for home status and type of unintentional subst death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+corrplot::corrplot(sa.res, title = "Table 8b. Pearson residuals for home status and type of unintentional subst death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-12-2.png" style="display: block; margin: auto;" />
 
-### **9. By education**
+### 9. Educational attainment
+
+The educational attainment of almost 24% of homeless decedents could not be ascertained and this may not be surprising as many details about this population may be difficult to verify. Among homeless decedents for whom educational attainment could be ascertained over 60% had a high school diploma, GED, or less education. In comparison, decedents with permanent homes tended to have more formal education with a larger proportion having an Associates or Bachelors degree or higher compared with homeless decedents. Educational attainment is also statistically significantly associated with homeless status (p &lt; 0.05). As figure 9b indicates having less than a high school education was strongly positively correlated with being homeless while having an associates or bachelors degree was strongly negatively correlated with being homeless.
 
 ``` r
+# Chi square  - checking for expected counts < 5
+eductable <- table(EDAdf$educ, EDAdf$status)
+educchi<-chisq.test(eductable)
+educchi$expected
+```
+
+    ##                         
+    ##                           Homeless With home
+    ##   <=8th grade             77.42642 12346.574
+    ##   9-12th gr., no diploma  70.74571 11281.254
+    ##   H.S. grad/GED          359.24386 57285.756
+    ##   Some college           177.63081 28325.369
+    ##   Associate's             62.40729  9951.593
+    ##   Bachelors              166.47552 26546.524
+    ##   Masters                 57.56502  9179.435
+    ##   Doctorate/Professional  28.89157  4607.108
+    ##   Unknown                 92.61381 14768.386
+
+``` r
+#recoding unknown educational status among homeless based on armed forces participation,
+#collapsing individual groups
+EDAdf$educ2 <- NA
+EDAdf$educ2 <- ifelse(EDAdf$educ=="<=8th grade", "Less than H.S. grad", 
+  ifelse(EDAdf$educ=="9-12th gr., no diploma", "Less than H.S. grad",
+   ifelse(EDAdf$educ=="H.S. grad/GED", "H.S. grad/GED", 
+     ifelse(EDAdf$educ=="Unknown" & EDAdf$military=="Y", "H.S. grad/GED",
+        ifelse(EDAdf$educ=="Some college","Some college",
+          ifelse(EDAdf$educ=="Associate's","Associates/Bachelors",
+            ifelse(EDAdf$educ=="Bachelors","Associates/Bachelors",
+              ifelse(EDAdf$educ=="Masters","Masters/Doctorate/Professional",
+                ifelse(EDAdf$educ=="Doctorate/Professional","Masters/Doctorate/Professional",
+                  ifelse(EDAdf$educ=="Unknown","Unknown", NA))))))))))
+
+#barplot
 theme_set(theme_cowplot(font_size = 10))
-ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
+ploteduc2 <- ggplot(EDAdf, aes(x=educ2, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
             hjust = -0.25, size=3) +
-  labs(y="Percent", x = "Educational attainment", title = "Educational attainment
+  labs(y="Percent", x = "Educational attainment", title = "Figure 9a. Educational attainment
        by homeless status", caption = "Homeless: n=1,093; With home: 
        n = 174,292") +
   facet_grid(.~status) + 
@@ -2148,43 +2269,58 @@ ploteduc <- ggplot(EDAdf, aes(x=educ, group = status, fill = status)) +
   coord_flip() +
   guides(fill=FALSE)
 
-ploteduc + theme(panel.spacing.x = unit(2.5, "lines"))
+ploteduc2 + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
 
 ``` r
-eductable <- table(EDAdf$educ, EDAdf$status)
-
-# Chi square test of independence 
-educchi<-chisq.test(eductable)
-educchi
+#Chi Square test of independence
+eductable2 <- table(EDAdf$educ2, EDAdf$status)
+educchi2<-chisq.test(eductable2)
+educchi2
 ```
 
     ## 
     ##  Pearson's Chi-squared test
     ## 
-    ## data:  eductable
-    ## X-squared = 917.82, df = 8, p-value < 2.2e-16
+    ## data:  eductable2
+    ## X-squared = 790.89, df = 5, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
-educ.res<-round(educchi$residuals, 3)
+educ.res2<-round(educchi2$residuals, 3)
 
-corrplot::corrplot(educ.res, title = "Pearson residuals for home status and educational attainment", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+corrplot::corrplot(educ.res2, title = "Figure 9b. Pearson residuals for home status and educational attainment", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-13-2.png" style="display: block; margin: auto;" />
 
-### **10. By military service**
+### 10. Military service
+
+Armed forces participation was difficult to ascertain for over 11% of homeless decedents. Among those for whom military service information was available, homeless status was negatively correlated with armed forces participation (p &lt; 0.05).
 
 ``` r
+# Chi square  - checking for expected counts < 5
+miltable <- table(EDAdf$military, EDAdf$status)
+milchi<-chisq.test(miltable)
+milchi$expected
+```
+
+    ##    
+    ##       Homeless  With home
+    ##   N 798.955361 127403.045
+    ##   U   8.674949   1383.325
+    ##   Y 285.369690  45505.630
+
+``` r
+#bar plot
 theme_set(theme_cowplot(font_size = 10))
 plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
   geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
   geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
             vjust = -0.5, size=3) +
-  labs(y="Percent", x = "Armed Forces participation", title = "Armed Forces 
+  labs(y="Percent", x = "Armed Forces participation", title = "Figure 10a. Armed Forces 
        participation by homeless status", caption = "Homeless: n=1,093; With home: 
        n = 174,292") +
   facet_grid(.~status) + 
@@ -2194,16 +2330,34 @@ plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
 plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+
+``` r
+#Chi Square test of independence
+milchi
+```
+
+    ## 
+    ##  Pearson's Chi-squared test
+    ## 
+    ## data:  miltable
+    ## X-squared = 1493.5, df = 2, p-value < 2.2e-16
+
+``` r
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+mil.res<-round(milchi$residuals, 3)
+
+corrplot::corrplot(mil.res, title = "Figure 10b. Pearson residuals: homeless status by armed forces participation", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+```
+
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-14-2.png" style="display: block; margin: auto;" />
 
 C. Text analysis of cause of death text fields
 ----------------------------------------------
 
-Examining literal fields in death certificates may provide some insight into whether death certifiers used these fields to identify homeless individuals or whether there are certain recurring themes that are not captured by the underlying cause of death ICD 10 codes. I'm specifically interested in place of death street address and in cause of death literals (concatenating four part 1 lines and the part 2 contributing causes fields).
+Examining literal fields in death certificates may provide some insight into whether death certifiers used these fields to identify homeless individuals or whether there are certain recurring themes that are not captured by the underlying cause of death ICD 10 codes. The text fields contain the raw, unprcessed cause of death information For this part of the analysis I examine cause of death literals (concatenating the four part 1 lines and the part 2 contributing causes fields where medical certifiers can enter free text to describe what decease or injury caused a decedent's death).
 
-This part is looking at concatenated cause of death fields.
-
-Method - bag of words.
+I used the bag of words method to analyse the concatenated text fields. In addition to creating tokens consisting of single word stems, I also created a customized dictionary of "stop words" to remove commonly used words that do not contribute to an overall understanding of causes and context of death.
 
 The keyness plot below compares relative frequence of cause of death terms for decedents with homes vs. without homes. The chi square test shows the strength of the relationship between home status and dying of a particular cause of death.
 
@@ -2239,7 +2393,7 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-15-1.png" style="display: block; margin: auto;" />
 
 In the following plot, I repeat the above text analysis and plot two word combinations that show up most frequently by homeless status i.e. ngrams=2
 
@@ -2278,4 +2432,7 @@ textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, 
                  color = c("#EC7063","#4DB6AC"))
 ```
 
-<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
+<img src="Capstone_RNotebook_files/figure-markdown_github/unnamed-chunk-16-1.png" style="display: block; margin: auto;" />
+
+D. Discussion of findings from exploratory data analysis
+--------------------------------------------------------
