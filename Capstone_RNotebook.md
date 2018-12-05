@@ -2427,7 +2427,7 @@ T.dtm3 <- dfm(T.corpus,
            ngrams=2)
 
 
-T.keyness3 = textstat_keyness(T.dtm3, target = "Homeless")
+T.keyness3 <- textstat_keyness(T.dtm3, target = "Homeless")
 textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
                  color = c("#EC7063","#4DB6AC"))
 ```
@@ -2436,3 +2436,7 @@ textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, 
 
 D. Discussion of findings from exploratory data analysis
 --------------------------------------------------------
+
+Based on the exploratory data analysis above the features that are statistically significantly associated with homeless statust include age, gender, manner of death (i.e. natural, suicide, homicide, or accidental), leading cause of death (broad groupings of ICD-10 codes for the diseases or injuries that account for the greatest number of deaths), educational attainment, race/ethnicity, and military service. Among causes of death, unintended injuries, primarily unintentional poisoning by drugs accounts for a large proportion of homeless deaths.
+
+Analysis of raw text in the cause of death text fields reinforced findings from earlier analysis and also provided some additional insight into circumstances of death that was not apparent by simply analyzing a single underlying cause of death code for each death. Cause of death classification results in an oversimplification of the events leading to death and valuable details may be lost by analyzing ICD 10 codes alone. The two keyness plots above (particularly the second one) indicate that multiple illicit drugs were detected in the numerous drug overdose deaths or that there was a combination of both alcohol and illicit drugs present in the body at the time of death. Another new piece of information is that in many of the homeless deaths a key contributor to death was exposure to environmental cold resulting in hypothermia or leading to carbon monoxide poisoning (perhaps due to unsafe heating sources. The keyness plots also show the contrast between the types of deaths among homeless decedents and those with permanent homes. Decedents with homes were much more likely to die of chronic diseases characteristic of older age compared with accidents and injuries that led to the majority of homeless deaths.
