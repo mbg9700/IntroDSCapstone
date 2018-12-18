@@ -2,9 +2,11 @@
 title: "Classifying deaths in Washington State by homeless status"
 author: "Maya Bhat-Gregerson"
 date: "Fall 2018"
+always_allow_html: yes
 output:
   github_document:
     toc: TRUE
+    
 ---
 
 ```{r echo=FALSE, message = FALSE }
@@ -33,7 +35,7 @@ knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 9, fig.align = "
 
 The purpose of this project is twofold: (1) to conduct exploratory analysis comparing death data for known homeless decedents with data for those with permanent homes at the time of death, and (2) to use the findings to train a machine learning model to classify unlabeled deaths in Washington State by homeless status.  
 
-Currently, there is no consistent and definitive way to identify homelessness among decedents (such as a checkbox on the death certificate). Understanding the differences in demographics (gender, race/ethnicity, agegroup etc.) and causes of death between decedents who were homeless and those with permanent homes will validate our current understanding of the differences between these populations and provide direction for addressing the health needs of homeless individuals.
+Currently, there is no consistent and definitive way to identify homelessness among decedents (such as a checkbox on the death certificate). Understanding the differences in demographics (gender, race/ethnicity, age group etc.) and causes of death between decedents who were homeless and those with permanent homes will validate our current understanding of the differences between these populations and provide direction for addressing the health needs of homeless individuals.
 
 The data sets used for this project include Washington State final annual death certificate data for 2003-2017 and the King County Medical Examiner Office`s registry of deaths among homeless individuals who died in King County, Washington. This registry contains name, birth date, death date, and place of death for homeless individuals who died between 2003 through late 2017.  However, the registry does not contain important attributes that will be necessary for exploratory data analysis and for machine learning.  These additional attributes are available in the death certificate information for each of the decedents listed in the homeless death registry requiring a linkage of the registry and the death certificate data to have a complete data set.
 
@@ -44,9 +46,9 @@ The data sets used for this project include Washington State final annual death 
 
 The following diagram provides an overview of the data pre-processing steps in preparation for exploratory data analysis and machine learning.
 
-```{r}
+```{r, echo=FALSE}
 
-schematic <- "Data preprocessing schematic.png"
+schematic <- "Data preprocessing schematic2.png"
 include_graphics(schematic)
 
 ```
@@ -56,13 +58,13 @@ include_graphics(schematic)
 
 This step includes:
 
-a.  Limiting Washington annual mortality data sets (WAMD) for 2003 through 2017 to attributes that are likely to be relevant to training the machine learning model. 
+a.  Limiting Washington annual mortality data sets (WAMD) for 2003 through 2017 to attributes that are likely to be relevant to training the machine learning model e.g. removing administrative variables (such as date of death certificate filing, amendments to death certificate), name and relationship to decedent of person who reported the death etc. 
   
 b.  Standardizing attribute names and formats by renaming attributes and coercing data types in both WAMD and King County Homeless Death Registry (HDR) data. Due to changes in data collection practices for WAMD over the years, attribute names and formats are inconsistent.
   
 c.  Limiting records in WAMD to decedents who were Washington State residents who died in Washington State.
     
-d.  Deriving new features that group the records by agegroup, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
+d.  Deriving new features that group the records by age group, leading causes of death etc. to allow exploratory data analysis and comparison with the homeless death data.
 
 ###  2. Homeless decedents - linking homeless death data to their death certificates
 
@@ -93,26 +95,67 @@ This section addresses cleaning and limiting the data sets (in terms of number o
   
 ###  1.  Cleaning and standardizing WAMD annual data 2003-2017
 
-Read death certificate data in three groups as one combined dataset slowed R down too much. I created the three datasets using a SQL query in our vital statistics database and restricted the results to the desired features in the SQL query including:
+I created the dataset by connecting my R session to WA Department of Health's vital statistics SQL data base, selecting relevant features (variables), and renaming them for ease of use.  The resulting data set consists of the following features:
 
-last name, first name, middle name, social security number, death certificate number, date of death, date of birth, sex,type of death certifier (physician, Medical examiner, coroner etc), manner of death, cause of death (ICD 10 codes),   residence street address, residence city, residence zipcode, residence state, residence county, death county, death zipcode, death state, type of place where death occurred (hospital, home, hospice etc), educational attainment, marital status, race, ethnicity, occupation code.
+last name, first name, middle name, social security number, death certificate number, date of death, date of birth, sex,type of death certifier (physician, Medical examiner, coroner etc), manner of death, cause of death (ICD 10 codes),   residence street address, residence city, residence zipcode, residence state, residence county, death county, death zipcode, death state, type of place where death occurred (hospital, home, hospice etc), educational attainment, marital status, race, ethnicity, occupation code, and military service.
+
+A description of these features and their values is provided in the data dictionary found in Appendix A.
+
 
 ```{r}
-# Reading in WA death data 2003 through 2017 and appending into one data set
+library(RODBC)
 
-wa0307 <- fread("Data/WA2003_07.csv")
-wa0812 <- fread("Data/WA2008_12.csv")
-wa1317 <- fread("Data/WA2013_17.csv")
+wls <- odbcDriverConnect(connection ="Driver={ODBC Driver 13 for SQL Server};server=DOH01DBTUMP10,9799;
+                            database=WA_DB_DQSS;trusted_connection=yes;")
 
-WA0317 <- rbind(wa0307, wa0812, wa1317)
+WA0317 <- sqlQuery(wls,"SELECT SFN_NUM as 'certno', 
+	DOB as 'dob',
+	DOD as 'dod',
+	LNAME as 'lname',
+	GNAME as 'fname',
+	MNAME as 'mname',
+	SEX as 'sex',
+	SSN as 'ssn', 
+	CERT_DESIG as 'attclass',
+	RACE_NCHS_CD as 'brgrace',
+	DETHNIC_NO as 'hispanic',
+	MANNER as 'manner',
+	RES_COUNTY as 'rcounty',
+	RES_CITY as 'rcity', 
+	RES_ADDR1 as 'rstreet',  
+	RES_MATCH_CODE as 'resmatchcode', 
+	RES_STATE_FIPS_CD as 'rstateFIPS', 
+	RES_ZIP as 'rzip',
+	DADDR1 as 'dstreet', 
+	--DNAME_FIPS_CD as 'dcityFIPS',
+	DNAME_CITY as 'dcity',
+	DZIP9 as 'dzip',
+	DCOUNTY as 'dcounty', 
+	DSTATEL_FIPS_CD as 'dstateFIPS',
+	DPLACEL as 'dplacelit',
+	DPLACE as 'dplacecode', 
+	DATE_DEATH_YEAR as'dthyr',
+	--ME_CASE_NUM as 'MEcasenum', 
+	TRX_CAUSE_ACME as 'UCOD', 
+	TRX_REC_AXIS_CD as 'MCOD', 
+	DEDUC as 'educ', 
+	MARITAL as 'marital', 
+	OCCUP_MILHAM as 'occup',
+	ARMED as 'military',
+CODIA_QUERY+ ' ' + ISNULL(CODIB_QUERY, '') + ' ' + ISNULL(CODIC_QUERY, '') + ' ' + ISNULL(CODID_QUERY, '') + ' ' + ISNULL(CONDII_QUERY, '') + ' ' + ISNULL(INJRY_L_QUERY, '') as 'codlit'
+
+                   FROM [wa_vrvweb_events].[VRV_DEATH_TBL]
+                   WHERE SFN_NUM BETWEEN '2003000001' AND '2017089999'
+                   AND FL_VOIDED = '0'
+                   AND FL_CURRENT = '1'
+                   AND VRV_REGISTERED_FLAG = '1'")
+
+odbcClose(wls)
 
 
 WA0317 <-subset(WA0317, dstateFIPS=="WA")
 str(WA0317)
-
-
 ```
-
 
 I coerced specific features into factors and dates as they were read in as character strings by R.  To prepare for record linkage later I standardized the last and first name fields by removing leading, trailing, and mid-name white spaces, removed all hyphenations.  I also removed hyphens from the social security number charcter string.  I left social security number as a string to avoid losing leading zeroes.
 
@@ -134,6 +177,8 @@ WA0317$fname <- str_replace_all(WA0317$fname, pattern = "-", replacement = "")
 
 WA0317$ssn <- str_replace_all(WA0317$ssn, pattern= "-", replacement = "")
 
+WA0317$UCOD <- as.character(WA0317$UCOD)
+
 WA0317$UCOD <- ifelse((nchar(WA0317$UCOD)) < 4, paste(WA0317$UCOD, "0", sep = ""),
                       WA0317$UCOD)
 
@@ -154,6 +199,8 @@ WA0317$resmatchcode <- as.numeric(WA0317$resmatchcode)
 summary(WA0317)
 str(WA0317)
 ```
+
+The summary of the features shown above indicates that some have missing values e.g. "brgrace" (calculated race variable), "rstreet" (residential street address), "MCOD" (multiple cause of death). Some of these variables routinely have missing values for acceptable reasons, for example not all deaths have multiple causes of death as these are optional fields and the health care provider completing the death certificate may only report a single underlying cause of death.  Race is also a feature that routinely has substantial proportion of records with missing values as funeral homes (which typically report demographic information for decedents) may not be able to obtain this information. Further in the data processing when the data set is limited to deaths occurring in King County, WA, fewer variables have large numbers of missing variables and, where they exist, they are not necessary for linkage with the list of homeless decedents.
 
 ###  2.  Deriving new features in preparation for exploratory data analysis
 
@@ -507,9 +554,17 @@ The HDR contains name, date of birth, date of death, place of death (address), a
 
 KCMEO is required by law to submit a death certificate for all deaths it investigates.  For this reason, it is very likely that the decedents' last names, first names, and locations of death will be recorded in an identical manner in HDR as well as the death certificates (barring data entry error).  
 
-In this situation it is possible to use deterministic linkage to link HDR records with their complete death certificates. Using a derived attribute created by concatenating attributes in the HDR data set with low missing data ("namelast", "deathcity", "deathaddress", and "birthdate") and matching it with the same derived variable in the death data set should result in an accurate match and record linkage. 
+In this situation it is possible to use iterative deterministic linkage to link HDR records with their complete death certificates. Using a derived attribute created by concatenating attributes in the HDR data set with low missing data ("namelast", "deathcity", "deathaddress", and "birthdate") and matching it with the same derived variable in the death data set should result in an accurate match and record linkage. 
 
-Pre-processing of the HDR and death data sets includes standardizing the values in the attributes to be used in the linkage, and creating the derived variable (concatenation of the above variables) in both data sets. The following steps use multiple combinations of key variables to link the homeless death registry records with their corresponding death certificates.  The linking variables were selected based on the proportion that were missing values.  Variables with low proportions of missing values were selected to complete the linkage.
+Pre-processing of the HDR and death data sets includes standardizing the values in the attributes to be used in the linkage, and creating the derived variable (concatenation of the above variables) in both data sets. The following steps use multiple combinations of key variables to link the homeless death registry records with their corresponding death certificates.  The linking variables were selected based on the proportion that were missing values.  Variables with low proportions of missing values were selected to complete the linkage. The four stage linkage process and the results of each round include:
+
+  -iteration 1: last name, first name, date of birth - 89% (n=1,008) identification
+  -iteration 2 (starting with only unmatched records from iteration 1): social security number - 5.5% (n=62) identification
+  -iteration 3 (starting with only unmatched records from iteration 2): date of death, last name, first name - 1.5% (n=17) identification
+  -iteration 4 (starting with only unmatched records from iteration 3): date of death, date of birth, last name - 0.5% (n=6) identification
+
+Conducting the linkage steps listed above in reverse order yields the same number (1,093 out of 1,131) of linked records.
+
 
 
 ```{r homeless_dth_link}
@@ -580,11 +635,51 @@ homelessd <- distinct(homelessd, lname.h, dob.h, .keep_all = TRUE)
 homeless5 <-filter(homelessd, is.na(certno.k))
 homelessd1 <- filter(homelessd, !is.na(certno.k))
 
-
-
 # Round 4 linkage yielded an additional 6 matched records 
 
-# Total matched records after 4 rounds of linkage = 1,106 out of a possible 1,131 homeless decedents
+# Total matched records after 4 rounds of linkage = 1,093 out of a possible 1,131 homeless decedents
+
+
+
+#################################
+## Implementing linking steps in reverse also yields 1,093 linked records###############
+
+homelessw <- merge(homeless, KC,by.x = c("dob.h", "dod.h", "lname.h"), 
+                   by.y = c("dob.k", "dod.k","lname.k"), all.x = TRUE)
+homelessw <- distinct(homelessw, lname.h, dob.h, .keep_all = TRUE)
+homelessw1 <- filter(homelessw, !is.na(certno.k))
+
+homeless10 <-filter(homelessw, is.na(certno.k))
+
+##790 linked in first round
+
+homeless10 <- select(homeless10, ends_with(".h"))
+homelessx <- merge(homeless10, KC, by.x =  c("dod.h", "fname.h", "lname.h"), 
+                   by.y = c("dod.k", "fname.k", "lname.k"), all.x = TRUE)
+homelessx <- distinct(homelessx, lname.h, dob.h, .keep_all = TRUE)
+homeless11 <-filter(homelessx, is.na(certno.k))
+homelessx1 <- filter(homelessx, !is.na(certno.k))
+
+##37 linked in second round
+
+homeless11 <- select(homeless11, ends_with(".h"))
+homelessy <- merge(homeless11, KC, by.x = "ssn.h", by.y = "ssn.k", all.x = TRUE)
+homelessy <- distinct(homelessy, lname.h, dob.h, .keep_all = TRUE)
+homeless12 <-filter(homelessy, is.na(certno.k))
+homelessy1 <- filter(homelessy, !is.na(certno.k))
+
+#165 linked in third round
+
+homeless12 <- select(homeless12, ends_with(".h"))
+homelessz <- merge(homeless12, KC, by.x = c("lname.h", "fname.h", "dob.h"), 
+                   by.y = c("lname.k", "fname.k", "dob.k"), all.x=TRUE)
+homelessz <- distinct(homelessz, lname.h, dob.h, .keep_all = TRUE)
+homeless13 <- filter(homelessz, is.na(certno.k))
+homelessz1 <- filter(homelessz, !is.na(certno.k))
+
+#101 linked in fourth round
+
+############################
 
 keepvar_h <- c("certno.k", "lname.h", "fname.h", "dob.h", "age.h", "mname.h", "dod.h", 
                "placeofdeath.h", "deathaddr.h", "deathcity.h", "dzip.h", "eventaddr.h", 
@@ -1186,7 +1281,7 @@ T <- EDAdf
 T$doc_id <-as.character(T$certno)
 T$text <- T$CODliteral
 
-CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse" )
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "use")
 
 
 T <- select(T, doc_id, text, everything())
@@ -1215,9 +1310,8 @@ textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n
 
 In the following plot, I repeat the above text analysis and plot two word combinations that show up most frequently by homeless status i.e. ngrams=2
 
-Interesting to see that there are so many deaths due to environmental exposure/hypothermia and substance use among the homeless compared with mostly chronic illness among the 'with home' decedents.  
+Drug and alcohol use are most strongly correlated with homeless deaths as are deaths deaths due to environmental exposure/hypothermia.  In comparison deaths to 'with home' decedents are most strongly associated with chronic diseases such as lung cancer and dementia, or conditions associated with old age such as aspirational pneumonia.  
 
-Need to compare month of death for homeless vs. with home to understand when the environmental exposure deaths occurred.
 
 ```{r fig.width=9, fig.height=7}
 
@@ -1226,7 +1320,7 @@ T <- EDAdf
 T$doc_id <-as.character(T$certno)
 T$text <- T$CODliteral
 
-CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "unknown", "if", "cause", "death" )
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "unknown", "if", "cause", "death", "use", "in")
 
 
 T <- select(T, doc_id, text, everything())
@@ -1250,7 +1344,6 @@ T.keyness3 <- textstat_keyness(T.dtm3, target = "Homeless")
 textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
                  color = c("#EC7063","#4DB6AC"))
 
-
 ```
 
 ## D. Discussion of findings from exploratory data analysis
@@ -1259,4 +1352,20 @@ Based on the exploratory data analysis above the features that are statistically
 
 Analysis of raw text in the cause of death text fields reinforced findings from earlier analysis and also provided some additional insight into circumstances of death that was not apparent by simply analyzing a single underlying cause of death code for each death. Cause of death classification results in an oversimplification of the events leading to death and valuable details may be lost by analyzing ICD 10 codes alone.  The two keyness plots above (particularly the second one) indicate that multiple illicit drugs were detected in the numerous drug overdose deaths or that there was a combination of both alcohol and illicit drugs present in the body at the time of death.  Another new piece of information is that in many of the homeless deaths a key contributor to death was exposure to environmental cold resulting in hypothermia or leading to carbon monoxide poisoning (perhaps due to unsafe heating sources.  The keyness plots also show the contrast between the types of deaths among homeless decedents and those with permanent homes.  Decedents with homes were much more likely to die of chronic diseases characteristic of older age compared with accidents and injuries that led to the majority of homeless deaths.
 
+
+## APPENDICES
+
+### Appendix A - Data dictionary for Washington State Mortality Data
+
+```{r}
+dd <- read.csv("DthDataDictionary.csv")
+library(kableExtra)
+
+dd %>%
+  kable() %>%
+  kable_styling(full_width = F, font_size = 10) %>%
+  column_spec(2, width = "15em") %>%
+  column_spec(3, width = "40em")
+
+```
 
