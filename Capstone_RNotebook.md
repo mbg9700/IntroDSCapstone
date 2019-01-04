@@ -152,40 +152,40 @@ WA0317 <-subset(WA0317, dstateFIPS=="WA")
 str(WA0317)
 ```
 
-    ## 'data.frame':    373707 obs. of  33 variables:
+    ## 'data.frame':    745940 obs. of  33 variables:
     ##  $ certno      : int  2017012363 2017019356 2017019357 2017019358 2017019359 2017026057 2017019361 2017019363 2017019367 2017019368 ...
-    ##  $ dob         : Factor w/ 34311 levels "01/01/1900","01/01/1902",..: 9866 11515 33864 24859 25521 20443 3217 18764 438 3024 ...
-    ##  $ dod         : Factor w/ 4552 levels "01/01/2003","01/01/2004",..: 788 1462 1462 1449 1449 2019 1397 1449 1488 1488 ...
-    ##  $ lname       : Factor w/ 82359 levels "A'BEAR","A'NIJEHOLT",..: 75814 9971 3940 34658 72182 30537 10279 24440 24962 46724 ...
-    ##  $ fname       : Factor w/ 23932 levels "\"FAY\"","\"TED\" THEODORE",..: 20780 5811 20009 23119 21334 10503 18844 18776 5403 5988 ...
-    ##  $ mname       : Factor w/ 28018 levels "-","--","------",..: 4744 NA 7492 14624 NA 8892 16992 10508 7791 13283 ...
+    ##  $ dob         : Factor w/ 39167 levels "01/01/1900","01/01/1902",..: 11211 13118 38661 28345 29099 23295 3684 21388 490 3463 ...
+    ##  $ dod         : Factor w/ 5480 levels "00/00/2016","01/01/2003",..: 935 1715 1715 1700 1700 2360 1640 1700 1745 1745 ...
+    ##  $ lname       : Factor w/ 123176 levels "A'ALONA-MOUNTS",..: 113287 15001 6225 51473 107797 45435 15457 36512 37315 69673 ...
+    ##  $ fname       : Factor w/ 38249 levels "'NONE'","'O",..: 33096 9031 31799 36830 34007 16346 29848 29741 8393 9306 ...
+    ##  $ mname       : Factor w/ 46681 levels "-","--","---",..: 7844 NA 12394 24147 NA 14621 28104 17257 12869 21797 ...
     ##  $ sex         : Factor w/ 3 levels "F","M","U": 1 2 1 2 1 1 1 2 1 2 ...
-    ##  $ ssn         : Factor w/ 375634 levels "000-00-0005",..: 263489 26465 296203 348119 9373 38368 75521 55387 287588 45964 ...
+    ##  $ ssn         : Factor w/ 744513 levels "000-00-0005",..: 516050 53912 580348 686098 18834 77731 149648 111489 564044 92640 ...
     ##  $ attclass    : int  7 1 1 2 1 1 1 2 1 1 ...
     ##  $ brgrace     : int  1 1 1 1 1 1 1 1 1 1 ...
     ##  $ hispanic    : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner      : Factor w/ 6 levels "A","C","H","N",..: 4 4 4 1 4 4 4 4 4 4 ...
-    ##  $ rcounty     : Factor w/ 824 levels "ADA","ADAMS",..: 371 410 410 669 568 148 371 339 133 149 ...
-    ##  $ rcity       : Factor w/ 2689 levels "4600 WELS","69006 LYON",..: 283 385 367 1439 848 2171 1173 1286 1414 2486 ...
-    ##  $ rstreet     : Factor w/ 301516 levels "#1 CONVALESCENT CENTER BLVD",..: 31547 5787 145986 51693 9438 236590 119463 222148 91139 263960 ...
+    ##  $ rcounty     : Factor w/ 1110 levels "-","ACADIA","ADA",..: 497 547 547 908 762 198 497 454 179 199 ...
+    ##  $ rcity       : Factor w/ 3849 levels "4600 WELS","69006 LYON",..: 418 565 539 2060 1222 3082 1674 1825 2026 3551 ...
+    ##  $ rstreet     : Factor w/ 565792 levels "- BLDG 3764 C STRYKER AVENUE",..: 58753 10789 273747 96690 17620 444874 224105 417482 171057 495873 ...
     ##  $ resmatchcode: int  100 100 100 100 100 NA 100 100 100 100 ...
-    ##  $ rstateFIPS  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip        : Factor w/ 4189 levels "00000","00705",..: 3129 3461 3457 3222 3289 3348 2993 3207 3617 3575 ...
-    ##  $ dstreet     : Factor w/ 119336 levels "-AT SEA","\"A PART OF THE FAMILY\" 2618 W 10TH",..: 116697 2314 NA 115454 112973 NA 118541 83255 34134 118548 ...
-    ##  $ dcity       : Factor w/ 1852 levels "A. MUANG THAILAND",..: 1466 269 259 969 598 1474 1138 852 953 1720 ...
-    ##  $ dzip        : Factor w/ 1703 levels "00000","01960",..: 884 1217 1215 975 1040 1092 902 966 1388 1334 ...
-    ##  $ dcounty     : Factor w/ 651 levels "ACADIA","ADA",..: 285 315 315 532 438 113 285 260 103 114 ...
-    ##  $ dstateFIPS  : Factor w/ 83 levels "AK","AL","AR",..: 79 79 79 79 79 79 79 79 79 79 ...
-    ##  $ dplacelit   : Factor w/ 19 levels "DECEDENT'S HOME",..: 14 14 11 14 14 14 15 1 1 5 ...
+    ##  $ rstateFIPS  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip        : Factor w/ 15555 levels "00000","00077",..: 7661 11656 11579 8784 9437 10089 5680 8652 13121 12785 ...
+    ##  $ dstreet     : Factor w/ 266441 levels "-- ENTER OTHER RESIDENCE ADDRESS AT",..: 257570 4823 NA 254060 245789 NA 263975 179608 73341 264018 ...
+    ##  $ dcity       : Factor w/ 2614 levels "171 M.3 T.MAE NA RUE A.MUANG",..: 2068 390 376 1374 848 2081 1602 1217 1354 2414 ...
+    ##  $ dzip        : Factor w/ 4998 levels "00000","01027",..: 2236 3614 3595 2589 2808 3017 2305 2560 4167 3993 ...
+    ##  $ dcounty     : Factor w/ 885 levels "A MUANG","ACADIA",..: 395 434 434 727 595 161 395 361 147 162 ...
+    ##  $ dstateFIPS  : Factor w/ 105 levels "53","AF","AK",..: 98 98 98 98 98 98 98 98 98 98 ...
+    ##  $ dplacelit   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 16 16 13 16 16 16 17 3 3 7 ...
     ##  $ dplacecode  : int  5 5 4 5 5 5 1 0 0 7 ...
     ##  $ dthyr       : int  2017 2017 2017 2017 2017 2017 2017 2017 2017 2017 ...
-    ##  $ UCOD        : Factor w/ 2694 levels "000","0000","A020",..: 1020 1127 913 1307 1120 1118 1043 1043 361 1112 ...
-    ##  $ MCOD        : Factor w/ 194088 levels "A020 A419","A020 A419 E872 I48",..: NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ UCOD        : Factor w/ 3133 levels ".","000","0000",..: 1188 1306 1057 1510 1299 1297 1211 1211 417 1290 ...
+    ##  $ MCOD        : Factor w/ 351268 levels ".","A020 A090 E86 I251 N170 N179",..: NA NA NA NA NA NA NA NA NA NA ...
     ##  $ educ        : int  4 3 6 6 3 3 4 4 4 1 ...
     ##  $ marital     : Factor w/ 7 levels "A","D","M","P",..: 2 7 7 3 7 7 7 5 3 7 ...
-    ##  $ occup       : Factor w/ 422 levels "`","000","007",..: 399 233 135 96 399 162 166 142 183 341 ...
+    ##  $ occup       : Factor w/ 430 levels "`","000","007",..: 407 237 137 97 407 165 169 144 186 348 ...
     ##  $ military    : Factor w/ 3 levels "N","U","Y": 1 1 1 3 1 1 1 1 1 3 ...
-    ##  $ codlit      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 79310 260877 226860 265479 204078 110195 79253 136703 102115 ...
+    ##  $ codlit      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 165190 519898 450424 528728 407828 224188 165129 276514 208464 ...
 
 I coerced specific features into factors and dates as they were read in as character strings by R. To prepare for record linkage later I standardized the last and first name fields by removing leading, trailing, and mid-name white spaces, removed all hyphenations. I also removed hyphens from the social security number charcter string. I left social security number as a string to avoid losing leading zeroes.
 
@@ -231,123 +231,123 @@ summary(WA0317)
 
     ##      certno               dob                  dod            
     ##  Min.   :2.003e+09   Min.   :1893-05-27   Min.   :2003-01-01  
-    ##  1st Qu.:2.005e+09   1st Qu.:1920-03-27   1st Qu.:2005-01-20  
-    ##  Median :2.007e+09   Median :1928-08-28   Median :2007-01-26  
-    ##  Mean   :2.007e+09   Mean   :1933-06-10   Mean   :2007-04-19  
-    ##  3rd Qu.:2.009e+09   3rd Qu.:1943-05-20   3rd Qu.:2009-01-05  
-    ##  Max.   :2.017e+09   Max.   :2017-08-08   Max.   :2017-08-21  
-    ##                      NA's   :43                               
+    ##  1st Qu.:2.007e+09   1st Qu.:1923-01-23   1st Qu.:2007-01-23  
+    ##  Median :2.010e+09   Median :1932-05-26   Median :2010-12-07  
+    ##  Mean   :2.010e+09   Mean   :1936-08-15   Mean   :2010-10-14  
+    ##  3rd Qu.:2.014e+09   3rd Qu.:1947-01-16   3rd Qu.:2014-08-13  
+    ##  Max.   :2.017e+09   Max.   :2017-12-31   Max.   :2017-12-31  
+    ##                      NA's   :74                               
     ##     lname              fname               mname        sex       
-    ##  Length:373707      Length:373707      MARIE  :  7867   F:187356  
-    ##  Class :character   Class :character   LEE    :  7742   M:186350  
-    ##  Mode  :character   Mode  :character   ANN    :  7082   U:     1  
-    ##                                        M      :  6003             
-    ##                                        L      :  5333             
-    ##                                        (Other):306520             
-    ##                                        NA's   : 33160             
+    ##  Length:745940      Length:745940      LEE    : 17386   F:369857  
+    ##  Class :character   Class :character   ANN    : 16544   M:376074  
+    ##  Mode  :character   Mode  :character   MARIE  : 16416   U:     9  
+    ##                                        JEAN   : 10791             
+    ##                                        M      : 10107             
+    ##                                        (Other):610339             
+    ##                                        NA's   : 64357             
     ##      ssn               attclass         brgrace       hispanic  
-    ##  Length:373707      1      :293239   1      :296880   N: 53927  
-    ##  Class :character   2      : 52652   2      :  8552   Y:319780  
-    ##  Mode  :character   7      : 12513   15     :  4636             
-    ##                     3      : 12230   3      :  4427             
-    ##                     6      :  3051   6      :  2098             
-    ##                     9      :    14   (Other): 11026             
-    ##                     (Other):     8   NA's   : 46088             
+    ##  Length:745940      1      :555602   1      :628492   N: 65318  
+    ##  Class :character   2      :107583   2      : 18751   Y:680622  
+    ##  Mode  :character   7      : 42333   15     : 10363             
+    ##                     3      : 30181   3      :  9900             
+    ##                     6      :  8862   6      :  4928             
+    ##                     (Other):    43   (Other): 27283             
+    ##                     NA's   :  1336   NA's   : 46223             
     ##   manner            rcounty             rcity       
-    ##  A   : 20641   KING     : 90879   SEATTLE  : 34238  
-    ##  C   :  1362   PIERCE   : 43807   SPOKANE  : 18578  
-    ##  H   :  1813   SNOHOMISH: 33877   TACOMA   : 18232  
-    ##  N   :342907   SPOKANE  : 29703   VANCOUVER: 15103  
-    ##  P   :    22   CLARK    : 19795   EVERETT  :  8521  
-    ##  S   :  6915   (Other)  :155293   (Other)  :278966  
-    ##  NA's:    47   NA's     :   353   NA's     :    69  
+    ##  A   : 42454   KING     :178725   SEATTLE  : 64245  
+    ##  C   :  2826   PIERCE   : 87204   SPOKANE  : 36951  
+    ##  H   :  3603   SNOHOMISH: 69007   TACOMA   : 35351  
+    ##  N   :682229   SPOKANE  : 59687   VANCOUVER: 30909  
+    ##  P   :    57   CLARK    : 40876   EVERETT  : 16875  
+    ##  S   : 14674   (Other)  :309645   (Other)  :561412  
+    ##  NA's:    97   NA's     :   796   NA's     :   197  
     ##                    rstreet        resmatchcode      rstateFIPS    
-    ##  UNKNOWN               :   637   Min.   :  0.00   WA     :364161  
-    ##  4831 35TH AVE SW      :   343   1st Qu.:100.00   OR     :  3355  
-    ##  7500 SEWARD PARK AVE S:   325   Median :100.00   ID     :  1768  
-    ##  534 BOYER AVE         :   323   Mean   : 95.56   CA     :   833  
-    ##  13023 GREENWOOD AVE N :   301   3rd Qu.:100.00   AK     :   571  
-    ##  (Other)               :371775   Max.   :100.00   (Other):  3018  
-    ##  NA's                  :     3   NA's   :198      NA's   :     1  
+    ##  UNKNOWN               :  1759   Min.   :  0.00   WA     :727568  
+    ##  7500 SEWARD PARK AVE S:   608   1st Qu.:100.00   OR     :  6428  
+    ##  4831 35TH AVE SW      :   596   Median :100.00   ID     :  3251  
+    ##  534 BOYER AVE         :   568   Mean   : 94.57   CA     :  1520  
+    ##  13023 GREENWOOD AVE N :   545   3rd Qu.:100.00   AK     :  1213  
+    ##  (Other)               :741824   Max.   :100.00   (Other):  5959  
+    ##  NA's                  :    40   NA's   :47629    NA's   :     1  
     ##       rzip                                       dstreet      
-    ##  98632  :  4380   FRANCISCAN HOSPICE HOUSE           :  2142  
-    ##  98133  :  3830   12822 124TH LANE NE                :   628  
-    ##  98902  :  3543   TRI-CITIES CHAPLAINCY HOSPICE HOUSE:   509  
-    ##  98382  :  3289   12822 124TH LN NE                  :   301  
-    ##  99208  :  3121   HOSPICE HOUSE                      :   299  
-    ##  (Other):355439   (Other)                            :135836  
-    ##  NA's   :   105   NA's                               :233992  
+    ##  98632  :  8356   FRANCISCAN HOSPICE HOUSE           :  5246  
+    ##  98133  :  7166   COTTAGE IN THE MEADOW              :  1760  
+    ##  98902  :  6808   TRI-CITIES CHAPLAINCY HOSPICE HOUSE:  1212  
+    ##  99208  :  6420   12822 124TH LANE NE                :  1072  
+    ##  98382  :  6354   HOSPICE OF SPOKANE HOSPICE HOUSE   :   961  
+    ##  (Other):710599   (Other)                            :339320  
+    ##  NA's   :   237   NA's                               :396369  
     ##        dcity             dzip             dcounty       dstateFIPS 
-    ##  SEATTLE  : 48664   98201  :  7101   KING     :102557   WA:373707  
-    ##  SPOKANE  : 26615   98122  :  6798   PIERCE   : 44837              
-    ##  TACOMA   : 19956   98902  :  6444   SPOKANE  : 33775              
-    ##  VANCOUVER: 18163   98405  :  6296   SNOHOMISH: 31002              
-    ##  EVERETT  : 12072   98104  :  5994   CLARK    : 21084              
-    ##  (Other)  :248161   (Other):295059   (Other)  :140451              
-    ##  NA's     :    76   NA's   : 46015   NA's     :     1              
-    ##                        dplacelit        dplacecode         dthyr      
-    ##  Hospital (inpatient)       :112425   4      :112865   2008   :48757  
-    ##  Home                       :112281   0      :112761   2009   :48349  
-    ##  Nursing home/long term care:101551   5      :101849   2007   :47539  
-    ##  Other place                : 18462   1      : 18537   2006   :46287  
-    ##  Hospice                    : 14965   7      : 15077   2005   :46272  
-    ##  Emergency room             : 12154   3      : 12194   2003   :45924  
-    ##  (Other)                    :  1869   (Other):   424   (Other):90579  
+    ##  SEATTLE  : 91224   98201  : 16625   KING     :200694   WA:745940  
+    ##  SPOKANE  : 53197   98405  : 15479   PIERCE   : 90133              
+    ##  TACOMA   : 38773   98122  : 13600   SPOKANE  : 67646              
+    ##  VANCOUVER: 37582   98506  : 12579   SNOHOMISH: 64035              
+    ##  EVERETT  : 25553   99204  : 12567   CLARK    : 43746              
+    ##  (Other)  :499517   (Other):629041   (Other)  :279682              
+    ##  NA's     :    94   NA's   : 46049   NA's     :     4              
+    ##                        dplacelit        dplacecode         dthyr       
+    ##  Home                       :220536   0      :237123   2017   : 56986  
+    ##  Hospital (inpatient)       :204310   4      :218105   2016   : 54783  
+    ##  Nursing home/long term care:165922   5      :187867   2015   : 54651  
+    ##  Hospice                    : 36101   7      : 39535   2014   : 52074  
+    ##  Other place                : 34453   1      : 37526   2013   : 51261  
+    ##  Emergency room             : 22323   3      : 23853   2012   : 50161  
+    ##  (Other)                    : 62295   (Other):  1931   (Other):426024  
     ##       UCOD               MCOD             educ        marital   
-    ##  C349   : 24968   C349 F179:  7219   3      :130911   A:   939  
-    ##  I251   : 24422   G309     :  5164   4      : 54493   D: 58926  
-    ##  G309   : 20455   C349     :  4168   9      : 46115   M:142727  
-    ##  I219   : 18505   C509     :  3238   6      : 36291   P:   225  
-    ##  J449   : 16328   I250     :  3217   1      : 33061   S: 36082  
-    ##  (Other):268864   (Other)  :349053   2      : 33024   U:  1755  
-    ##  NA's   :   165   NA's     :  1648   (Other): 39812   W:133053  
+    ##  C349   : 46385   C349 F179: 12914   3      :275429   A:  2408  
+    ##  I251   : 44322   G309     : 10676   4      :120355   D:125505  
+    ##  G309   : 43577   C349     :  6624   6      : 83031   M:279434  
+    ##  I219   : 32710   C259     :  5855   2      : 65277   P:   877  
+    ##  J449   : 30481   C509     :  5679   1      : 60747   S: 75571  
+    ##  (Other):548195   (Other)  :653617   9      : 51414   U:  4138  
+    ##  NA's   :   270   NA's     : 50575   (Other): 89687   W:258007  
     ##      occup        military                             codlit      
-    ##  908    : 69673   N:263206   LUNG CANCER                  :  3401  
-    ##  183    :  8932   U:  1969   ALZHEIMERS DEMENTIA          :  1735  
-    ##  290    :  7736   Y:108532   PANCREATIC CANCER            :  1575  
-    ##  396    :  6710              METASTATIC BREAST CANCER     :  1478  
-    ##  150    :  6486              COPD                         :  1456  
-    ##  (Other):266154              (Other)                      :363971  
-    ##  NA's   :  8016              NA's                         :    91
+    ##  908    :126897   N:529289   LUNG CANCER                  :  5731  
+    ##  183    : 19104   U:  4263   PANCREATIC CANCER            :  3184  
+    ##  290    : 15837   Y:212388   ALZHEIMERS DEMENTIA          :  2833  
+    ##  150    : 13582              METASTATIC BREAST CANCER     :  2743  
+    ##  396    : 13464              METASTATIC LUNG CANCER       :  2380  
+    ##  (Other):542052              (Other)                      :728924  
+    ##  NA's   : 15004              NA's                         :   145
 
 ``` r
 str(WA0317)
 ```
 
-    ## 'data.frame':    373707 obs. of  33 variables:
+    ## 'data.frame':    745940 obs. of  33 variables:
     ##  $ certno      : int  2017012363 2017019356 2017019357 2017019358 2017019359 2017026057 2017019361 2017019363 2017019367 2017019368 ...
     ##  $ dob         : Date, format: "1945-04-15" "1918-05-03" ...
     ##  $ dod         : Date, format: "2017-03-03" "2017-04-24" ...
     ##  $ lname       : chr  "VANRY" "BYERS" "BASKIN" "JOHNSON" ...
     ##  $ fname       : chr  "SYLVIA" "DOUGLAS" "SHIRLEY" "WILLARD" ...
-    ##  $ mname       : Factor w/ 28018 levels "-","--","------",..: 4744 NA 7492 14624 NA 8892 16992 10508 7791 13283 ...
+    ##  $ mname       : Factor w/ 46681 levels "-","--","---",..: 7844 NA 12394 24147 NA 14621 28104 17257 12869 21797 ...
     ##  $ sex         : Factor w/ 3 levels "F","M","U": 1 2 1 2 1 1 1 2 1 2 ...
     ##  $ ssn         : chr  "537446055" "258429171" "539181252" "559307744" ...
-    ##  $ attclass    : Factor w/ 9 levels "0","1","2","3",..: 8 2 2 3 2 2 2 3 2 2 ...
+    ##  $ attclass    : Factor w/ 10 levels "0","1","2","3",..: 8 2 2 3 2 2 2 3 2 2 ...
     ##  $ brgrace     : Factor w/ 20 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
     ##  $ hispanic    : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner      : Factor w/ 6 levels "A","C","H","N",..: 4 4 4 1 4 4 4 4 4 4 ...
-    ##  $ rcounty     : Factor w/ 821 levels "ADA","ADAMS",..: 370 409 409 667 566 148 370 338 133 149 ...
-    ##  $ rcity       : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 281 383 365 1433 843 2163 1168 1281 1408 2476 ...
-    ##  $ rstreet     : Factor w/ 295132 levels "#1 CONVALESCENT CENTER BLVD",..: 30855 5652 142771 50552 9212 231527 116818 217369 89082 258357 ...
+    ##  $ rcounty     : Factor w/ 1097 levels "ACADIA","ADA",..: 491 541 541 898 754 195 491 449 176 196 ...
+    ##  $ rcity       : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 415 560 534 2045 1211 3059 1663 1812 2011 3522 ...
+    ##  $ rstreet     : Factor w/ 555079 levels "#1 5TH AND MAIN ST.",..: 57600 10570 268421 94779 17238 436377 219748 409453 167666 486464 ...
     ##  $ resmatchcode: num  100 100 100 100 100 NA 100 100 100 100 ...
-    ##  $ rstateFIPS  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip        : Factor w/ 4162 levels "00000","00705",..: 3110 3438 3434 3202 3269 3327 2975 3187 3594 3552 ...
-    ##  $ dstreet     : Factor w/ 119336 levels "-AT SEA","\"A PART OF THE FAMILY\" 2618 W 10TH",..: 116697 2314 NA 115454 112973 NA 118541 83255 34134 118548 ...
-    ##  $ dcity       : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 94 92 368 220 550 427 321 359 641 ...
-    ##  $ dzip        : Factor w/ 1117 levels "00000","03282",..: 311 643 641 401 466 518 329 392 814 760 ...
+    ##  $ rstateFIPS  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip        : Factor w/ 15491 levels "00000","00077",..: 7625 11606 11529 8744 9396 10046 5651 8612 13065 12733 ...
+    ##  $ dstreet     : Factor w/ 266441 levels "-- ENTER OTHER RESIDENCE ADDRESS AT",..: 257570 4823 NA 254060 245789 NA 263975 179608 73341 264018 ...
+    ##  $ dcity       : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 102 100 404 244 600 467 356 395 695 ...
+    ##  $ dzip        : Factor w/ 3809 levels "00000","03282",..: 1086 2463 2444 1438 1657 1866 1155 1409 3016 2842 ...
     ##  $ dcounty     : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 21 21 32 27 5 17 15 4 6 ...
     ##  $ dstateFIPS  : Factor w/ 1 level "WA": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ dplacelit   : Factor w/ 18 levels "DECEDENT'S HOME",..: 13 13 10 13 13 13 14 1 1 5 ...
+    ##  $ dplacelit   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 16 16 13 16 16 16 17 3 3 7 ...
     ##  $ dplacecode  : Factor w/ 10 levels "0","1","2","3",..: 6 6 5 6 6 6 2 1 1 8 ...
-    ##  $ dthyr       : Factor w/ 14 levels "2003","2004",..: 14 14 14 14 14 14 14 14 14 14 ...
-    ##  $ UCOD        : Factor w/ 2656 levels "A020","A021",..: 1010 1117 905 1297 1110 1108 1033 1033 356 1102 ...
-    ##  $ MCOD        : Factor w/ 190524 levels "A020 A419","A020 A419 E872 I48",..: NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ dthyr       : Factor w/ 15 levels "2003","2004",..: 15 15 15 15 15 15 15 15 15 15 ...
+    ##  $ UCOD        : Factor w/ 3086 levels "A020","A021",..: 1178 1296 1049 1500 1289 1287 1201 1201 412 1280 ...
+    ##  $ MCOD        : Factor w/ 345266 levels "A020 A090 E86 I251 N170 N179",..: NA NA NA NA NA NA NA NA NA NA ...
     ##  $ educ        : Factor w/ 9 levels "1","2","3","4",..: 4 3 6 6 3 3 4 4 4 1 ...
     ##  $ marital     : Factor w/ 7 levels "A","D","M","P",..: 2 7 7 3 7 7 7 5 3 7 ...
-    ##  $ occup       : Factor w/ 422 levels "`","000","007",..: 399 233 135 96 399 162 166 142 183 341 ...
+    ##  $ occup       : Factor w/ 430 levels "`","000","007",..: 407 237 137 97 407 165 169 144 186 348 ...
     ##  $ military    : Factor w/ 3 levels "N","U","Y": 1 1 1 3 1 1 1 1 1 3 ...
-    ##  $ codlit      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 79310 260877 226860 265479 204078 110195 79253 136703 102115 ...
+    ##  $ codlit      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 165190 519898 450424 528728 407828 224188 165129 276514 208464 ...
 
 The summary of the features shown above indicates that some have missing values e.g. "brgrace" (calculated race variable), "rstreet" (residential street address), "MCOD" (multiple cause of death). Some of these variables routinely have missing values for acceptable reasons, for example not all deaths have multiple causes of death as these are optional fields and the health care provider completing the death certificate may only report a single underlying cause of death. Race is also a feature that routinely has substantial proportion of records with missing values as funeral homes (which typically report demographic information for decedents) may not be able to obtain this information. Further in the data processing when the data set is limited to deaths occurring in King County, WA, fewer variables have large numbers of missing variables and, where they exist, they are not necessary for linkage with the list of homeless decedents.
 
@@ -532,40 +532,40 @@ detach(WA0317)
 str(WA0317)
 ```
 
-    ## 'data.frame':    373707 obs. of  41 variables:
+    ## 'data.frame':    745940 obs. of  41 variables:
     ##  $ certno      : int  2017012363 2017019356 2017019357 2017019358 2017019359 2017026057 2017019361 2017019363 2017019367 2017019368 ...
     ##  $ dob         : Date, format: "1945-04-15" "1918-05-03" ...
     ##  $ dod         : Date, format: "2017-03-03" "2017-04-24" ...
     ##  $ lname       : chr  "VANRY" "BYERS" "BASKIN" "JOHNSON" ...
     ##  $ fname       : chr  "SYLVIA" "DOUGLAS" "SHIRLEY" "WILLARD" ...
-    ##  $ mname       : Factor w/ 28018 levels "-","--","------",..: 4744 NA 7492 14624 NA 8892 16992 10508 7791 13283 ...
+    ##  $ mname       : Factor w/ 46681 levels "-","--","---",..: 7844 NA 12394 24147 NA 14621 28104 17257 12869 21797 ...
     ##  $ sex         : Factor w/ 3 levels "F","M","U": 1 2 1 2 1 1 1 2 1 2 ...
     ##  $ ssn         : chr  "537446055" "258429171" "539181252" "559307744" ...
-    ##  $ attclass    : Factor w/ 9 levels "0","1","2","3",..: 8 2 2 3 2 2 2 3 2 2 ...
+    ##  $ attclass    : Factor w/ 10 levels "0","1","2","3",..: 8 2 2 3 2 2 2 3 2 2 ...
     ##  $ brgrace     : Factor w/ 20 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
     ##  $ hispanic    : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner      : Factor w/ 7 levels "Accident","Undetermined",..: 4 4 4 1 4 4 4 4 4 4 ...
-    ##  $ rcounty     : Factor w/ 821 levels "ADA","ADAMS",..: 370 409 409 667 566 148 370 338 133 149 ...
-    ##  $ rcity       : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 281 383 365 1433 843 2163 1168 1281 1408 2476 ...
-    ##  $ rstreet     : Factor w/ 295132 levels "#1 CONVALESCENT CENTER BLVD",..: 30855 5652 142771 50552 9212 231527 116818 217369 89082 258357 ...
+    ##  $ rcounty     : Factor w/ 1097 levels "ACADIA","ADA",..: 491 541 541 898 754 195 491 449 176 196 ...
+    ##  $ rcity       : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 415 560 534 2045 1211 3059 1663 1812 2011 3522 ...
+    ##  $ rstreet     : Factor w/ 555079 levels "#1 5TH AND MAIN ST.",..: 57600 10570 268421 94779 17238 436377 219748 409453 167666 486464 ...
     ##  $ resmatchcode: num  100 100 100 100 100 NA 100 100 100 100 ...
-    ##  $ rstateFIPS  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip        : Factor w/ 4162 levels "00000","00705",..: 3110 3438 3434 3202 3269 3327 2975 3187 3594 3552 ...
-    ##  $ dstreet     : Factor w/ 119336 levels "-AT SEA","\"A PART OF THE FAMILY\" 2618 W 10TH",..: 116697 2314 NA 115454 112973 NA 118541 83255 34134 118548 ...
-    ##  $ dcity       : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 94 92 368 220 550 427 321 359 641 ...
-    ##  $ dzip        : Factor w/ 1117 levels "00000","03282",..: 311 643 641 401 466 518 329 392 814 760 ...
+    ##  $ rstateFIPS  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip        : Factor w/ 15491 levels "00000","00077",..: 7625 11606 11529 8744 9396 10046 5651 8612 13065 12733 ...
+    ##  $ dstreet     : Factor w/ 266441 levels "-- ENTER OTHER RESIDENCE ADDRESS AT",..: 257570 4823 NA 254060 245789 NA 263975 179608 73341 264018 ...
+    ##  $ dcity       : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 102 100 404 244 600 467 356 395 695 ...
+    ##  $ dzip        : Factor w/ 3809 levels "00000","03282",..: 1086 2463 2444 1438 1657 1866 1155 1409 3016 2842 ...
     ##  $ dcounty     : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 21 21 32 27 5 17 15 4 6 ...
     ##  $ dstateFIPS  : Factor w/ 1 level "WA": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ dplacelit   : Factor w/ 18 levels "DECEDENT'S HOME",..: 13 13 10 13 13 13 14 1 1 5 ...
+    ##  $ dplacelit   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 16 16 13 16 16 16 17 3 3 7 ...
     ##  $ dplacecode  : Factor w/ 10 levels "0","1","2","3",..: 6 6 5 6 6 6 2 1 1 8 ...
-    ##  $ dthyr       : Factor w/ 14 levels "2003","2004",..: 14 14 14 14 14 14 14 14 14 14 ...
-    ##  $ UCOD        : Factor w/ 2656 levels "A020","A021",..: 1010 1117 905 1297 1110 1108 1033 1033 356 1102 ...
-    ##  $ MCOD        : Factor w/ 190524 levels "A020 A419","A020 A419 E872 I48",..: NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ dthyr       : Factor w/ 15 levels "2003","2004",..: 15 15 15 15 15 15 15 15 15 15 ...
+    ##  $ UCOD        : Factor w/ 3086 levels "A020","A021",..: 1178 1296 1049 1500 1289 1287 1201 1201 412 1280 ...
+    ##  $ MCOD        : Factor w/ 345266 levels "A020 A090 E86 I251 N170 N179",..: NA NA NA NA NA NA NA NA NA NA ...
     ##  $ educ        : Factor w/ 9 levels "<=8th grade",..: 4 3 6 6 3 3 4 4 4 1 ...
     ##  $ marital     : Factor w/ 7 levels "A","D","M","P",..: 2 7 7 3 7 7 7 5 3 7 ...
-    ##  $ occup       : Factor w/ 422 levels "`","000","007",..: 399 233 135 96 399 162 166 142 183 341 ...
+    ##  $ occup       : Factor w/ 430 levels "`","000","007",..: 407 237 137 97 407 165 169 144 186 348 ...
     ##  $ military    : Factor w/ 3 levels "N","U","Y": 1 1 1 3 1 1 1 1 1 3 ...
-    ##  $ codlit      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 79310 260877 226860 265479 204078 110195 79253 136703 102115 ...
+    ##  $ codlit      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 165190 519898 450424 528728 407828 224188 165129 276514 208464 ...
     ##  $ age         : num  72 99 91 90 91 89 89 47 64 96 ...
     ##  $ age5cat     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 5 5 5 5 4 4 5 ...
     ##  $ LCOD        : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 7 9 4 7 7 7 7 2 7 ...
@@ -581,116 +581,116 @@ summary(WA0317)
 
     ##      certno               dob                  dod            
     ##  Min.   :2.003e+09   Min.   :1893-05-27   Min.   :2003-01-01  
-    ##  1st Qu.:2.005e+09   1st Qu.:1920-03-27   1st Qu.:2005-01-20  
-    ##  Median :2.007e+09   Median :1928-08-28   Median :2007-01-26  
-    ##  Mean   :2.007e+09   Mean   :1933-06-10   Mean   :2007-04-19  
-    ##  3rd Qu.:2.009e+09   3rd Qu.:1943-05-20   3rd Qu.:2009-01-05  
-    ##  Max.   :2.017e+09   Max.   :2017-08-08   Max.   :2017-08-21  
-    ##                      NA's   :43                               
+    ##  1st Qu.:2.007e+09   1st Qu.:1923-01-23   1st Qu.:2007-01-23  
+    ##  Median :2.010e+09   Median :1932-05-26   Median :2010-12-07  
+    ##  Mean   :2.010e+09   Mean   :1936-08-15   Mean   :2010-10-14  
+    ##  3rd Qu.:2.014e+09   3rd Qu.:1947-01-16   3rd Qu.:2014-08-13  
+    ##  Max.   :2.017e+09   Max.   :2017-12-31   Max.   :2017-12-31  
+    ##                      NA's   :74                               
     ##     lname              fname               mname        sex       
-    ##  Length:373707      Length:373707      MARIE  :  7867   F:187356  
-    ##  Class :character   Class :character   LEE    :  7742   M:186350  
-    ##  Mode  :character   Mode  :character   ANN    :  7082   U:     1  
-    ##                                        M      :  6003             
-    ##                                        L      :  5333             
-    ##                                        (Other):306520             
-    ##                                        NA's   : 33160             
+    ##  Length:745940      Length:745940      LEE    : 17386   F:369857  
+    ##  Class :character   Class :character   ANN    : 16544   M:376074  
+    ##  Mode  :character   Mode  :character   MARIE  : 16416   U:     9  
+    ##                                        JEAN   : 10791             
+    ##                                        M      : 10107             
+    ##                                        (Other):610339             
+    ##                                        NA's   : 64357             
     ##      ssn               attclass         brgrace       hispanic  
-    ##  Length:373707      1      :293239   1      :296880   N: 53927  
-    ##  Class :character   2      : 52652   2      :  8552   Y:319780  
-    ##  Mode  :character   7      : 12513   15     :  4636             
-    ##                     3      : 12230   3      :  4427             
-    ##                     6      :  3051   6      :  2098             
-    ##                     9      :    14   (Other): 11026             
-    ##                     (Other):     8   NA's   : 46088             
+    ##  Length:745940      1      :555602   1      :628492   N: 65318  
+    ##  Class :character   2      :107583   2      : 18751   Y:680622  
+    ##  Mode  :character   7      : 42333   15     : 10363             
+    ##                     3      : 30181   3      :  9900             
+    ##                     6      :  8862   6      :  4928             
+    ##                     (Other):    43   (Other): 27283             
+    ##                     NA's   :  1336   NA's   : 46223             
     ##           manner            rcounty             rcity       
-    ##  Natural     :342907   KING     : 90879   SEATTLE  : 34238  
-    ##  Accident    : 20641   PIERCE   : 43807   SPOKANE  : 18578  
-    ##  Suicide     :  6915   SNOHOMISH: 33877   TACOMA   : 18232  
-    ##  Homicide    :  1813   SPOKANE  : 29703   VANCOUVER: 15103  
-    ##  Undetermined:  1362   CLARK    : 19795   EVERETT  :  8521  
-    ##  (Other)     :    22   (Other)  :155293   (Other)  :278966  
-    ##  NA's        :    47   NA's     :   353   NA's     :    69  
+    ##  Natural     :682229   KING     :178725   SEATTLE  : 64245  
+    ##  Accident    : 42454   PIERCE   : 87204   SPOKANE  : 36951  
+    ##  Suicide     : 14674   SNOHOMISH: 69007   TACOMA   : 35351  
+    ##  Homicide    :  3603   SPOKANE  : 59687   VANCOUVER: 30909  
+    ##  Undetermined:  2826   CLARK    : 40876   EVERETT  : 16875  
+    ##  (Other)     :    57   (Other)  :309645   (Other)  :561412  
+    ##  NA's        :    97   NA's     :   796   NA's     :   197  
     ##                    rstreet        resmatchcode      rstateFIPS    
-    ##  UNKNOWN               :   637   Min.   :  0.00   WA     :364161  
-    ##  4831 35TH AVE SW      :   343   1st Qu.:100.00   OR     :  3355  
-    ##  7500 SEWARD PARK AVE S:   325   Median :100.00   ID     :  1768  
-    ##  534 BOYER AVE         :   323   Mean   : 95.56   CA     :   833  
-    ##  13023 GREENWOOD AVE N :   301   3rd Qu.:100.00   AK     :   571  
-    ##  (Other)               :371775   Max.   :100.00   (Other):  3018  
-    ##  NA's                  :     3   NA's   :198      NA's   :     1  
+    ##  UNKNOWN               :  1759   Min.   :  0.00   WA     :727568  
+    ##  7500 SEWARD PARK AVE S:   608   1st Qu.:100.00   OR     :  6428  
+    ##  4831 35TH AVE SW      :   596   Median :100.00   ID     :  3251  
+    ##  534 BOYER AVE         :   568   Mean   : 94.57   CA     :  1520  
+    ##  13023 GREENWOOD AVE N :   545   3rd Qu.:100.00   AK     :  1213  
+    ##  (Other)               :741824   Max.   :100.00   (Other):  5959  
+    ##  NA's                  :    40   NA's   :47629    NA's   :     1  
     ##       rzip                                       dstreet      
-    ##  98632  :  4380   FRANCISCAN HOSPICE HOUSE           :  2142  
-    ##  98133  :  3830   12822 124TH LANE NE                :   628  
-    ##  98902  :  3543   TRI-CITIES CHAPLAINCY HOSPICE HOUSE:   509  
-    ##  98382  :  3289   12822 124TH LN NE                  :   301  
-    ##  99208  :  3121   HOSPICE HOUSE                      :   299  
-    ##  (Other):355439   (Other)                            :135836  
-    ##  NA's   :   105   NA's                               :233992  
+    ##  98632  :  8356   FRANCISCAN HOSPICE HOUSE           :  5246  
+    ##  98133  :  7166   COTTAGE IN THE MEADOW              :  1760  
+    ##  98902  :  6808   TRI-CITIES CHAPLAINCY HOSPICE HOUSE:  1212  
+    ##  99208  :  6420   12822 124TH LANE NE                :  1072  
+    ##  98382  :  6354   HOSPICE OF SPOKANE HOSPICE HOUSE   :   961  
+    ##  (Other):710599   (Other)                            :339320  
+    ##  NA's   :   237   NA's                               :396369  
     ##        dcity             dzip             dcounty       dstateFIPS 
-    ##  SEATTLE  : 48664   98201  :  7101   KING     :102557   WA:373707  
-    ##  SPOKANE  : 26615   98122  :  6798   PIERCE   : 44837              
-    ##  TACOMA   : 19956   98902  :  6444   SPOKANE  : 33775              
-    ##  VANCOUVER: 18163   98405  :  6296   SNOHOMISH: 31002              
-    ##  EVERETT  : 12072   98104  :  5994   CLARK    : 21084              
-    ##  (Other)  :248161   (Other):295059   (Other)  :140451              
-    ##  NA's     :    76   NA's   : 46015   NA's     :     1              
-    ##                        dplacelit        dplacecode         dthyr      
-    ##  Hospital (inpatient)       :112425   4      :112865   2008   :48757  
-    ##  Home                       :112281   0      :112761   2009   :48349  
-    ##  Nursing home/long term care:101551   5      :101849   2007   :47539  
-    ##  Other place                : 18462   1      : 18537   2006   :46287  
-    ##  Hospice                    : 14965   7      : 15077   2005   :46272  
-    ##  Emergency room             : 12154   3      : 12194   2003   :45924  
-    ##  (Other)                    :  1869   (Other):   424   (Other):90579  
+    ##  SEATTLE  : 91224   98201  : 16625   KING     :200694   WA:745940  
+    ##  SPOKANE  : 53197   98405  : 15479   PIERCE   : 90133              
+    ##  TACOMA   : 38773   98122  : 13600   SPOKANE  : 67646              
+    ##  VANCOUVER: 37582   98506  : 12579   SNOHOMISH: 64035              
+    ##  EVERETT  : 25553   99204  : 12567   CLARK    : 43746              
+    ##  (Other)  :499517   (Other):629041   (Other)  :279682              
+    ##  NA's     :    94   NA's   : 46049   NA's     :     4              
+    ##                        dplacelit        dplacecode         dthyr       
+    ##  Home                       :220536   0      :237123   2017   : 56986  
+    ##  Hospital (inpatient)       :204310   4      :218105   2016   : 54783  
+    ##  Nursing home/long term care:165922   5      :187867   2015   : 54651  
+    ##  Hospice                    : 36101   7      : 39535   2014   : 52074  
+    ##  Other place                : 34453   1      : 37526   2013   : 51261  
+    ##  Emergency room             : 22323   3      : 23853   2012   : 50161  
+    ##  (Other)                    : 62295   (Other):  1931   (Other):426024  
     ##       UCOD               MCOD                            educ       
-    ##  C349   : 24968   C349 F179:  7219   H.S. grad/GED         :130911  
-    ##  I251   : 24422   G309     :  5164   Some college          : 54493  
-    ##  G309   : 20455   C349     :  4168   Unknown               : 46115  
-    ##  I219   : 18505   C509     :  3238   Bachelors             : 36291  
-    ##  J449   : 16328   I250     :  3217   <=8th grade           : 33061  
-    ##  (Other):268864   (Other)  :349053   9-12th gr., no diploma: 33024  
-    ##  NA's   :   165   NA's     :  1648   (Other)               : 39812  
+    ##  C349   : 46385   C349 F179: 12914   H.S. grad/GED         :275429  
+    ##  I251   : 44322   G309     : 10676   Some college          :120355  
+    ##  G309   : 43577   C349     :  6624   Bachelors             : 83031  
+    ##  I219   : 32710   C259     :  5855   9-12th gr., no diploma: 65277  
+    ##  J449   : 30481   C509     :  5679   <=8th grade           : 60747  
+    ##  (Other):548195   (Other)  :653617   Unknown               : 51414  
+    ##  NA's   :   270   NA's     : 50575   (Other)               : 89687  
     ##  marital        occup        military  
-    ##  A:   939   908    : 69673   N:263206  
-    ##  D: 58926   183    :  8932   U:  1969  
-    ##  M:142727   290    :  7736   Y:108532  
-    ##  P:   225   396    :  6710             
-    ##  S: 36082   150    :  6486             
-    ##  U:  1755   (Other):266154             
-    ##  W:133053   NA's   :  8016             
+    ##  A:  2408   908    :126897   N:529289  
+    ##  D:125505   183    : 19104   U:  4263  
+    ##  M:279434   290    : 15837   Y:212388  
+    ##  P:   877   150    : 13582             
+    ##  S: 75571   396    : 13464             
+    ##  U:  4138   (Other):542052             
+    ##  W:258007   NA's   : 15004             
     ##                            codlit            age             age5cat      
-    ##  LUNG CANCER                  :  3401   Min.   :  0.00   <18yrs  :  5482  
-    ##  ALZHEIMERS DEMENTIA          :  1735   1st Qu.: 64.00   18-29yrs:  6409  
-    ##  PANCREATIC CANCER            :  1575   Median : 79.00   30-44yrs: 13532  
-    ##  METASTATIC BREAST CANCER     :  1478   Mean   : 73.86   45-64yrs: 69366  
-    ##  COPD                         :  1456   3rd Qu.: 87.00   65+ yrs :278875  
-    ##  (Other)                      :363971   Max.   :112.00   NA's    :    43  
-    ##  NA's                         :    91   NA's   :43                        
-    ##                     LCOD                           injury      
-    ##  Other                :88701   MV - all               :  5296  
-    ##  Heart Dis.           :85292   No injury              :353759  
-    ##  Cancer               :83100   Other injury           :  3478  
-    ##  Stroke               :22925   Unintentional fall     :  5271  
-    ##  Chronic Lwr Resp Dis.:21842   Unintentional poisoning:  5903  
-    ##  Alzheimers           :21127                                   
-    ##  (Other)              :50720                                   
+    ##  LUNG CANCER                  :  5731   Min.   :  0.00   <18yrs  :  9978  
+    ##  PANCREATIC CANCER            :  3184   1st Qu.: 64.00   18-29yrs: 12483  
+    ##  ALZHEIMERS DEMENTIA          :  2833   Median : 79.00   30-44yrs: 25793  
+    ##  METASTATIC BREAST CANCER     :  2743   Mean   : 74.17   45-64yrs:138528  
+    ##  METASTATIC LUNG CANCER       :  2380   3rd Qu.: 87.00   65+ yrs :559084  
+    ##  (Other)                      :728924   Max.   :114.00   NA's    :    74  
+    ##  NA's                         :   145   NA's   :74                        
+    ##                     LCOD                            injury      
+    ##  Other                :187548   MV - all               :  9533  
+    ##  Cancer               :162623   No injury              :704739  
+    ##  Heart Dis.           :161864   Other injury           :  7293  
+    ##  Alzheimers           : 44973   Unintentional fall     : 11884  
+    ##  Chronic Lwr Resp Dis.: 43189   Unintentional poisoning: 12491  
+    ##  Stroke               : 42143                                   
+    ##  (Other)              :103600                                   
     ##               substance             residence           raceethnic5    
-    ##  Alcohol-induced   :  5762   Out of state:  9255   AIAN NH    :  4303  
-    ##  Drug-induced      :  6840   WA resident :364161   Asian/PI NH: 10907  
-    ##  No Substance abuse:361105   NA's        :   291   Black NH   :  8446  
-    ##                                                    Hispanic   :  7976  
-    ##                                                    Other      :  2008  
-    ##                                                    Unknown    : 46088  
-    ##                                                    White NH   :293979  
+    ##  Alcohol-induced   : 12988   Out of state: 17806   AIAN NH    :  9549  
+    ##  Drug-induced      : 14198   WA resident :727568   Asian/PI NH: 26014  
+    ##  No Substance abuse:718754   NA's        :   566   Black NH   : 18492  
+    ##                                                    Hispanic   : 19352  
+    ##                                                    Other      :  5513  
+    ##                                                    Unknown    : 46223  
+    ##                                                    White NH   :620797  
     ##    raceethnic6    
-    ##  White NH:293979  
-    ##  Unknown : 46088  
-    ##  Asian   :  9760  
-    ##  Black NH:  8446  
-    ##  Hispanic:  7976  
-    ##  AIAN NH :  4303  
-    ##  (Other) :  3155
+    ##  White NH:620797  
+    ##  Unknown : 46223  
+    ##  Asian   : 23119  
+    ##  Hispanic: 19352  
+    ##  Black NH: 18492  
+    ##  AIAN NH :  9549  
+    ##  (Other) :  8408
 
 ### 3. Creating a training data set of decedents who had permanent homes at time of death
 
@@ -734,40 +734,40 @@ KC0317_wh <- subset(KC, KC$resmatchcode.k >= 95)
 str(KC)
 ```
 
-    ## 'data.frame':    102557 obs. of  41 variables:
+    ## 'data.frame':    200694 obs. of  41 variables:
     ##  $ certno.k      : int  2017012363 2017019361 2017025187 2017025188 2017025189 2017025190 2017025192 2017025196 2017025197 2017007506 ...
     ##  $ dob.k         : Date, format: "1945-04-15" "1928-02-04" ...
     ##  $ dod.k         : Date, format: "2017-03-03" "2017-04-19" ...
     ##  $ lname.k       : chr  "VANRY" "CALLERY" "BURNETT" "LEE" ...
     ##  $ fname.k       : chr  "SYLVIA" "ROSALIE" "CHARLES" "DOUGLAS" ...
-    ##  $ mname.k       : Factor w/ 28018 levels "-","--","------",..: 4744 16992 26069 13007 NA 22686 632 20918 26521 21262 ...
+    ##  $ mname.k       : Factor w/ 46681 levels "-","--","---",..: 7844 28104 43459 21330 NA 37632 1079 34669 44195 35250 ...
     ##  $ sex.k         : Factor w/ 3 levels "F","M","U": 1 1 2 2 1 1 2 1 2 1 ...
     ##  $ ssn.k         : chr  "537446055" "476289831" "527366846" "019488823" ...
-    ##  $ attclass.k    : Factor w/ 9 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
+    ##  $ attclass.k    : Factor w/ 10 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
     ##  $ brgrace.k     : Factor w/ 20 levels "1","2","3","4",..: 1 1 1 1 10 1 1 1 5 1 ...
     ##  $ hispanic.k    : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner.k      : Factor w/ 7 levels "Accident","Undetermined",..: 4 4 4 4 4 4 4 4 4 4 ...
-    ##  $ rcounty.k     : Factor w/ 821 levels "ADA","ADAMS",..: 370 370 370 370 667 370 370 370 370 370 ...
-    ##  $ rcity.k       : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 281 1168 2636 1974 1374 167 584 2149 1168 1472 ...
-    ##  $ rstreet.k     : Factor w/ 295132 levels "#1 CONVALESCENT CENTER BLVD",..: 30855 116818 87974 138151 99723 131987 31577 137993 43356 151554 ...
+    ##  $ rcounty.k     : Factor w/ 1097 levels "ACADIA","ADA",..: 491 491 491 491 898 491 491 491 491 491 ...
+    ##  $ rcity.k       : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 415 1663 3752 2801 1964 244 848 3038 1663 2097 ...
+    ##  $ rstreet.k     : Factor w/ 555079 levels "#1 5TH AND MAIN ST.",..: 57600 219748 165576 259794 187796 248195 58903 259487 81121 285252 ...
     ##  $ resmatchcode.k: num  100 100 100 100 100 100 100 100 100 100 ...
-    ##  $ rstateFIPS.k  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip.k        : Factor w/ 4162 levels "00000","00705",..: 3110 2975 3022 3003 2981 2938 3119 3121 2972 2988 ...
-    ##  $ dstreet.k     : Factor w/ 119336 levels "-AT SEA","\"A PART OF THE FAMILY\" 2618 W 10TH",..: 116697 118541 NA 15664 NA 115633 NA NA 16550 58254 ...
-    ##  $ dcity.k       : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 427 297 297 545 38 71 545 290 384 ...
-    ##  $ dzip.k        : Factor w/ 1117 levels "00000","03282",..: 311 329 196 196 287 163 310 275 192 203 ...
+    ##  $ rstateFIPS.k  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip.k        : Factor w/ 15491 levels "00000","00077",..: 7625 5651 6328 6095 5800 4995 7831 7884 5613 5928 ...
+    ##  $ dstreet.k     : Factor w/ 266441 levels "-- ENTER OTHER RESIDENCE ADDRESS AT",..: 257570 263975 NA 33444 NA 254623 NA NA 35286 125530 ...
+    ##  $ dcity.k       : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 467 326 326 595 42 78 595 319 421 ...
+    ##  $ dzip.k        : Factor w/ 3809 levels "00000","03282",..: 1086 1155 509 509 987 309 1079 938 474 558 ...
     ##  $ dcounty.k     : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 17 17 17 17 17 17 17 17 17 ...
     ##  $ dstateFIPS.k  : Factor w/ 1 level "WA": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ dplacelit.k   : Factor w/ 18 levels "DECEDENT'S HOME",..: 13 14 10 5 10 13 10 10 1 3 ...
+    ##  $ dplacelit.k   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 16 17 13 7 13 16 13 13 3 5 ...
     ##  $ dplacecode.k  : Factor w/ 10 levels "0","1","2","3",..: 6 2 5 8 5 6 5 5 1 1 ...
-    ##  $ dthyr.k       : Factor w/ 14 levels "2003","2004",..: 14 14 14 14 14 14 14 14 14 14 ...
-    ##  $ UCOD.k        : Factor w/ 2656 levels "A020","A021",..: 1010 1033 1324 1145 401 743 253 1141 198 1401 ...
-    ##  $ MCOD.k        : Factor w/ 190524 levels "A020 A419","A020 A419 E872 I48",..: NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ dthyr.k       : Factor w/ 15 levels "2003","2004",..: 15 15 15 15 15 15 15 15 15 15 ...
+    ##  $ UCOD.k        : Factor w/ 3086 levels "A020","A021",..: 1178 1201 1529 1325 466 858 301 1321 241 1619 ...
+    ##  $ MCOD.k        : Factor w/ 345266 levels "A020 A090 E86 I251 N170 N179",..: NA NA NA NA NA NA NA NA NA NA ...
     ##  $ educ.k        : Factor w/ 9 levels "<=8th grade",..: 4 4 8 1 5 7 6 7 3 6 ...
     ##  $ marital.k     : Factor w/ 7 levels "A","D","M","P",..: 2 7 3 2 3 2 3 3 3 5 ...
-    ##  $ occup.k       : Factor w/ 422 levels "`","000","007",..: 399 166 78 132 399 95 287 65 374 132 ...
+    ##  $ occup.k       : Factor w/ 430 levels "`","000","007",..: 407 169 79 134 407 96 292 66 381 134 ...
     ##  $ military.k    : Factor w/ 3 levels "N","U","Y": 1 1 3 3 1 1 3 1 1 1 ...
-    ##  $ codlit.k      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 110195 19321 7938 241732 15213 160973 19870 170546 193568 ...
+    ##  $ codlit.k      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 224188 49087 19496 478880 36212 326063 50849 345109 390224 ...
     ##  $ age.k         : num  72 89 85 59 70 86 71 63 65 55 ...
     ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 4 5 4 ...
     ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 7 9 10 2 9 2 10 2 9 ...
@@ -781,40 +781,40 @@ str(KC)
 str(KC0317_wh)
 ```
 
-    ## 'data.frame':    95883 obs. of  41 variables:
+    ## 'data.frame':    174298 obs. of  41 variables:
     ##  $ certno.k      : int  2017012363 2017019361 2017025187 2017025188 2017025189 2017025190 2017025192 2017025196 2017025197 2017007506 ...
     ##  $ dob.k         : Date, format: "1945-04-15" "1928-02-04" ...
     ##  $ dod.k         : Date, format: "2017-03-03" "2017-04-19" ...
     ##  $ lname.k       : chr  "VANRY" "CALLERY" "BURNETT" "LEE" ...
     ##  $ fname.k       : chr  "SYLVIA" "ROSALIE" "CHARLES" "DOUGLAS" ...
-    ##  $ mname.k       : Factor w/ 28018 levels "-","--","------",..: 4744 16992 26069 13007 NA 22686 632 20918 26521 21262 ...
+    ##  $ mname.k       : Factor w/ 46681 levels "-","--","---",..: 7844 28104 43459 21330 NA 37632 1079 34669 44195 35250 ...
     ##  $ sex.k         : Factor w/ 3 levels "F","M","U": 1 1 2 2 1 1 2 1 2 1 ...
     ##  $ ssn.k         : chr  "537446055" "476289831" "527366846" "019488823" ...
-    ##  $ attclass.k    : Factor w/ 9 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
+    ##  $ attclass.k    : Factor w/ 10 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
     ##  $ brgrace.k     : Factor w/ 20 levels "1","2","3","4",..: 1 1 1 1 10 1 1 1 5 1 ...
     ##  $ hispanic.k    : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner.k      : Factor w/ 7 levels "Accident","Undetermined",..: 4 4 4 4 4 4 4 4 4 4 ...
-    ##  $ rcounty.k     : Factor w/ 821 levels "ADA","ADAMS",..: 370 370 370 370 667 370 370 370 370 370 ...
-    ##  $ rcity.k       : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 281 1168 2636 1974 1374 167 584 2149 1168 1472 ...
-    ##  $ rstreet.k     : Factor w/ 295132 levels "#1 CONVALESCENT CENTER BLVD",..: 30855 116818 87974 138151 99723 131987 31577 137993 43356 151554 ...
+    ##  $ rcounty.k     : Factor w/ 1097 levels "ACADIA","ADA",..: 491 491 491 491 898 491 491 491 491 491 ...
+    ##  $ rcity.k       : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 415 1663 3752 2801 1964 244 848 3038 1663 2097 ...
+    ##  $ rstreet.k     : Factor w/ 555079 levels "#1 5TH AND MAIN ST.",..: 57600 219748 165576 259794 187796 248195 58903 259487 81121 285252 ...
     ##  $ resmatchcode.k: num  100 100 100 100 100 100 100 100 100 100 ...
-    ##  $ rstateFIPS.k  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip.k        : Factor w/ 4162 levels "00000","00705",..: 3110 2975 3022 3003 2981 2938 3119 3121 2972 2988 ...
-    ##  $ dstreet.k     : Factor w/ 119336 levels "-AT SEA","\"A PART OF THE FAMILY\" 2618 W 10TH",..: 116697 118541 NA 15664 NA 115633 NA NA 16550 58254 ...
-    ##  $ dcity.k       : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 427 297 297 545 38 71 545 290 384 ...
-    ##  $ dzip.k        : Factor w/ 1117 levels "00000","03282",..: 311 329 196 196 287 163 310 275 192 203 ...
+    ##  $ rstateFIPS.k  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip.k        : Factor w/ 15491 levels "00000","00077",..: 7625 5651 6328 6095 5800 4995 7831 7884 5613 5928 ...
+    ##  $ dstreet.k     : Factor w/ 266441 levels "-- ENTER OTHER RESIDENCE ADDRESS AT",..: 257570 263975 NA 33444 NA 254623 NA NA 35286 125530 ...
+    ##  $ dcity.k       : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 467 326 326 595 42 78 595 319 421 ...
+    ##  $ dzip.k        : Factor w/ 3809 levels "00000","03282",..: 1086 1155 509 509 987 309 1079 938 474 558 ...
     ##  $ dcounty.k     : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 17 17 17 17 17 17 17 17 17 ...
     ##  $ dstateFIPS.k  : Factor w/ 1 level "WA": 1 1 1 1 1 1 1 1 1 1 ...
-    ##  $ dplacelit.k   : Factor w/ 18 levels "DECEDENT'S HOME",..: 13 14 10 5 10 13 10 10 1 3 ...
+    ##  $ dplacelit.k   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 16 17 13 7 13 16 13 13 3 5 ...
     ##  $ dplacecode.k  : Factor w/ 10 levels "0","1","2","3",..: 6 2 5 8 5 6 5 5 1 1 ...
-    ##  $ dthyr.k       : Factor w/ 14 levels "2003","2004",..: 14 14 14 14 14 14 14 14 14 14 ...
-    ##  $ UCOD.k        : Factor w/ 2656 levels "A020","A021",..: 1010 1033 1324 1145 401 743 253 1141 198 1401 ...
-    ##  $ MCOD.k        : Factor w/ 190524 levels "A020 A419","A020 A419 E872 I48",..: NA NA NA NA NA NA NA NA NA NA ...
+    ##  $ dthyr.k       : Factor w/ 15 levels "2003","2004",..: 15 15 15 15 15 15 15 15 15 15 ...
+    ##  $ UCOD.k        : Factor w/ 3086 levels "A020","A021",..: 1178 1201 1529 1325 466 858 301 1321 241 1619 ...
+    ##  $ MCOD.k        : Factor w/ 345266 levels "A020 A090 E86 I251 N170 N179",..: NA NA NA NA NA NA NA NA NA NA ...
     ##  $ educ.k        : Factor w/ 9 levels "<=8th grade",..: 4 4 8 1 5 7 6 7 3 6 ...
     ##  $ marital.k     : Factor w/ 7 levels "A","D","M","P",..: 2 7 3 2 3 2 3 3 3 5 ...
-    ##  $ occup.k       : Factor w/ 422 levels "`","000","007",..: 399 166 78 132 399 95 287 65 374 132 ...
+    ##  $ occup.k       : Factor w/ 430 levels "`","000","007",..: 407 169 79 134 407 96 292 66 381 134 ...
     ##  $ military.k    : Factor w/ 3 levels "N","U","Y": 1 1 3 3 1 1 3 1 1 1 ...
-    ##  $ codlit.k      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 110195 19321 7938 241732 15213 160973 19870 170546 193568 ...
+    ##  $ codlit.k      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 224188 49087 19496 478880 36212 326063 50849 345109 390224 ...
     ##  $ age.k         : num  72 89 85 59 70 86 71 63 65 55 ...
     ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 4 5 4 ...
     ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 7 9 10 2 9 2 10 2 9 ...
@@ -831,108 +831,116 @@ summary(KC0317_wh)
 
     ##     certno.k             dob.k                dod.k           
     ##  Min.   :2.003e+09   Min.   :1893-12-12   Min.   :2003-01-01  
-    ##  1st Qu.:2.005e+09   1st Qu.:1919-11-27   1st Qu.:2005-01-02  
-    ##  Median :2.007e+09   Median :1928-04-10   Median :2007-01-04  
-    ##  Mean   :2.007e+09   Mean   :1933-08-21   Mean   :2007-03-29  
-    ##  3rd Qu.:2.008e+09   3rd Qu.:1944-02-21   3rd Qu.:2008-12-19  
+    ##  1st Qu.:2.006e+09   1st Qu.:1922-01-20   1st Qu.:2006-08-24  
+    ##  Median :2.010e+09   Median :1931-03-14   Median :2010-03-20  
+    ##  Mean   :2.010e+09   Mean   :1936-03-13   Mean   :2010-02-23  
+    ##  3rd Qu.:2.013e+09   3rd Qu.:1947-02-02   3rd Qu.:2013-09-18  
     ##  Max.   :2.017e+09   Max.   :2017-08-08   Max.   :2017-08-20  
-    ##                      NA's   :13                               
-    ##    lname.k            fname.k             mname.k      sex.k    
-    ##  Length:95883       Length:95883       M      : 1936   F:48508  
-    ##  Class :character   Class :character   MARIE  : 1845   M:47374  
-    ##  Mode  :character   Mode  :character   ANN    : 1681   U:    1  
-    ##                                        LEE    : 1579            
-    ##                                        A      : 1554            
-    ##                                        (Other):76383            
-    ##                                        NA's   :10905            
-    ##     ssn.k             attclass.k      brgrace.k     hispanic.k
-    ##  Length:95883       1      :78349   1      :70440   N:14051   
-    ##  Class :character   2      :12543   2      : 4596   Y:81832   
-    ##  Mode  :character   7      : 3739   5      : 1369             
-    ##                     3      :  924   6      : 1142             
-    ##                     6      :  323   7      : 1140             
-    ##                     4      :    2   (Other): 5032             
-    ##                     (Other):    3   NA's   :12164             
-    ##          manner.k         rcounty.k            rcity.k     
-    ##  Natural     :87843   KING     :83581   SEATTLE    :32532  
-    ##  Accident    : 5465   SNOHOMISH: 4791   BELLEVUE   : 5581  
-    ##  Suicide     : 1694   PIERCE   : 2401   RENTON     : 5032  
-    ##  Homicide    :  537   KITSAP   :  821   KENT       : 4549  
-    ##  Undetermined:  323   CLALLAM  :  451   SHORELINE  : 3910  
-    ##  (Other)     :    1   SKAGIT   :  399   FEDERAL WAY: 3886  
-    ##  NA's        :   20   (Other)  : 3439   (Other)    :40393  
-    ##                   rstreet.k     resmatchcode.k  rstateFIPS.k  
-    ##  4831 35TH AVE SW      :  342   Min.   : 95    WA     :95878  
-    ##  7500 SEWARD PARK AVE S:  325   1st Qu.:100    AK     :    1  
-    ##  13023 GREENWOOD AVE N :  301   Median :100    AZ     :    1  
-    ##  19303 FREMONT AVE N   :  287   Mean   :100    NY     :    1  
-    ##  1122 S 216TH ST       :  201   3rd Qu.:100    TX     :    1  
-    ##  10101 NE 120TH ST     :  168   Max.   :100    XX     :    1  
-    ##  (Other)               :94259                  (Other):    0  
-    ##      rzip.k                      dstreet.k            dcity.k     
-    ##  98133  : 3545   12822 124TH LANE NE  :  594   SEATTLE    :45064  
-    ##  98118  : 2532   12822 124TH LN NE    :  287   KIRKLAND   : 6910  
-    ##  98003  : 2446   2424 156TH AVE NE    :   65   BELLEVUE   : 6614  
-    ##  98198  : 2436   13023 GREENWOOD AVE N:   55   RENTON     : 5602  
-    ##  98125  : 2116   1122 S 216TH ST      :   50   FEDERAL WAY: 4800  
-    ##  98155  : 2089   (Other)              :30288   (Other)    :26877  
-    ##  (Other):80719   NA's                 :64544   NA's       :   16  
-    ##      dzip.k        dcounty.k     dstateFIPS.k
-    ##  98122  : 6414   KING   :95883   WA:95883    
-    ##  98034  : 5577   ADAMS  :    0               
-    ##  98104  : 5178   ASOTIN :    0               
-    ##  98133  : 5178   BENTON :    0               
-    ##  98003  : 3450   CHELAN :    0               
-    ##  (Other):57906   CLALLAM:    0               
-    ##  NA's   :12180   (Other):    0               
+    ##                      NA's   :18                               
+    ##    lname.k            fname.k             mname.k       sex.k    
+    ##  Length:174298      Length:174298      ANN    :  3438   F:87563  
+    ##  Class :character   Class :character   MARIE  :  3396   M:86731  
+    ##  Mode  :character   Mode  :character   LEE    :  3134   U:    4  
+    ##                                        M      :  3005            
+    ##                                        A      :  2494            
+    ##                                        (Other):139251            
+    ##                                        NA's   : 19580            
+    ##     ssn.k             attclass.k       brgrace.k      hispanic.k
+    ##  Length:174298      1      :138170   1      :135183   N: 16157  
+    ##  Class :character   2      : 23017   2      :  8936   Y:158141  
+    ##  Mode  :character   7      :  9972   5      :  2820             
+    ##                     3      :  2062   6      :  2328             
+    ##                     6      :  1072   7      :  2312             
+    ##                     4      :     2   (Other): 10549             
+    ##                     (Other):     3   NA's   : 12170             
+    ##          manner.k          rcounty.k             rcity.k     
+    ##  Natural     :159571   KING     :152532   SEATTLE    :56966  
+    ##  Accident    :  9943   SNOHOMISH:  8323   BELLEVUE   :10343  
+    ##  Suicide     :  3178   PIERCE   :  4225   RENTON     : 9395  
+    ##  Homicide    :   921   KITSAP   :  1379   KENT       : 8735  
+    ##  Undetermined:   662   CLALLAM  :   809   FEDERAL WAY: 7309  
+    ##  (Other)     :     1   SKAGIT   :   737   AUBURN     : 7110  
+    ##  NA's        :    22   (Other)  :  6293   (Other)    :74440  
+    ##                   rstreet.k      resmatchcode.k  rstateFIPS.k   
+    ##  7500 SEWARD PARK AVE S:   584   Min.   : 95    WA     :174282  
+    ##  4831 35TH AVE SW      :   573   1st Qu.:100    CA     :     4  
+    ##  13023 GREENWOOD AVE N :   532   Median :100    AK     :     2  
+    ##  19303 FREMONT AVE N   :   406   Mean   :100    NY     :     2  
+    ##  1122 S 216TH ST       :   367   3rd Qu.:100    AZ     :     1  
+    ##  4700 PHINNEY AVE N    :   307   Max.   :100    FL     :     1  
+    ##  (Other)               :171529                  (Other):     6  
+    ##      rzip.k                                     dstreet.k     
+    ##  98133  :  6302   12822 124TH LANE NE                :  1015  
+    ##  98003  :  4533   12822 124TH LN NE                  :   407  
+    ##  98118  :  4487   EVERGREEN HOSPICE                  :   280  
+    ##  98198  :  4398   EVERGREEN HOSPICE, 12822 124TH LANE:    95  
+    ##  98125  :  3880   2424 156TH AVE NE                  :    85  
+    ##  98155  :  3796   (Other)                            : 63124  
+    ##  (Other):146902   NA's                               :109292  
+    ##         dcity.k          dzip.k         dcounty.k      dstateFIPS.k
+    ##  SEATTLE    :78720   98122  : 11743   KING   :174298   WA:174298   
+    ##  KIRKLAND   :12878   98034  : 10951   ADAMS  :     0               
+    ##  BELLEVUE   :12261   98133  :  9533   ASOTIN :     0               
+    ##  RENTON     :10635   98104  :  9416   BENTON :     0               
+    ##  FEDERAL WAY: 9098   98003  :  7283   CHELAN :     0               
+    ##  (Other)    :50690   (Other):113192   CLALLAM:     0               
+    ##  NA's       :   16   NA's   : 12180   (Other):     0               
     ##                       dplacelit.k     dplacecode.k      dthyr.k     
-    ##  Hospital (inpatient)       :35155   4      :35277   2008   :12409  
-    ##  Nursing home/long term care:26684   5      :26745   2007   :12141  
-    ##  Home                       :25667   0      :25745   2003   :12129  
-    ##  Other place                : 3367   1      : 3389   2009   :12111  
-    ##  Hospice                    : 3047   7      : 3060   2006   :12019  
-    ##  Emergency room             : 1603   3      : 1605   2005   :11886  
-    ##  (Other)                    :  360   (Other):   62   (Other):23188  
-    ##      UCOD.k            MCOD.k                         educ.k     
-    ##  C349   : 5848   C349 F179: 1534   H.S. grad/GED         :30327  
-    ##  I251   : 5497   I250     : 1185   Some college          :14551  
-    ##  G309   : 5302   G309     : 1102   Unknown               :13041  
-    ##  I219   : 3774   C349     : 1058   Bachelors             :12880  
-    ##  I250   : 3530   C259     :  843   <=8th grade           : 7081  
-    ##  (Other):71897   (Other)  :89822   9-12th gr., no diploma: 6312  
-    ##  NA's   :   35   NA's     :  339   (Other)               :11691  
-    ##  marital.k    occup.k      military.k                     codlit.k    
-    ##  A:  208   908    :16164   N:69502    LUNG CANCER             :  640  
-    ##  D:15019   557    : 2712   U:  717    PROBABLE ASCVD          :  462  
-    ##  M:34910   183    : 2656   Y:25664    ALZHEIMERS DEMENTIA     :  412  
-    ##  P:   74   290    : 2343              PANCREATIC CANCER       :  391  
-    ##  S:11776   396    : 1848              ASCVD                   :  390  
-    ##  U:  619   (Other):67921              (Other)                 :93551  
-    ##  W:33277   NA's   : 2239              NA's                    :   37  
-    ##      age.k           age5cat.k                      LCOD.k     
-    ##  Min.   :  0.00   <18yrs  : 1772   Other               :24945  
-    ##  1st Qu.: 63.00   18-29yrs: 1669   Cancer              :21521  
-    ##  Median : 79.00   30-44yrs: 3712   Heart Dis.          :20492  
-    ##  Mean   : 73.61   45-64yrs:18242   Stroke              : 6244  
-    ##  3rd Qu.: 87.00   65+ yrs :70475   Alzheimers          : 5551  
-    ##  Max.   :112.00   NA's    :   13   Injury-unintentional: 5078  
-    ##  NA's   :13                        (Other)             :12052  
-    ##                     injury.k                 substance.k   
-    ##  MV - all               : 1244   Alcohol-induced   : 1357  
-    ##  No injury              :90795   Drug-induced      : 1769  
-    ##  Other injury           :  804   No Substance abuse:92757  
-    ##  Unintentional fall     : 1546                             
-    ##  Unintentional poisoning: 1494                             
-    ##                                                            
-    ##                                                            
-    ##        residence.k        raceethnic5.k    raceethnic6.k  
-    ##  Out of state:    5   AIAN NH    :  743   White NH:69750  
-    ##  WA resident :95878   Asian/PI NH: 6087   Unknown :12164  
-    ##                       Black NH   : 4545   Asian   : 5644  
-    ##                       Hispanic   : 1916   Black NH: 4545  
-    ##                       Other      :  678   Hispanic: 1916  
-    ##                       Unknown    :12164   AIAN NH :  743  
-    ##                       White NH   :69750   (Other) : 1121
+    ##  Hospital (inpatient)       :61570   4      :61711   2016   :13337  
+    ##  Home                       :49301   0      :49395   2015   :13128  
+    ##  Nursing home/long term care:44847   5      :47537   2014   :13025  
+    ##  Other place                : 6311   1      : 6339   2013   :12757  
+    ##  Hospice                    : 5979   7      : 5997   2012   :12641  
+    ##  Emergency room             : 3175   3      : 3179   2011   :12427  
+    ##  (Other)                    : 3115   (Other):  140   (Other):96983  
+    ##      UCOD.k             MCOD.k                          educ.k     
+    ##  G309   : 10173   C349 F179:  2588   H.S. grad/GED         :57248  
+    ##  C349   :  9873   G309     :  2135   Some college          :28396  
+    ##  I251   :  9492   I250     :  1961   Bachelors             :26685  
+    ##  I250   :  6112   C349     :  1635   Unknown               :14555  
+    ##  I219   :  6072   C259     :  1528   <=8th grade           :12388  
+    ##  (Other):132534   (Other)  :164045   9-12th gr., no diploma:11174  
+    ##  NA's   :    42   NA's     :   406   (Other)               :23852  
+    ##  marital.k    occup.k       military.k
+    ##  A:  496   908    : 27768   N:127428  
+    ##  D:28434   183    :  5111   U:  1271  
+    ##  M:62439   557    :  5096   Y: 45599  
+    ##  P:  228   290    :  4310             
+    ##  S:22059   150    :  3470             
+    ##  U: 1278   (Other):124752             
+    ##  W:59364   NA's   :  3791             
+    ##                             codlit.k          age.k       
+    ##  LUNG CANCER                    :  1053   Min.   :  0.00  
+    ##  PANCREATIC CANCER              :   739   1st Qu.: 64.00  
+    ##  ALZHEIMERS DEMENTIA            :   704   Median : 79.00  
+    ##  METASTATIC BREAST CANCER       :   650   Mean   : 73.95  
+    ##  NON SMALL CELL LUNG CANCER     :   518   3rd Qu.: 88.00  
+    ##  (Other)                        :170576   Max.   :113.00  
+    ##  NA's                           :    58   NA's   :18      
+    ##     age5cat.k                       LCOD.k     
+    ##  <18yrs  :  3076   Other               :47413  
+    ##  18-29yrs:  2999   Cancer              :38590  
+    ##  30-44yrs:  6478   Heart Dis.          :36220  
+    ##  45-64yrs: 33061   Alzheimers          :10659  
+    ##  65+ yrs :128666   Stroke              :10358  
+    ##  NA's    :    18   Injury-unintentional: 9408  
+    ##                    (Other)             :21650  
+    ##                     injury.k                  substance.k    
+    ##  MV - all               :  2022   Alcohol-induced   :  2740  
+    ##  No injury              :164880   Drug-induced      :  3335  
+    ##  Other injury           :  1513   No Substance abuse:168223  
+    ##  Unintentional fall     :  2979                              
+    ##  Unintentional poisoning:  2904                              
+    ##                                                              
+    ##                                                              
+    ##        residence.k         raceethnic5.k     raceethnic6.k   
+    ##  Out of state:    16   AIAN NH    :  1491   White NH:133603  
+    ##  WA resident :174282   Asian/PI NH: 12714   Unknown : 12170  
+    ##                        Black NH   :  8831   Asian   : 11818  
+    ##                        Hispanic   :  4022   Black NH:  8831  
+    ##                        Other      :  1467   Hispanic:  4022  
+    ##                        Unknown    : 12170   AIAN NH :  1491  
+    ##                        White NH   :133603   (Other) :  2363
 
 C. King County Medical Examiner\`s Homeless Death Registry data - November 2003 to September 2017
 -------------------------------------------------------------------------------------------------
@@ -1260,121 +1268,121 @@ summary(homelessfinal)
 ```
 
     ##     certno.k           lname.h            fname.h         
-    ##  Min.   :2.003e+09   Length:574         Length:574        
-    ##  1st Qu.:2.005e+09   Class :character   Class :character  
-    ##  Median :2.006e+09   Mode  :character   Mode  :character  
-    ##  Mean   :2.007e+09                                        
-    ##  3rd Qu.:2.008e+09                                        
+    ##  Min.   :2.003e+09   Length:1093        Length:1093       
+    ##  1st Qu.:2.006e+09   Class :character   Class :character  
+    ##  Median :2.010e+09   Mode  :character   Mode  :character  
+    ##  Mean   :2.010e+09                                        
+    ##  3rd Qu.:2.014e+09                                        
     ##  Max.   :2.017e+09                                        
     ##                                                           
     ##      dob.h                age.h         mname.h         
-    ##  Min.   :1913-02-27   Min.   :17.00   Length:574        
-    ##  1st Qu.:1951-02-02   1st Qu.:42.00   Class :character  
-    ##  Median :1957-07-04   Median :49.00   Mode  :character  
-    ##  Mean   :1957-12-27   Mean   :48.87                     
-    ##  3rd Qu.:1964-12-19   3rd Qu.:56.00                     
-    ##  Max.   :1988-08-21   Max.   :93.00                     
+    ##  Min.   :1913-02-27   Min.   :17.00   Length:1093       
+    ##  1st Qu.:1953-05-27   1st Qu.:41.00   Class :character  
+    ##  Median :1960-07-18   Median :50.00   Mode  :character  
+    ##  Mean   :1961-07-24   Mean   :48.77                     
+    ##  3rd Qu.:1969-06-26   3rd Qu.:57.00                     
+    ##  Max.   :1995-12-31   Max.   :93.00                     
     ##                                                         
     ##      dod.h                              placeofdeath.h deathaddr.h       
-    ##  Min.   :1991-09-01   HARBORVIEW MEDICAL CENTER:105    Length:574        
-    ##  1st Qu.:2005-08-18   OUTDOORS                 : 25    Class :character  
-    ##  Median :2007-01-02   RESIDENCE                : 23    Mode  :character  
-    ##  Mean   :2007-06-20   VEHICLE                  : 19                      
-    ##  3rd Qu.:2008-09-02   OTHER                    : 12                      
-    ##  Max.   :2063-01-01   (Other)                  :306                      
-    ##  NA's   :30           NA's                     : 84                      
+    ##  Min.   :1991-09-01   HARBORVIEW MEDICAL CENTER:166    Length:1093       
+    ##  1st Qu.:2006-12-01   OUTDOORS                 :110    Class :character  
+    ##  Median :2010-05-26   RESIDENCE                : 50    Mode  :character  
+    ##  Mean   :2010-11-07   VEHICLE                  : 39                      
+    ##  3rd Qu.:2014-11-20   SIDEWALK                 : 20                      
+    ##  Max.   :2063-01-01   (Other)                  :616                      
+    ##  NA's   :55           NA's                     : 92                      
     ##       deathcity.h      dzip.h    eventaddr.h             eventcity.h 
-    ##  SEATTLE    :452   98104  :169   Length:574         SEATTLE    :413  
-    ##  KENT       : 16   98122  : 31   Class :character   KENT       : 19  
-    ##  RENTON     : 16   98101  : 30   Mode  :character   RENTON     : 17  
-    ##  FEDERAL WAY: 12   98133  : 30                      TUKWILA    : 17  
-    ##  TUKWILA    : 12   98134  : 15                      FEDERAL WAY: 13  
-    ##  BELLEVUE   : 11   (Other):297                      (Other)    : 82  
-    ##  (Other)    : 55   NA's   :  2                      NA's       : 13  
-    ##    dcounty.k     attclass.k  sex.k     brgrace.k   hispanic.k
-    ##  KING   :574   2      :499   F: 87   1      :389   N: 60     
-    ##  ADAMS  :  0   1      : 70   M:487   2      : 96   Y:514     
-    ##  ASOTIN :  0   7      :  3   U:  0   3      : 31             
-    ##  BENTON :  0   3      :  1           15     : 29             
-    ##  CHELAN :  0   6      :  1           99     :  7             
-    ##  CLALLAM:  0   0      :  0           (Other): 15             
-    ##  (Other):  0   (Other):  0           NA's   :  7             
+    ##  SEATTLE    :823   98104  :299   Length:1093        SEATTLE    :748  
+    ##  RENTON     : 39   98133  : 65   Class :character   KENT       : 43  
+    ##  KENT       : 36   98101  : 56   Mode  :character   RENTON     : 36  
+    ##  AUBURN     : 31   98122  : 49                      AUBURN     : 31  
+    ##  FEDERAL WAY: 30   98107  : 32                      FEDERAL WAY: 30  
+    ##  (Other)    :133   (Other):588                      (Other)    :174  
+    ##  NA's       :  1   NA's   :  4                      NA's       : 31  
+    ##    dcounty.k      attclass.k  sex.k     brgrace.k   hispanic.k
+    ##  KING   :1093   2      :974   F:178   1      :736   N:100     
+    ##  ADAMS  :   0   1      :107   M:915   2      :164   Y:993     
+    ##  ASOTIN :   0   7      :  7   U:  0   3      : 78             
+    ##  BENTON :   0   3      :  2           15     : 49             
+    ##  CHELAN :   0   6      :  1           99     : 16             
+    ##  CLALLAM:   0   (Other):  0           (Other): 43             
+    ##  (Other):   0   NA's   :  2           NA's   :  7             
     ##          manner.k       rcounty.k      rcity.k   
-    ##  Accident    :240   KING     :357   SEATTLE:228  
-    ##  Natural     :216   UNKNOWN  : 90   UNKNOWN:113  
-    ##  Suicide     : 48   UNK      : 20   UNK    : 22  
-    ##  Homicide    : 37   SNOHOMISH: 16   KENT   : 16  
-    ##  Undetermined: 32   PIERCE   : 14   BURIEN : 10  
-    ##  (Other)     :  0   (Other)  : 58   (Other):167  
-    ##  NA's        :  1   NA's     : 19   NA's   : 18  
-    ##                        rstreet.k    rstateFIPS.k        rzip.k   
-    ##  UNKNOWN                    :105   WA     :435   99999     :158  
-    ##  HOMELESS                   : 30   ZZ     :105   98104     : 44  
-    ##  NO PERMANENT ADDRESS       : 20   CA     : 10   99999-9999: 27  
-    ##  UNK                        : 16   OR     :  5   98101     : 14  
-    ##  NO PERMANENT PLACE OF ABODE: 13   AK     :  3   98133     : 12  
-    ##  77 S WASHINGTON ST         : 10   ID     :  2   (Other)   :317  
-    ##  (Other)                    :380   (Other): 14   NA's      :  2  
+    ##  Accident    :496   KING     :735   SEATTLE:459  
+    ##  Natural     :394   UNKNOWN  :142   UNKNOWN:198  
+    ##  Suicide     : 81   SNOHOMISH: 29   KENT   : 33  
+    ##  Homicide    : 61   PIERCE   : 28   RENTON : 23  
+    ##  Undetermined: 60   UNK      : 20   UNK    : 22  
+    ##  (Other)     :  0   (Other)  :104   (Other):326  
+    ##  NA's        :  1   NA's     : 35   NA's   : 32  
+    ##                 rstreet.k    rstateFIPS.k        rzip.k   
+    ##  UNKNOWN             :225   WA     :886   99999     :299  
+    ##  HOMELESS            : 50   ZZ     :151   98104     : 95  
+    ##  NO PERMANENT ADDRESS: 42   CA     : 13   98101     : 28  
+    ##  77 S WASHINGTON ST  : 21   OR     :  8   99999-9999: 28  
+    ##  TRANSIENT           : 19   AK     :  4   98133     : 22  
+    ##  (Other)             :734   ID     :  3   (Other)   :616  
+    ##  NA's                :  2   (Other): 28   NA's      :  5  
     ##         dcity.k                         dplacelit.k   dplacecode.k
-    ##  SEATTLE    :457   Other place                :320   1      :321  
-    ##  KENT       : 16   Hospital (inpatient)       :150   4      :151  
-    ##  RENTON     : 16   Home                       : 50   0      : 50  
-    ##  FEDERAL WAY: 12   Emergency room             : 24   3      : 26  
-    ##  BELLEVUE   : 11   Nursing home/long term care: 21   5      : 21  
-    ##  AUBURN     :  9   Hospice                    :  4   7      :  4  
-    ##  (Other)    : 53   (Other)                    :  5   (Other):  1  
+    ##  SEATTLE    :832   Other place                :572   1      :624  
+    ##  RENTON     : 39   Hospital (inpatient)       :247   4      :272  
+    ##  KENT       : 36   Home                       : 99   0      :100  
+    ##  AUBURN     : 32   OTHER                      : 52   3      : 49  
+    ##  FEDERAL WAY: 30   Emergency room             : 45   5      : 37  
+    ##  BELLEVUE   : 21   Nursing home/long term care: 34   7      :  8  
+    ##  (Other)    :103   (Other)                    : 44   (Other):  3  
     ##     dthyr.k        UCOD.k              MCOD.k   
-    ##  2006   :108   X420   : 88   I250         : 14  
-    ##  2005   : 93   X440   : 61   I119         : 12  
-    ##  2007   : 89   I250   : 42   R99          :  6  
-    ##  2004   : 82   I119   : 26   X70 T71      :  6  
-    ##  2008   : 78   K703   : 22   X72 S019 T141:  6  
-    ##  2009   : 72   (Other):334   (Other)      :525  
-    ##  (Other): 52   NA's   :  1   NA's         :  5  
+    ##  2006   :108   X420   :153   R99          : 26  
+    ##  2017   : 94   X440   :140   I250         : 23  
+    ##  2005   : 93   I250   : 80   I250 I119    : 19  
+    ##  2015   : 90   I119   : 38   I119         : 15  
+    ##  2007   : 89   K703   : 38   X95 T019 T141: 13  
+    ##  2016   : 86   (Other):642   (Other)      :906  
+    ##  (Other):533   NA's   :  2   NA's         : 91  
     ##                     educ.k    marital.k    occup.k       age5cat.k  
-    ##  H.S. grad/GED         :185   A:  3     999    :149   <18yrs  :  0  
-    ##  Unknown               :185   D:179     980    : 39   18-29yrs: 42  
-    ##  9-12th gr., no diploma: 93   M: 40     982    : 34   30-44yrs:136  
-    ##  Some college          : 65   P:  0     997    : 17   45-64yrs:340  
-    ##  Bachelors             : 15   S:239     715    : 16   65+ yrs : 55  
-    ##  <=8th grade           : 14   U:100     (Other):303   NA's    :  1  
-    ##  (Other)               : 17   W: 13     NA's   : 16                 
+    ##  H.S. grad/GED         :398   A:  8     999    :269   <18yrs  :  0  
+    ##  Unknown               :306   D:320     980    : 81   18-29yrs: 84  
+    ##  9-12th gr., no diploma:179   M: 69     982    : 58   30-44yrs:264  
+    ##  Some college          :109   P:  0     997    : 45   45-64yrs:643  
+    ##  <=8th grade           : 36   S:486     998    : 34   65+ yrs :101  
+    ##  Bachelors             : 28   U:188     (Other):576   NA's    :  1  
+    ##  (Other)               : 37   W: 22     NA's   : 30                 
     ##                        LCOD.k                       injury.k  
-    ##  Injury-unintentional     :231   MV - all               : 30  
-    ##  Other                    :130   No injury              :341  
-    ##  Heart Dis.               : 86   Other injury           : 27  
-    ##  Suicide-all              : 48   Unintentional fall     : 11  
-    ##  Chronic Liver dis./cirrh.: 32   Unintentional poisoning:165  
-    ##  Cancer                   : 15                                
-    ##  (Other)                  : 32                                
+    ##  Injury-unintentional     :487   MV - all               : 57  
+    ##  Other                    :228   No injury              :604  
+    ##  Heart Dis.               :155   Other injury           : 58  
+    ##  Suicide-all              : 81   Unintentional fall     : 18  
+    ##  Chronic Liver dis./cirrh.: 58   Unintentional poisoning:356  
+    ##  Cancer                   : 28                                
+    ##  (Other)                  : 56                                
     ##              substance.k        residence.k      raceethnic5.k
-    ##  Alcohol-induced   : 44   Out of state: 34   AIAN NH    : 31  
-    ##  Drug-induced      :176   WA resident :435   Asian/PI NH:  6  
-    ##  No Substance abuse:354   NA's        :105   Black NH   : 92  
-    ##                                              Hispanic   : 54  
-    ##                                              Other      : 11  
+    ##  Alcohol-induced   : 91   Out of state: 56   AIAN NH    : 75  
+    ##  Drug-induced      :357   WA resident :886   Asian/PI NH: 24  
+    ##  No Substance abuse:645   NA's        :151   Black NH   :157  
+    ##                                              Hispanic   : 95  
+    ##                                              Other      : 21  
     ##                                              Unknown    :  7  
-    ##                                              White NH   :373  
+    ##                                              White NH   :714  
     ##   raceethnic6.k
-    ##  White NH:373  
-    ##  Black NH: 92  
-    ##  Hispanic: 54  
-    ##  AIAN NH : 31  
-    ##  Other   : 11  
-    ##  Unknown :  7  
-    ##  (Other) :  6  
-    ##                                                                                codlit.k  
-    ##  ASCVD                                                                             :  8  
-    ##  HYPERTENSIVE AND ASCVD                                                            :  7  
-    ##  HYPERTENSIVE CARDIOVASCULAR DISEASE                                               :  5  
-    ##  ACUTE INTOXICATION COMBINED EFFECTS OF METHADONE AND COCAINE    TOXIC USE OF DRUGS:  3  
-    ##  ATHEROSCLEROTIC AND HYPERTENSIVE CARDIOVASCULAR DISEASE                           :  3  
-    ##  (Other)                                                                           :547  
-    ##  NA's                                                                              :  1  
+    ##  White NH:714  
+    ##  Black NH:157  
+    ##  Hispanic: 95  
+    ##  AIAN NH : 75  
+    ##  Other   : 21  
+    ##  Asian   : 19  
+    ##  (Other) : 12  
+    ##                                                          codlit.k   
+    ##  HYPERTENSIVE AND ATHEROSCLEROTIC CARDIOVASCULAR DISEASE     :  18  
+    ##  HYPERTENSIVE CARDIOVASCULAR DISEASE                         :   9  
+    ##  ASCVD                                                       :   8  
+    ##  MULTIPLE GUNSHOT WOUNDS     SHOT BY OTHER                   :   8  
+    ##  HYPERTENSIVE AND ASCVD                                      :   7  
+    ##  (Other)                                                     :1042  
+    ##  NA's                                                        :   1  
     ##  military.k
-    ##  N:379     
-    ##  U: 69     
-    ##  Y:126     
+    ##  N:778     
+    ##  U:121     
+    ##  Y:194     
     ##            
     ##            
     ##            
@@ -1384,49 +1392,49 @@ summary(homelessfinal)
 str(homelessfinal)
 ```
 
-    ## 'data.frame':    574 obs. of  42 variables:
-    ##  $ certno.k      : int  2004023773 2013065733 2005056470 2005063775 2004006096 2006040788 2007048723 2004004628 2005081461 2008061185 ...
-    ##  $ lname.h       : chr  "ALLEN" "ALONZOPERNILLA" "ALSTON" "ANAGICK" ...
-    ##  $ fname.h       : chr  "RONALD" "EDWIN" "KAMAL" "MICHAEL" ...
-    ##  $ dob.h         : Date, format: "1940-08-07" "1966-11-14" ...
-    ##  $ age.h         : int  63 46 21 39 57 69 67 50 58 56 ...
-    ##  $ mname.h       : chr  "FRANK" "GUSTAVO" "RAHMAN MARLEY" "PETER" ...
-    ##  $ dod.h         : Date, format: "2004-06-29" NA ...
-    ##  $ placeofdeath.h: Factor w/ 349 levels "\"TENT CITY\"",..: NA 232 261 123 NA 143 123 NA 123 123 ...
-    ##  $ deathaddr.h   : chr  "HARBORVIEW MEDICAL CENTER" "600 GALER STREET" "33819 26TH AVENUE SW" "325 NINTH AVENUE" ...
-    ##  $ deathcity.h   : Factor w/ 32 levels "AUBURN","BELLEVUE",..: 25 25 10 25 25 25 25 13 25 25 ...
-    ##  $ dzip.h        : Factor w/ 74 levels "98001","98002",..: 38 43 12 38 51 53 38 19 38 38 ...
-    ##  $ eventaddr.h   : chr  "325 9TH AVE (HMC)" "600 GALER STREET" "33819 26TH AVENUE SW" "1521 15TH AVE." ...
-    ##  $ eventcity.h   : Factor w/ 60 levels "ABERDEEN","ACME",..: 45 45 17 45 45 45 45 24 3 45 ...
+    ## 'data.frame':    1093 obs. of  42 variables:
+    ##  $ certno.k      : int  2017019289 2014057047 2017016040 2010070278 2016052688 2015064867 2011073979 2004023773 2013045577 2013065733 ...
+    ##  $ lname.h       : chr  "ADAMS" "ADLER" "ALANIS" "ALBERTE" ...
+    ##  $ fname.h       : chr  "DANIEL" "CHRISTOPHER" "RUPERTO" "LINDA" ...
+    ##  $ dob.h         : Date, format: "1987-10-09" "1972-01-10" ...
+    ##  $ age.h         : int  29 42 48 52 41 32 40 63 25 46 ...
+    ##  $ mname.h       : chr  "T." "D." "FELIX" "SUE" ...
+    ##  $ dod.h         : Date, format: "2017-04-18" "2014-09-10" ...
+    ##  $ placeofdeath.h: Factor w/ 349 levels "\"TENT CITY\"",..: 192 163 257 154 20 37 225 NA 122 232 ...
+    ##  $ deathaddr.h   : chr  "107TH AND NORTHGATE WY" "1230 CENTRAL AVE. S." "308 4TH AVE S, APT #502" "23605 SE EVANS ST." ...
+    ##  $ deathcity.h   : Factor w/ 32 levels "AUBURN","BELLEVUE",..: 25 13 25 11 25 25 13 25 12 25 ...
+    ##  $ dzip.h        : Factor w/ 74 levels "98001","98002",..: 56 18 38 14 46 57 18 38 15 43 ...
+    ##  $ eventaddr.h   : chr  "107TH AND NORTHGATE WY" "1230 CENTRAL AVE. S." "308 4TH AVE S, APT #502" "23605 SE EVANS ST." ...
+    ##  $ eventcity.h   : Factor w/ 60 levels "ABERDEEN","ACME",..: 45 24 45 20 45 45 24 45 23 45 ...
     ##  $ dcounty.k     : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 17 17 17 17 17 17 17 17 17 ...
-    ##  $ attclass.k    : Factor w/ 9 levels "0","1","2","3",..: 2 3 3 3 3 2 3 3 3 2 ...
-    ##  $ sex.k         : Factor w/ 3 levels "F","M","U": 2 2 2 2 2 2 2 2 2 1 ...
-    ##  $ brgrace.k     : Factor w/ 20 levels "1","2","3","4",..: 1 15 2 3 1 1 1 1 1 1 ...
-    ##  $ hispanic.k    : Factor w/ 2 levels "N","Y": 2 1 2 2 2 2 2 2 2 2 ...
-    ##  $ manner.k      : Factor w/ 7 levels "Accident","Undetermined",..: 4 2 3 1 1 4 4 1 1 4 ...
-    ##  $ rcounty.k     : Factor w/ 821 levels "ADA","ADAMS",..: 370 NA 370 16 719 370 370 370 745 370 ...
-    ##  $ rcity.k       : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 2149 NA 750 63 1726 2149 2149 2142 2458 2149 ...
-    ##  $ rstreet.k     : Factor w/ 295132 levels "#1 CONVALESCENT CENTER BLVD",..: 294420 295025 94954 172030 205829 48408 268569 116453 295025 215526 ...
-    ##  $ rstateFIPS.k  : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 2 58 58 58 58 63 58 ...
-    ##  $ rzip.k        : Factor w/ 4162 levels "00000","00705",..: 3086 3985 2959 3857 3424 3088 3091 3119 NA 3043 ...
-    ##  $ dcity.k       : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 545 197 545 545 545 545 290 545 545 ...
-    ##  $ dplacelit.k   : Factor w/ 18 levels "DECEDENT'S HOME",..: 6 17 17 6 17 6 9 17 6 6 ...
-    ##  $ dplacecode.k  : Factor w/ 10 levels "0","1","2","3",..: 5 2 2 5 2 5 3 2 5 5 ...
-    ##  $ dthyr.k       : Factor w/ 14 levels "2003","2004",..: 2 11 3 3 2 4 5 2 3 6 ...
-    ##  $ UCOD.k        : Factor w/ 2656 levels "A020","A021",..: 1506 2225 2565 2444 2524 1299 1011 2522 2503 1136 ...
-    ##  $ MCOD.k        : Factor w/ 190524 levels "A020 A419","A020 A419 E872 I48",..: 157297 175028 177082 175347 177365 155107 99028 177405 177233 135647 ...
-    ##  $ educ.k        : Factor w/ 9 levels "<=8th grade",..: 9 3 3 2 2 9 9 3 9 3 ...
-    ##  $ marital.k     : Factor w/ 7 levels "A","D","M","P",..: 5 5 5 5 5 6 2 2 6 2 ...
-    ##  $ occup.k       : Factor w/ 422 levels "`","000","007",..: 422 401 366 366 NA 132 422 414 422 422 ...
-    ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 4 4 2 3 4 5 5 4 4 4 ...
-    ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 3 9 9 8 8 4 7 8 8 10 ...
-    ##  $ injury.k      : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 4 5 2 2 5 3 2 ...
-    ##  $ substance.k   : Factor w/ 3 levels "Alcohol-induced",..: 1 3 3 3 2 3 3 2 3 3 ...
-    ##  $ residence.k   : Factor w/ 2 levels "Out of state",..: 2 2 2 1 2 2 2 2 NA 2 ...
-    ##  $ raceethnic5.k : Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 7 4 3 1 7 7 7 7 7 7 ...
-    ##  $ raceethnic6.k : Factor w/ 8 levels "AIAN NH","Asian",..: 8 4 3 1 8 8 8 8 8 8 ...
-    ##  $ codlit.k      : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 42494 187983 138227 79867 6746 240000 145074 6676 267775 206953 ...
-    ##  $ military.k    : Factor w/ 3 levels "N","U","Y": 2 1 1 1 1 2 1 1 2 1 ...
+    ##  $ attclass.k    : Factor w/ 10 levels "0","1","2","3",..: 3 3 3 3 3 3 3 2 3 3 ...
+    ##  $ sex.k         : Factor w/ 3 levels "F","M","U": 2 2 2 1 2 1 2 2 2 2 ...
+    ##  $ brgrace.k     : Factor w/ 20 levels "1","2","3","4",..: 2 1 1 1 2 8 1 1 15 15 ...
+    ##  $ hispanic.k    : Factor w/ 2 levels "N","Y": 2 2 1 2 2 2 2 2 1 1 ...
+    ##  $ manner.k      : Factor w/ 7 levels "Accident","Undetermined",..: 1 2 1 1 1 1 1 4 1 2 ...
+    ##  $ rcounty.k     : Factor w/ 1097 levels "ACADIA","ADA",..: 1084 491 491 1000 898 491 60 491 491 NA ...
+    ##  $ rcity.k       : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 3779 1663 3038 3497 2224 3038 263 3038 158 NA ...
+    ##  $ rstreet.k     : Factor w/ 555079 levels "#1 5TH AND MAIN ST.",..: 532489 553625 306598 554896 384045 554896 142053 553968 369807 554896 ...
+    ##  $ rstateFIPS.k  : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 66 61 61 18 61 61 61 ...
+    ##  $ rzip.k        : Factor w/ 15491 levels "00000","00077",..: 13178 5651 6586 15155 6019 15155 2646 7268 4793 15155 ...
+    ##  $ dcity.k       : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 319 595 304 595 595 319 595 317 595 ...
+    ##  $ dplacelit.k   : Factor w/ 21 levels "DEAD ON ARRIVAL TO HOSPITAL IN TRANSPORT",..: 17 20 19 20 20 5 20 9 20 20 ...
+    ##  $ dplacecode.k  : Factor w/ 10 levels "0","1","2","3",..: 2 2 9 2 2 1 2 5 2 2 ...
+    ##  $ dthyr.k       : Factor w/ 15 levels "2003","2004",..: 15 12 15 8 14 13 9 2 11 11 ...
+    ##  $ UCOD.k        : Factor w/ 3086 levels "A020","A021",..: 2934 2598 2931 2934 2699 2934 2926 1738 2890 2598 ...
+    ##  $ MCOD.k        : Factor w/ 345266 levels "A020 A090 E86 I251 N170 N179",..: NA 315360 NA 336970 321046 337786 333129 277005 331562 315360 ...
+    ##  $ educ.k        : Factor w/ 9 levels "<=8th grade",..: 3 9 5 9 3 4 2 9 3 3 ...
+    ##  $ marital.k     : Factor w/ 7 levels "A","D","M","P",..: 5 6 5 2 1 5 2 5 5 5 ...
+    ##  $ occup.k       : Factor w/ 430 levels "`","000","007",..: 10 430 188 430 106 428 430 430 410 409 ...
+    ##  $ age5cat.k     : Factor w/ 5 levels "<18yrs","18-29yrs",..: 3 3 4 4 3 3 3 4 2 4 ...
+    ##  $ LCOD.k        : Factor w/ 11 levels "Alzheimers","Cancer",..: 8 9 8 8 8 8 8 3 8 9 ...
+    ##  $ injury.k      : Factor w/ 5 levels "MV - all","No injury",..: 5 2 5 5 1 5 3 2 3 2 ...
+    ##  $ substance.k   : Factor w/ 3 levels "Alcohol-induced",..: 2 3 2 2 3 2 3 1 3 3 ...
+    ##  $ residence.k   : Factor w/ 2 levels "Out of state",..: 2 2 2 NA 2 2 1 2 2 2 ...
+    ##  $ raceethnic5.k : Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 3 7 4 7 3 2 7 7 4 4 ...
+    ##  $ raceethnic6.k : Factor w/ 8 levels "AIAN NH","Asian",..: 3 8 4 8 3 2 8 8 4 4 ...
+    ##  $ codlit.k      : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 199479 536384 21735 8845 512628 9115 296594 93915 243599 379110 ...
+    ##  $ military.k    : Factor w/ 3 levels "N","U","Y": 1 2 1 1 1 1 1 2 1 1 ...
 
 ``` r
 a <- table(homelessfinal$injury.k)
@@ -1435,9 +1443,9 @@ a
 
     ## 
     ##                MV - all               No injury            Other injury 
-    ##                      30                     341                      27 
+    ##                      57                     604                      58 
     ##      Unintentional fall Unintentional poisoning 
-    ##                      11                     165
+    ##                      18                     356
 
 ``` r
 #miss_var_summary(homelessfinal)
@@ -1492,78 +1500,90 @@ EDAdf$dplacecode <- factor(EDAdf$dplacecode,
 summary(EDAdf)
 ```
 
-    ##      certno             dcounty         attclass     sex      
-    ##  Min.   :2.003e+09   KING   :96457   1      :78419   F:48595  
-    ##  1st Qu.:2.005e+09   ADAMS  :    0   2      :13042   M:47861  
-    ##  Median :2.007e+09   ASOTIN :    0   7      : 3742   U:    1  
-    ##  Mean   :2.007e+09   BENTON :    0   3      :  925            
-    ##  3rd Qu.:2.008e+09   CHELAN :    0   6      :  324            
-    ##  Max.   :2.017e+09   CLALLAM:    0   4      :    2            
-    ##                      (Other):    0   (Other):    3            
-    ##     brgrace      hispanic           manner           rcounty     
-    ##  1      :70829   N:14111   Natural     :88059   KING     :83938  
-    ##  2      : 4692   Y:82346   Accident    : 5705   SNOHOMISH: 4807  
-    ##  5      : 1369             Suicide     : 1742   PIERCE   : 2415  
-    ##  6      : 1143             Homicide    :  574   KITSAP   :  824  
-    ##  7      : 1140             Undetermined:  355   CLALLAM  :  451  
-    ##  (Other): 5113             (Other)     :    1   (Other)  : 4003  
-    ##  NA's   :12171             NA's        :   21   NA's     :   19  
-    ##        rcity         rstateFIPS         rzip               dcity      
-    ##  SEATTLE  :32760   WA     :96313   98133  : 3557   SEATTLE    :45521  
-    ##  BELLEVUE : 5587   ZZ     :  105   98118  : 2538   KIRKLAND   : 6916  
-    ##  RENTON   : 5041   CA     :   10   98003  : 2450   BELLEVUE   : 6625  
-    ##  KENT     : 4565   OR     :    5   98198  : 2446   RENTON     : 5618  
-    ##  SHORELINE: 3918   AK     :    4   98125  : 2126   FEDERAL WAY: 4812  
-    ##  (Other)  :44568   TX     :    3   (Other):83338   (Other)    :26949  
-    ##  NA's     :   18   (Other):   17   NA's   :    2   NA's       :   16  
-    ##                       dplacecode        dthyr            UCOD      
-    ##  Hospital inpatient        :35428   2008   :12487   C349   : 5855  
-    ##  Nursing home/Longterm care:26766   2007   :12230   I251   : 5500  
-    ##  Home                      :25795   2009   :12183   G309   : 5302  
-    ##  Other                     : 3710   2003   :12135   I219   : 3779  
-    ##  Hospice                   : 3064   2006   :12127   I250   : 3572  
-    ##  ER                        : 1631   2005   :11979   (Other):72413  
-    ##  (Other)                   :   63   (Other):23316   NA's   :   36  
-    ##                      educ       marital     occupcode         age5cat     
-    ##  H.S. grad/GED         :30512   A:  211   908    :16180   <18yrs  : 1772  
-    ##  Some college          :14616   D:15198   557    : 2714   18-29yrs: 1711  
-    ##  Unknown               :13226   M:34950   183    : 2657   30-44yrs: 3848  
-    ##  Bachelors             :12895   P:   74   290    : 2347   45-64yrs:18582  
-    ##  <=8th grade           : 7095   S:12015   396    : 1855   65+ yrs :70530  
-    ##  9-12th gr., no diploma: 6405   U:  719   (Other):68449   NA's    :   14  
-    ##  (Other)               :11708   W:33290   NA's   : 2255                   
-    ##                    LCOD                           injury     
-    ##  Other               :25075   MV - all               : 1274  
-    ##  Cancer              :21536   No injury              :91136  
-    ##  Heart Dis.          :20578   Other injury           :  831  
-    ##  Stroke              : 6249   Unintentional fall     : 1557  
-    ##  Alzheimers          : 5551   Unintentional poisoning: 1659  
-    ##  Injury-unintentional: 5309                                  
-    ##  (Other)             :12159                                  
-    ##               substance            residence          raceethnic5   
-    ##  Alcohol-induced   : 1401   Out of state:   39   AIAN NH    :  774  
-    ##  Drug-induced      : 1945   WA resident :96313   Asian/PI NH: 6093  
-    ##  No Substance abuse:93111   NA's        :  105   Black NH   : 4637  
-    ##                                                  Hispanic   : 1970  
-    ##                                                  Other      :  689  
-    ##                                                  Unknown    :12171  
-    ##                                                  White NH   :70123  
-    ##    raceethnic6                       CODliteral    military 
-    ##  White NH:70123   LUNG CANCER             :  640   N:69881  
-    ##  Unknown :12171   PROBABLE ASCVD          :  465   U:  786  
-    ##  Asian   : 5648   ALZHEIMERS DEMENTIA     :  412   Y:25790  
-    ##  Black NH: 4637   ASCVD                   :  398            
-    ##  Hispanic: 1970   PANCREATIC CANCER       :  391            
-    ##  AIAN NH :  774   (Other)                 :94113            
-    ##  (Other) : 1134   NA's                    :   38            
-    ##        status     
-    ##  Homeless :  574  
-    ##  With home:95883  
-    ##                   
-    ##                   
-    ##                   
-    ##                   
+    ##      certno             dcounty          attclass      sex      
+    ##  Min.   :2.003e+09   KING   :175391   1      :138277   F:87741  
+    ##  1st Qu.:2.006e+09   ADAMS  :     0   2      : 23991   M:87646  
+    ##  Median :2.010e+09   ASOTIN :     0   7      :  9979   U:    4  
+    ##  Mean   :2.010e+09   BENTON :     0   3      :  2064            
+    ##  3rd Qu.:2.013e+09   CHELAN :     0   6      :  1073            
+    ##  Max.   :2.017e+09   CLALLAM:     0   (Other):     5            
+    ##                      (Other):     0   NA's   :     2            
+    ##     brgrace       hispanic            manner            rcounty      
+    ##  1      :135919   N: 16257   Natural     :159965   KING     :153267  
+    ##  2      :  9100   Y:159134   Accident    : 10439   SNOHOMISH:  8352  
+    ##  5      :  2820              Suicide     :  3259   PIERCE   :  4253  
+    ##  6      :  2331              Homicide    :   982   KITSAP   :  1387  
+    ##  7      :  2314              Undetermined:   722   CLALLAM  :   812  
+    ##  (Other): 10730              (Other)     :     1   (Other)  :  7285  
+    ##  NA's   : 12177              NA's        :    23   NA's     :    35  
+    ##          rcity         rstateFIPS          rzip                dcity      
+    ##  SEATTLE    :57425   WA     :175168   98133  :  6324   SEATTLE    :79552  
+    ##  BELLEVUE   :10358   ZZ     :   151   98003  :  4543   KIRKLAND   :12892  
+    ##  RENTON     : 9418   CA     :    17   98118  :  4502   BELLEVUE   :12282  
+    ##  KENT       : 8768   OR     :     8   98198  :  4411   RENTON     :10674  
+    ##  FEDERAL WAY: 7326   AK     :     6   98125  :  3892   FEDERAL WAY: 9128  
+    ##  (Other)    :82064   TX     :     4   (Other):151714   (Other)    :50847  
+    ##  NA's       :   32   (Other):    37   NA's   :     5   NA's       :   16  
+    ##                       dplacecode        dthyr            UCOD       
+    ##  Hospital inpatient        :61983   2016   :13423   G309   : 10173  
+    ##  Home                      :49495   2015   :13218   C349   :  9886  
+    ##  Nursing home/Longterm care:47574   2014   :13089   I251   :  9496  
+    ##  Other                     : 6963   2013   :12840   I250   :  6192  
+    ##  Hospice                   : 6005   2012   :12696   I219   :  6081  
+    ##  ER                        : 3228   2008   :12488   (Other):133519  
+    ##  (Other)                   :  143   (Other):97637   NA's   :    44  
+    ##                      educ       marital     occupcode     
+    ##  H.S. grad/GED         :57646   A:  504   908    : 27793  
+    ##  Some college          :28505   D:28754   183    :  5112  
+    ##  Bachelors             :26713   M:62508   557    :  5104  
+    ##  Unknown               :14861   P:  228   290    :  4315  
+    ##  <=8th grade           :12424   S:22545   150    :  3470  
+    ##  9-12th gr., no diploma:11353   U: 1466   (Other):125776  
+    ##  (Other)               :23889   W:59386   NA's   :  3821  
+    ##      age5cat                         LCOD      
+    ##  <18yrs  :  3076   Other               :47641  
+    ##  18-29yrs:  3083   Cancer              :38618  
+    ##  30-44yrs:  6742   Heart Dis.          :36375  
+    ##  45-64yrs: 33704   Alzheimers          :10659  
+    ##  65+ yrs :128767   Stroke              :10368  
+    ##  NA's    :    19   Injury-unintentional: 9895  
+    ##                    (Other)             :21835  
+    ##                      injury                    substance     
+    ##  MV - all               :  2079   Alcohol-induced   :  2831  
+    ##  No injury              :165484   Drug-induced      :  3692  
+    ##  Other injury           :  1571   No Substance abuse:168868  
+    ##  Unintentional fall     :  2997                              
+    ##  Unintentional poisoning:  3260                              
+    ##                                                              
+    ##                                                              
+    ##         residence           raceethnic5       raceethnic6    
+    ##  Out of state:    72   AIAN NH    :  1566   White NH:134317  
+    ##  WA resident :175168   Asian/PI NH: 12738   Unknown : 12177  
+    ##  NA's        :   151   Black NH   :  8988   Asian   : 11837  
+    ##                        Hispanic   :  4117   Black NH:  8988  
+    ##                        Other      :  1488   Hispanic:  4117  
+    ##                        Unknown    : 12177   AIAN NH :  1566  
+    ##                        White NH   :134317   (Other) :  2389  
+    ##                                                 CODliteral     military  
+    ##  LUNG CANCER                                         :  1053   N:128206  
+    ##  PANCREATIC CANCER                                   :   739   U:  1392  
+    ##  ALZHEIMERS DEMENTIA                                 :   704   Y: 45793  
+    ##  METASTATIC BREAST CANCER                            :   650             
+    ##  PROBABLE ATHEROSCLEROTIC CARDIOVASCULAR DISEASE     :   521             
+    ##  (Other)                                             :171665             
+    ##  NA's                                                :    59             
+    ##        status      
+    ##  Homeless :  1093  
+    ##  With home:174298  
+    ##                    
+    ##                    
+    ##                    
+    ##                    
     ## 
+
+``` r
+write.csv(EDAdf, file = "HomelessFinal.csv")
+```
 
 III. EXPLORATORY DATA ANALYSIS
 ==============================
@@ -1579,52 +1599,52 @@ miss_var_summary(h)
 ```
 
     ## # A tibble: 28 x 3
-    ##    variable   n_miss pct_miss
-    ##    <chr>       <int>    <dbl>
-    ##  1 residence     105   18.3  
-    ##  2 rcounty        19    3.31 
-    ##  3 rcity          18    3.14 
-    ##  4 occupcode      16    2.79 
-    ##  5 brgrace         7    1.22 
-    ##  6 rzip            2    0.348
-    ##  7 manner          1    0.174
-    ##  8 UCOD            1    0.174
-    ##  9 age5cat         1    0.174
-    ## 10 CODliteral      1    0.174
+    ##    variable  n_miss pct_miss
+    ##    <chr>      <int>    <dbl>
+    ##  1 residence    151  13.8   
+    ##  2 rcounty       35   3.20  
+    ##  3 rcity         32   2.93  
+    ##  4 occupcode     30   2.74  
+    ##  5 brgrace        7   0.640 
+    ##  6 rzip           5   0.457 
+    ##  7 attclass       2   0.183 
+    ##  8 UCOD           2   0.183 
+    ##  9 manner         1   0.0915
+    ## 10 age5cat        1   0.0915
     ## # ... with 18 more rows
 
 ``` r
 str(h)
 ```
 
-    ## 'data.frame':    574 obs. of  28 variables:
-    ##  $ certno     : int  2004023773 2013065733 2005056470 2005063775 2004006096 2006040788 2007048723 2004004628 2005081461 2008061185 ...
+    ## 'data.frame':    1093 obs. of  28 variables:
+    ##  $ certno     : int  2017019289 2014057047 2017016040 2010070278 2016052688 2015064867 2011073979 2004023773 2013045577 2013065733 ...
     ##  $ dcounty    : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 17 17 17 17 17 17 17 17 17 ...
-    ##  $ attclass   : Factor w/ 9 levels "0","1","2","3",..: 2 3 3 3 3 2 3 3 3 2 ...
-    ##  $ sex        : Factor w/ 3 levels "F","M","U": 2 2 2 2 2 2 2 2 2 1 ...
-    ##  $ brgrace    : Factor w/ 20 levels "1","2","3","4",..: 1 15 2 3 1 1 1 1 1 1 ...
-    ##  $ hispanic   : Factor w/ 2 levels "N","Y": 2 1 2 2 2 2 2 2 2 2 ...
-    ##  $ manner     : Factor w/ 7 levels "Accident","Undetermined",..: 4 2 3 1 1 4 4 1 1 4 ...
-    ##  $ rcounty    : Factor w/ 821 levels "ADA","ADAMS",..: 370 NA 370 16 719 370 370 370 745 370 ...
-    ##  $ rcity      : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 2149 NA 750 63 1726 2149 2149 2142 2458 2149 ...
-    ##  $ rstateFIPS : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 2 58 58 58 58 63 58 ...
-    ##  $ rzip       : Factor w/ 4162 levels "00000","00705",..: 3086 3985 2959 3857 3424 3088 3091 3119 NA 3043 ...
-    ##  $ dcity      : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 545 197 545 545 545 545 290 545 545 ...
-    ##  $ dplacecode : Factor w/ 10 levels "0","1","2","3",..: 5 2 2 5 2 5 3 2 5 5 ...
-    ##  $ dthyr      : Factor w/ 14 levels "2003","2004",..: 2 11 3 3 2 4 5 2 3 6 ...
-    ##  $ UCOD       : Factor w/ 2656 levels "A020","A021",..: 1506 2225 2565 2444 2524 1299 1011 2522 2503 1136 ...
-    ##  $ educ       : Factor w/ 9 levels "<=8th grade",..: 9 3 3 2 2 9 9 3 9 3 ...
-    ##  $ marital    : Factor w/ 7 levels "A","D","M","P",..: 5 5 5 5 5 6 2 2 6 2 ...
-    ##  $ occupcode  : Factor w/ 422 levels "`","000","007",..: 422 401 366 366 NA 132 422 414 422 422 ...
-    ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 4 4 2 3 4 5 5 4 4 4 ...
-    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 3 9 9 8 8 4 7 8 8 10 ...
-    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 4 5 2 2 5 3 2 ...
-    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 1 3 3 3 2 3 3 2 3 3 ...
-    ##  $ residence  : Factor w/ 2 levels "Out of state",..: 2 2 2 1 2 2 2 2 NA 2 ...
-    ##  $ raceethnic5: Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 7 4 3 1 7 7 7 7 7 7 ...
-    ##  $ raceethnic6: Factor w/ 8 levels "AIAN NH","Asian",..: 8 4 3 1 8 8 8 8 8 8 ...
-    ##  $ CODliteral : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 42494 187983 138227 79867 6746 240000 145074 6676 267775 206953 ...
-    ##  $ military   : Factor w/ 3 levels "N","U","Y": 2 1 1 1 1 2 1 1 2 1 ...
+    ##  $ attclass   : Factor w/ 10 levels "0","1","2","3",..: 3 3 3 3 3 3 3 2 3 3 ...
+    ##  $ sex        : Factor w/ 3 levels "F","M","U": 2 2 2 1 2 1 2 2 2 2 ...
+    ##  $ brgrace    : Factor w/ 20 levels "1","2","3","4",..: 2 1 1 1 2 8 1 1 15 15 ...
+    ##  $ hispanic   : Factor w/ 2 levels "N","Y": 2 2 1 2 2 2 2 2 1 1 ...
+    ##  $ manner     : Factor w/ 7 levels "Accident","Undetermined",..: 1 2 1 1 1 1 1 4 1 2 ...
+    ##  $ rcounty    : Factor w/ 1097 levels "ACADIA","ADA",..: 1084 491 491 1000 898 491 60 491 491 NA ...
+    ##  $ rcity      : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 3779 1663 3038 3497 2224 3038 263 3038 158 NA ...
+    ##  $ rstateFIPS : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 66 61 61 18 61 61 61 ...
+    ##  $ rzip       : Factor w/ 15491 levels "00000","00077",..: 13178 5651 6586 15155 6019 15155 2646 7268 4793 15155 ...
+    ##  $ dcity      : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 319 595 304 595 595 319 595 317 595 ...
+    ##  $ dplacecode : Factor w/ 10 levels "0","1","2","3",..: 2 2 9 2 2 1 2 5 2 2 ...
+    ##  $ dthyr      : Factor w/ 15 levels "2003","2004",..: 15 12 15 8 14 13 9 2 11 11 ...
+    ##  $ UCOD       : Factor w/ 3086 levels "A020","A021",..: 2934 2598 2931 2934 2699 2934 2926 1738 2890 2598 ...
+    ##  $ educ       : Factor w/ 9 levels "<=8th grade",..: 3 9 5 9 3 4 2 9 3 3 ...
+    ##  $ marital    : Factor w/ 7 levels "A","D","M","P",..: 5 6 5 2 1 5 2 5 5 5 ...
+    ##  $ occupcode  : Factor w/ 430 levels "`","000","007",..: 10 430 188 430 106 428 430 430 410 409 ...
+    ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 3 3 4 4 3 3 3 4 2 4 ...
+    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 8 9 8 8 8 8 8 3 8 9 ...
+    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 5 2 5 5 1 5 3 2 3 2 ...
+    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 2 3 2 2 3 2 3 1 3 3 ...
+    ##  $ residence  : Factor w/ 2 levels "Out of state",..: 2 2 2 NA 2 2 1 2 2 2 ...
+    ##  $ raceethnic5: Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 3 7 4 7 3 2 7 7 4 4 ...
+    ##  $ raceethnic6: Factor w/ 8 levels "AIAN NH","Asian",..: 3 8 4 8 3 2 8 8 4 4 ...
+    ##  $ CODliteral : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 199479 536384 21735 8845 512628 9115 296594 93915 243599 379110 ...
+    ##  $ military   : Factor w/ 3 levels "N","U","Y": 1 2 1 1 1 1 1 2 1 1 ...
     ##  $ status     : chr  "Homeless" "Homeless" "Homeless" "Homeless" ...
 
 ``` r
@@ -1635,41 +1655,41 @@ miss_var_summary(wh)
     ## # A tibble: 28 x 3
     ##    variable   n_miss pct_miss
     ##    <chr>       <int>    <dbl>
-    ##  1 brgrace     12164  12.7   
-    ##  2 occupcode    2239   2.34  
-    ##  3 CODliteral     37   0.0386
-    ##  4 UCOD           35   0.0365
-    ##  5 manner         20   0.0209
-    ##  6 dcity          16   0.0167
-    ##  7 age5cat        13   0.0136
-    ##  8 certno          0   0     
-    ##  9 dcounty         0   0     
-    ## 10 attclass        0   0     
+    ##  1 brgrace     12170  6.98   
+    ##  2 occupcode    3791  2.18   
+    ##  3 CODliteral     58  0.0333 
+    ##  4 UCOD           42  0.0241 
+    ##  5 manner         22  0.0126 
+    ##  6 age5cat        18  0.0103 
+    ##  7 dcity          16  0.00918
+    ##  8 certno          0  0      
+    ##  9 dcounty         0  0      
+    ## 10 attclass        0  0      
     ## # ... with 18 more rows
 
 ``` r
 str(wh)
 ```
 
-    ## 'data.frame':    95883 obs. of  28 variables:
+    ## 'data.frame':    174298 obs. of  28 variables:
     ##  $ certno     : int  2017012363 2017019361 2017025187 2017025188 2017025189 2017025190 2017025192 2017025196 2017025197 2017007506 ...
     ##  $ dcounty    : Factor w/ 40 levels "ADAMS","ASOTIN",..: 17 17 17 17 17 17 17 17 17 17 ...
-    ##  $ attclass   : Factor w/ 9 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
+    ##  $ attclass   : Factor w/ 10 levels "0","1","2","3",..: 8 2 2 8 2 2 2 2 2 3 ...
     ##  $ sex        : Factor w/ 3 levels "F","M","U": 1 1 2 2 1 1 2 1 2 1 ...
     ##  $ brgrace    : Factor w/ 20 levels "1","2","3","4",..: 1 1 1 1 10 1 1 1 5 1 ...
     ##  $ hispanic   : Factor w/ 2 levels "N","Y": 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ manner     : Factor w/ 7 levels "Accident","Undetermined",..: 4 4 4 4 4 4 4 4 4 4 ...
-    ##  $ rcounty    : Factor w/ 821 levels "ADA","ADAMS",..: 370 370 370 370 667 370 370 370 370 370 ...
-    ##  $ rcity      : Factor w/ 2679 levels "4600 WELS","69006 LYON",..: 281 1168 2636 1974 1374 167 584 2149 1168 1472 ...
-    ##  $ rstateFIPS : Factor w/ 63 levels "AB","AK","AL",..: 58 58 58 58 58 58 58 58 58 58 ...
-    ##  $ rzip       : Factor w/ 4162 levels "00000","00705",..: 3110 2975 3022 3003 2981 2938 3119 3121 2972 2988 ...
-    ##  $ dcity      : Factor w/ 687 levels "ABERDEEN","ACME",..: 545 427 297 297 545 38 71 545 290 384 ...
+    ##  $ rcounty    : Factor w/ 1097 levels "ACADIA","ADA",..: 491 491 491 491 898 491 491 491 491 491 ...
+    ##  $ rcity      : Factor w/ 3819 levels "4600 WELS","69006 LYON",..: 415 1663 3752 2801 1964 244 848 3038 1663 2097 ...
+    ##  $ rstateFIPS : Factor w/ 66 levels "AB","AK","AL",..: 61 61 61 61 61 61 61 61 61 61 ...
+    ##  $ rzip       : Factor w/ 15491 levels "00000","00077",..: 7625 5651 6328 6095 5800 4995 7831 7884 5613 5928 ...
+    ##  $ dcity      : Factor w/ 747 levels "ABERDEEN","ACME",..: 595 467 326 326 595 42 78 595 319 421 ...
     ##  $ dplacecode : Factor w/ 10 levels "0","1","2","3",..: 6 2 5 8 5 6 5 5 1 1 ...
-    ##  $ dthyr      : Factor w/ 14 levels "2003","2004",..: 14 14 14 14 14 14 14 14 14 14 ...
-    ##  $ UCOD       : Factor w/ 2656 levels "A020","A021",..: 1010 1033 1324 1145 401 743 253 1141 198 1401 ...
+    ##  $ dthyr      : Factor w/ 15 levels "2003","2004",..: 15 15 15 15 15 15 15 15 15 15 ...
+    ##  $ UCOD       : Factor w/ 3086 levels "A020","A021",..: 1178 1201 1529 1325 466 858 301 1321 241 1619 ...
     ##  $ educ       : Factor w/ 9 levels "<=8th grade",..: 4 4 8 1 5 7 6 7 3 6 ...
     ##  $ marital    : Factor w/ 7 levels "A","D","M","P",..: 2 7 3 2 3 2 3 3 3 5 ...
-    ##  $ occupcode  : Factor w/ 422 levels "`","000","007",..: 399 166 78 132 399 95 287 65 374 132 ...
+    ##  $ occupcode  : Factor w/ 430 levels "`","000","007",..: 407 169 79 134 407 96 292 66 381 134 ...
     ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 5 5 4 5 5 5 4 5 4 ...
     ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 7 9 10 2 9 2 10 2 9 ...
     ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 2 2 2 2 2 2 2 2 ...
@@ -1677,7 +1697,7 @@ str(wh)
     ##  $ residence  : Factor w/ 2 levels "Out of state",..: 2 2 2 2 2 2 2 2 2 2 ...
     ##  $ raceethnic5: Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 7 7 7 7 2 7 7 7 2 7 ...
     ##  $ raceethnic6: Factor w/ 8 levels "AIAN NH","Asian",..: 8 8 8 8 2 8 8 8 2 8 ...
-    ##  $ CODliteral : Factor w/ 276558 levels "\"PRIMARY PNEUMONIA\" ADVANCED DEMENTIA    ",..: 83426 110195 19321 7938 241732 15213 160973 19870 170546 193568 ...
+    ##  $ CODliteral : Factor w/ 551452 levels "-- GASTROINTESTINAL BLEEDING-- METASTATIC CHOLANGIOCARCINOMA, PRIMARY SITE IS THE LIVER DUCTS METASTATIC TO THE"| __truncated__,..: 173260 224188 49087 19496 478880 36212 326063 50849 345109 390224 ...
     ##  $ military   : Factor w/ 3 levels "N","U","Y": 1 1 3 3 1 1 3 1 1 1 ...
     ##  $ status     : chr  "With home" "With home" "With home" "With home" ...
 
@@ -1708,16 +1728,16 @@ placechi$expected
 
     ##                             
     ##                                  Homeless    With home
-    ##   Home                       153.50187130 25641.498129
-    ##   Other                       22.07760971  3687.922390
-    ##   In transport                 0.32134526    53.678655
-    ##   ER                           9.70581710  1621.294183
-    ##   Hospital inpatient         210.82629566 35217.173704
-    ##   Nursing home/Longterm care 159.28013519 26606.719865
-    ##   Hospital                     0.00000000     0.000000
-    ##   Hospice                     18.23336824  3045.766632
-    ##   Other person's home          0.01785251     2.982147
-    ##   Unknown                      0.03570503     5.964295
+    ##   Home                       308.44247994 49186.557520
+    ##   Other                       43.39195854  6919.608041
+    ##   In transport                 0.49231146    78.507689
+    ##   ER                          20.11622033  3207.883780
+    ##   Hospital inpatient         386.26508202 61596.734918
+    ##   Nursing home/Longterm care 296.47121004 47277.528790
+    ##   Hospital                     0.29289416    46.707106
+    ##   Hospice                     37.42190306  5967.578097
+    ##   Other person's home          0.04985433     7.950146
+    ##   Unknown                      0.05608612     8.943914
 
 ``` r
 # recode to remove cells (in homeless status vs. place of death type contingency table) with expected count <=5
@@ -1739,14 +1759,14 @@ p
 ```
 
     ##                             
-    ##                              Homeless With home   Sum
-    ##   ER/Outpatient                    26      1605  1631
-    ##   Home                             50     25745 25795
-    ##   Hospice                           4      3060  3064
-    ##   Hospital inpatient              151     35277 35428
-    ##   Nursing home/Longterm care       21     26745 26766
-    ##   Other                           322      3451  3773
-    ##   Sum                             574     95883 96457
+    ##                              Homeless With home    Sum
+    ##   ER/Outpatient                    49      3179   3228
+    ##   Home                            100     49395  49495
+    ##   Hospice                           8      5997   6005
+    ##   Hospital inpatient              272     61711  61983
+    ##   Nursing home/Longterm care       37     47537  47574
+    ##   Other                           627      6479   7106
+    ##   Sum                            1093    174298 175391
 
 ``` r
 placechi2 <- chisq.test(placetable2)
@@ -1754,13 +1774,13 @@ placechi2$expected
 ```
 
     ##                             
-    ##                                Homeless With home
-    ##   ER/Outpatient                9.705817  1621.294
-    ##   Home                       153.501871 25641.498
-    ##   Hospice                     18.233368  3045.767
-    ##   Hospital inpatient         210.826296 35217.174
-    ##   Nursing home/Longterm care 159.280135 26606.720
-    ##   Other                       22.452513  3750.547
+    ##                               Homeless With home
+    ##   ER/Outpatient               20.11622  3207.884
+    ##   Home                       308.44248 49186.558
+    ##   Hospice                     37.42190  5967.578
+    ##   Hospital inpatient         386.26508 61596.735
+    ##   Nursing home/Longterm care 296.47121 47277.529
+    ##   Other                       44.28310  7061.717
 
 ``` r
 # bar plot of recoded place of death vs. homeless status
@@ -1792,7 +1812,7 @@ placechi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  placetable2
-    ## X-squared = 4267, df = 5, p-value < 2.2e-16
+    ## X-squared = 8185.3, df = 5, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -1818,12 +1838,12 @@ agegrpchi$expected
 ```
 
     ##           
-    ##             Homeless With home
-    ##   <18yrs    10.52804  1761.472
-    ##   18-29yrs  10.16562  1700.834
-    ##   30-44yrs  22.86225  3825.138
-    ##   45-64yrs 110.40185 18471.598
-    ##   65+ yrs  419.04223 70110.958
+    ##             Homeless  With home
+    ##   <18yrs    19.15353   3056.846
+    ##   18-29yrs  19.19711   3063.803
+    ##   30-44yrs  41.98084   6700.019
+    ##   45-64yrs 209.86684  33494.133
+    ##   65+ yrs  801.80168 127965.198
 
 ``` r
 # Bar Graph
@@ -1854,7 +1874,7 @@ agegrpchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  agegrptble
-    ## X-squared = 1472.6, df = 4, p-value < 2.2e-16
+    ## X-squared = 2936.8, df = 4, p-value < 2.2e-16
 
 ``` r
 agegrp.res<-round(agegrpchi$residuals, 3)
@@ -1884,9 +1904,9 @@ genderchi$expected
 
     ##    
     ##         Homeless    With home
-    ##   F 2.891810e+02 4.830582e+04
-    ##   M 2.848131e+02 4.757619e+04
-    ##   U 5.950838e-03 9.940492e-01
+    ##   F 546.78354648 87194.216454
+    ##   M 546.19152636 87099.808474
+    ##   U   0.02492716     3.975073
 
 ``` r
 EDAdf$sex2 <- NA
@@ -1922,7 +1942,7 @@ genderchi2
     ##  Pearson's Chi-squared test with Yates' continuity correction
     ## 
     ## data:  gendertable2
-    ## X-squared = 285.17, df = 1, p-value < 2.2e-16
+    ## X-squared = 499.52, df = 1, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -1946,24 +1966,18 @@ Figure 4b. shows the contributions of the various race/ethnicity by homeless sta
 
 raceth5table <- table(EDAdf$raceethnic5, EDAdf$status)
 raceth5chi<-chisq.test(raceth5table)
-```
-
-    ## Warning in chisq.test(raceth5table): Chi-squared approximation may be
-    ## incorrect
-
-``` r
 raceth5chi$expected
 ```
 
     ##              
     ##                 Homeless  With home
-    ##   AIAN NH       4.605949   769.3941
-    ##   Asian/PI NH  36.258457  6056.7415
-    ##   Black NH     27.594037  4609.4060
-    ##   Hispanic     11.723151  1958.2768
-    ##   Other         4.100128   684.8999
-    ##   Unknown      72.427652 12098.5723
-    ##   White NH    417.290627 69705.7094
+    ##   AIAN NH       9.758984   1556.241
+    ##   Asian/PI NH  79.380550  12658.619
+    ##   Black NH     56.011335   8931.989
+    ##   Hispanic     25.656282   4091.344
+    ##   Other         9.272905   1478.727
+    ##   Unknown      75.884515  12101.115
+    ##   White NH    837.035429 133479.965
 
 ``` r
 # bar plot
@@ -1994,7 +2008,7 @@ raceth5chi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  raceth5table
-    ## X-squared = 558.03, df = 6, p-value < 2.2e-16
+    ## X-squared = 945.63, df = 6, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2021,13 +2035,13 @@ mannertable
 
     ##               
     ##                Homeless With home
-    ##   Accident          240      5465
-    ##   Undetermined       32       323
-    ##   Homicide           37       537
-    ##   Natural           216     87843
+    ##   Accident          496      9943
+    ##   Undetermined       60       662
+    ##   Homicide           61       921
+    ##   Natural           394    159571
     ##   Unk.                0         0
     ##   Pending             0         1
-    ##   Suicide            48      1694
+    ##   Suicide            81      3178
 
 ``` r
 mannerchi<-chisq.test(mannertable)
@@ -2042,13 +2056,13 @@ mannerchi$expected
 
     ##               
     ##                    Homeless    With home
-    ##   Accident     3.389777e+01 5.671102e+03
-    ##   Undetermined 2.109326e+00 3.528907e+02
-    ##   Homicide     3.410573e+00 5.705894e+02
-    ##   Natural      5.232258e+02 8.753577e+04
+    ##   Accident     6.500267e+01 1.037400e+04
+    ##   Undetermined 4.495826e+00 7.175042e+02
+    ##   Homicide     6.114821e+00 9.758852e+02
+    ##   Natural      9.960870e+02 1.589689e+05
     ##   Unk.         0.000000e+00 0.000000e+00
-    ##   Pending      5.941764e-03 9.940582e-01
-    ##   Suicide      1.035055e+01 1.731649e+03
+    ##   Pending      6.226906e-03 9.937731e-01
+    ##   Suicide      2.029349e+01 3.238707e+03
 
 ``` r
 # recode to remove cells with expected count less than 5
@@ -2096,12 +2110,12 @@ mannerchi2$expected
 ```
 
     ##               
-    ##                  Homeless  With home
-    ##   Accident      33.898118  5671.1019
-    ##   Homicide       3.410608   570.5894
-    ##   Natural      523.231265 87535.7687
-    ##   Suicide       10.350661  1731.6493
-    ##   Undetermined   2.109348   352.8907
+    ##                  Homeless   With home
+    ##   Accident      65.003039  10373.9970
+    ##   Homicide       6.114856    975.8851
+    ##   Natural      996.092651 158968.9073
+    ##   Suicide       20.293601   3238.7064
+    ##   Undetermined   4.495852    717.5041
 
 ``` r
 mannerchi2
@@ -2111,7 +2125,7 @@ mannerchi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  mannertable2
-    ## X-squared = 2338.7, df = 4, p-value < 2.2e-16
+    ## X-squared = 4609.8, df = 4, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2137,18 +2151,18 @@ lcodchi$expected
 ```
 
     ##                            
-    ##                               Homeless With home
-    ##   Alzheimers                 33.033103  5517.967
-    ##   Cancer                    128.157251 21407.843
-    ##   Chronic Liver dis./cirrh.   7.980074  1333.020
-    ##   Chronic Lwr Resp Dis.      26.653804  4452.346
-    ##   Diabetes                   16.721855  2793.278
-    ##   Flu                        10.634148  1776.366
-    ##   Heart Dis.                122.456348 20455.544
-    ##   Injury-unintentional       31.593000  5277.407
-    ##   Other                     149.217268 24925.783
-    ##   Stroke                     37.186788  6211.813
-    ##   Suicide-all                10.366360  1731.634
+    ##                              Homeless With home
+    ##   Alzheimers                 66.42466 10592.575
+    ##   Cancer                    240.65929 38377.341
+    ##   Chronic Liver dis./cirrh.  17.16858  2737.831
+    ##   Chronic Lwr Resp Dis.      49.16883  7840.831
+    ##   Diabetes                   31.16519  4969.835
+    ##   Flu                        18.27161  2913.728
+    ##   Heart Dis.                226.68139 36148.319
+    ##   Injury-unintentional       61.66357  9833.336
+    ##   Other                     296.88874 47344.111
+    ##   Stroke                     64.61121 10303.389
+    ##   Suicide-all                20.29694  3236.703
 
 ``` r
 #bar plot
@@ -2179,7 +2193,7 @@ lcodchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  lcodtable
-    ## X-squared = 1673, df = 10, p-value < 2.2e-16
+    ## X-squared = 3614.4, df = 10, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2200,34 +2214,28 @@ Unintentional injury and homeless status are statistically signficantly associat
 # Chi square  - checking if expected cell size counts are < 5
 injurytable <- table(EDAdf$injury, EDAdf$status)
 injurychi<-chisq.test(injurytable)
-```
-
-    ## Warning in chisq.test(injurytable): Chi-squared approximation may be
-    ## incorrect
-
-``` r
 injurychi$observed
 ```
 
     ##                          
     ##                           Homeless With home
-    ##   MV - all                      30      1244
-    ##   No injury                    341     90795
-    ##   Other injury                  27       804
-    ##   Unintentional fall            11      1546
-    ##   Unintentional poisoning      165      1494
+    ##   MV - all                      57      2022
+    ##   No injury                    604    164880
+    ##   Other injury                  58      1513
+    ##   Unintentional fall            18      2979
+    ##   Unintentional poisoning      356      2904
 
 ``` r
 injurychi$expected
 ```
 
     ##                          
-    ##                             Homeless  With home
-    ##   MV - all                  7.581368  1266.4186
-    ##   No injury               542.335590 90593.6644
-    ##   Other injury              4.945147   826.0549
-    ##   Unintentional fall        9.265455  1547.7345
-    ##   Unintentional poisoning   9.872441  1649.1276
+    ##                              Homeless  With home
+    ##   MV - all                  12.955893   2066.044
+    ##   No injury               1031.261650 164452.738
+    ##   Other injury               9.790143   1561.210
+    ##   Unintentional fall        18.676677   2978.323
+    ##   Unintentional poisoning   20.315638   3239.684
 
 ``` r
 #bar plot
@@ -2258,7 +2266,7 @@ injurychi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  injurytable
-    ## X-squared = 2693.3, df = 4, p-value < 2.2e-16
+    ## X-squared = 6149.2, df = 4, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2282,19 +2290,19 @@ sachi$observed
 
     ##                     
     ##                      Homeless With home
-    ##   Alcohol-induced          44      1357
-    ##   Drug-induced            176      1769
-    ##   No Substance abuse      354     92757
+    ##   Alcohol-induced          91      2740
+    ##   Drug-induced            357      3335
+    ##   No Substance abuse      645    168223
 
 ``` r
 sachi$expected
 ```
 
     ##                     
-    ##                        Homeless With home
-    ##   Alcohol-induced      8.337124  1392.663
-    ##   Drug-induced        11.574380  1933.426
-    ##   No Substance abuse 554.088495 92556.912
+    ##                        Homeless  With home
+    ##   Alcohol-induced      17.64220   2813.358
+    ##   Drug-induced         23.00777   3668.992
+    ##   No Substance abuse 1052.35003 167815.650
 
 ``` r
 #bar plot
@@ -2326,7 +2334,7 @@ sachi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  satable
-    ## X-squared = 2576, df = 2, p-value < 2.2e-16
+    ## X-squared = 5344.4, df = 2, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2350,15 +2358,15 @@ educchi$expected
 
     ##                         
     ##                           Homeless With home
-    ##   <=8th grade             42.22120  7052.779
-    ##   9-12th gr., no diploma  38.11512  6366.885
-    ##   H.S. grad/GED          181.57198 30330.428
-    ##   Some college            86.97745 14529.023
-    ##   Associate's             29.20671  4878.793
-    ##   Bachelors               76.73606 12818.264
-    ##   Masters                 25.82664  4314.173
-    ##   Doctorate/Professional  14.63906  2445.361
-    ##   Unknown                 78.70579 13147.294
+    ##   <=8th grade             77.42377 12346.576
+    ##   9-12th gr., no diploma  70.74952 11282.250
+    ##   H.S. grad/GED          359.23781 57286.762
+    ##   Some college           177.63719 28327.363
+    ##   Associate's             62.41138  9952.589
+    ##   Bachelors              166.46982 26546.530
+    ##   Masters                 57.56305  9179.437
+    ##   Doctorate/Professional  28.89681  4608.103
+    ##   Unknown                 92.61064 14768.389
 
 ``` r
 #recoding unknown educational status among homeless based on armed forces participation,
@@ -2405,7 +2413,7 @@ educchi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  eductable2
-    ## X-squared = 253.52, df = 5, p-value < 2.2e-16
+    ## X-squared = 790.93, df = 5, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
@@ -2424,19 +2432,14 @@ Armed forces participation was difficult to ascertain for over 11% of homeless d
 # Chi square  - checking for expected counts < 5
 miltable <- table(EDAdf$military, EDAdf$status)
 milchi<-chisq.test(miltable)
-```
-
-    ## Warning in chisq.test(miltable): Chi-squared approximation may be incorrect
-
-``` r
 milchi$expected
 ```
 
     ##    
     ##       Homeless  With home
-    ##   N 415.850524 69465.1495
-    ##   U   4.677359   781.3226
-    ##   Y 153.472117 25636.5279
+    ##   N 798.952957 127407.047
+    ##   U   8.674653   1383.325
+    ##   Y 285.372391  45507.628
 
 ``` r
 #bar plot
@@ -2466,7 +2469,7 @@ milchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  miltable
-    ## X-squared = 898.09, df = 2, p-value < 2.2e-16
+    ## X-squared = 1493.6, df = 2, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 

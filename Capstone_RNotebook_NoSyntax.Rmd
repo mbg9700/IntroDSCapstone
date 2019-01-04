@@ -46,7 +46,7 @@ The data sets used for this project include Washington State final annual death 
 
 The following diagram provides an overview of the data pre-processing steps in preparation for exploratory data analysis and machine learning.
 
-```{r, echo=FALSE}
+```{r Data preprocessing schematic, echo=FALSE}
 
 schematic <- "Data preprocessing schematic2.png"
 include_graphics(schematic)
@@ -102,7 +102,7 @@ last name, first name, middle name, social security number, death certificate nu
 A description of these features and their values is provided in the data dictionary found in Appendix A.
 
 
-```{r}
+```{r Get data from WHALES}
 library(RODBC)
 
 wls <- odbcDriverConnect(connection ="Driver={ODBC Driver 13 for SQL Server};server=DOH01DBTUMP10,9799;

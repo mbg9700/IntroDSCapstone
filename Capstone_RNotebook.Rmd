@@ -759,7 +759,7 @@ EDAdf$dplacecode <- factor(EDAdf$dplacecode,
                                       "Hospital inpatient", "Nursing home/Longterm care", 
                                       "Hospital", "Hospice", "Other person's home", "Unknown"))
 summary(EDAdf)
-
+write.csv(EDAdf, file = "HomelessFinal.csv")
 ```
 
 

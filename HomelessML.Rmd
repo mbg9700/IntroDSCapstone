@@ -1,0 +1,148 @@
+---
+title: "Classification of Homeless Deaths with Machine Learning"
+author: "MBG"
+date: "December 29, 2018"
+output: 
+  github_document:
+      toc: TRUE
+---
+
+```{r echo=FALSE, message = FALSE }
+library(caTools)
+library(magrittr)
+library(tidyverse)
+library(stringr)
+library(knitr)
+library(naniar)
+library(dplyr)
+library(epiDisplay)
+library(ROCR)
+knitr::opts_chunk$set(message = FALSE, error=FALSE, fig.width = 9, fig.align = "center")
+```
+
+### READ AND SUBSET DATA
+
+I created two versions of the dataset containing my dependent and independent variables.  The first one includes "unknown" values as valid levels in factor variables and the second one recodes them to NAs.
+
+```{r}
+homeless <- read.csv("HomelessFinal.csv")
+str(homeless)
+h1 <- subset(homeless, select= c("sex", "raceethnic5", "manner", "dplacecode", "educ", "age5cat", "LCOD", "status", "injury", "substance"))
+summary(h1)
+
+h1$homeless[h1$status=="Homeless"] <- 1
+h1$homeless[h1$status=="With home"] <- 0
+
+h1$homeless <- factor(h1$homeless)
+
+h2 <- h1
+
+levels(h2$sex)[levels(h2$sex)=="U"] <- NA
+levels(h2$raceethnic5)[6] <- NA
+levels(h2$manner)[4] <- NA
+levels(h2$educ)[4] <- NA
+summary(h2)
+
+```
+
+
+
+### SPLIT DATA INTO TRAINING AND TESTING SUBSETS
+
+```{r}
+split = sample.split(h2$homeless, SplitRatio = 0.65)
+HTrain = subset(h2, split==TRUE)
+HTest = subset(h2, split==FALSE)
+```
+
+
+### CREATE MODEL
+
+In this attempt I use the dataset that does not retain "unknown" values as valid levels in factor variables.
+
+I specified the reference categories in each factor variable within the model. 
+  
+```{r}
+
+
+HTrain$sex <- relevel(HTrain$sex, ref = "F")
+HTrain$raceethnic5 <-relevel(HTrain$raceethnic5, ref = "White NH")
+HTrain$manner <- relevel(HTrain$manner, ref = "Natural")
+HTrain$dplacecode <- relevel(HTrain$dplacecode, ref = "Home")
+HTrain$edu <- relevel(HTrain$educ, ref =  "<=8th grade")
+HTrain$age5cat <- relevel(HTrain$age5cat, ref = "65+ yrs")
+HTrain$injury <- relevel(HTrain$injury, ref = "No injury")
+HTrain$substance <- relevel(HTrain$substance, ref = "No Substance abuse")
+HTrain$LCOD <- relevel(HTrain$LCOD, ref = "Other")
+
+## model 1 with all independent variables included
+LR1 <- glm(homeless ~ sex + raceethnic5 + manner + dplacecode + educ + age5cat + injury + substance + LCOD, data = HTrain, family = "binomial")
+
+summary(LR1)
+
+LR1tab <- coef(summary(LR1))
+LR1tab[, "Estimate"] <- exp(coef(LR1))
+LR1tab
+
+
+## ROC curve for model 1
+lroc(LR1)
+
+```
+
+
+####  Evaluating logistic regression model 1 performance
+
+  1. Residuals - 50% of the errors in predictions (between 1st and 3rd quartiles) are within an odds ratio of 0.95 to 0.98 away from the true value.
+  2. A number of independent variables are statistically significantly positively associated with the dependent variable (homelessness at death). Many of these make sense given the relationship between homeless status at death and these independent variables as seen in the exploratory data anlaysis phase. These include: 
+    - being male, 
+    - being American Indian/Native American non-Hispanic, 
+    - being Hispanic, 
+    - dying from an accidental cause, an undetermined cause, or homicide (manner of death), 
+    - dying in a location designated by the death certifier as "other" or "other person's home",
+    - age at death from 18 to 64 years old,
+    - dying of alcohol or drug induced causes,
+    - dying of influenza or heart disease.
+  3. The ROC curve indicates an AUC of almost 97% indicating that the model has high sensitivity and specificity. 
+    
+    
+### APPLY MODEL 1 TO THE TEST DATA SET TO EVALUATE MODEL
+
+I set the threshold probability level at 0.5 i.e. if the model predicts that there's a greater than 0.5 probability that the observation is homeless then it is classified as a homeless death.  Tabulating the predicted values against the actual recorded ones gives the confusion matrix.
+
+```{r}
+predict1 <- predict(LR1, type = "response", newdata = HTest)
+table(HTest$homeless, predict1 > 0.5)
+
+```
+
+Accuracy of model = accurate predictions/total # observations
+
+```{r}
+
+## model accuracy
+(47391+52)/(47391+50+315+52)
+
+
+## baseline accuracy - if baseline predicted all outcomes as 0
+(47391+50)/(47391+50+315+52)
+
+```
+
+While the accuracy is 99% the model predicts the homeless deaths correctly 52 times out of 315 actual homeless deaths.
+
+
+### Out of sample AUC
+```{r}
+ROCRpred1 = prediction(predict1, HTest$homeless)
+as.numeric(performance(ROCRpred1, "auc")@y.values)
+#ROCRperf1 = performance(ROCRpred1, measure = "tpr",x.measure = "fpr")
+#plot(ROCRperf1, col = rainbow(10))
+
+```
+
+
+It looks like the model has a high out of sample accuracy of 97% as well.
+
+OK - this seems too good to be true.  What am I missing?
+
