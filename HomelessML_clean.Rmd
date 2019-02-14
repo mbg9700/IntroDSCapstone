@@ -1,0 +1,604 @@
+---
+title: "Classification of Homeless Deaths with Machine Learning"
+author: "Maya Bhat-Gregerson"
+date: r format(Sys.time(), '%B %d, %Y')
+output: 
+  github_document:
+      toc: TRUE
+---
+
+```{r echo=FALSE, message = FALSE }
+library(caTools)
+library(magrittr)
+library(tidyverse)
+library(knitr)
+library(epiDisplay)
+library(ROCR)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(e1071)
+library(gmodels)
+library(caret)
+library(klaR)
+library(plyr)
+
+knitr::opts_chunk$set(message = FALSE, error=FALSE, echo = FALSE, fig.width = 9, fig.align = "center")
+```
+
+# MACHINE LEARNING MODELS TO CLASSIFY DEATHS BY HOMELESS STATUS
+
+In the exploratory data analysis phase I was able to identify a number of independent variables that are strongly associated with homelessness.  These features include sex, race and ethnicity (5 groups including Hispanic as race), place of death (e.g. home, hospital, hospice, etc), manner of death (natural, homicide, suicide, accident, or undetermined), leading cause of death (groupings of ICD 10 codes), educational attainment, age group, type of injury involved in death (no injury, motor vehicle injury, fall, poisoning), and whether underlying cause of death was due to drug or alcohol use.  All predictors are categorical variables.
+
+## I. LOGISTIC REGRESSION
+
+### READ AND SUBSET DATA
+
+I created two versions of the dataset containing my dependent and independent variables.  The first one includes "unknown" values as valid levels in factor variables and the second one recodes them to NAs.
+
+```{r}
+homeless <- read.csv("HomelessFinal.csv")
+h1 <- subset(homeless, select= c("sex", "raceethnic5", "manner", "dplacecode", "educ", "age5cat", "LCOD", "status", "injury", "substance"))
+
+table(h1$status)
+table(as.numeric(h1$status))
+head(h1$status)
+tail(h1$status)
+
+h1$homeless <- h1$status
+h1$homeless <-as.numeric(h1$homeless)
+table(h1$homeless)
+h1$homeless[h1$homeless==2]<-0
+str(h1$status)
+str(h1$homeless)
+#limit dataset to random sample of 4000 with home and all homeless deaths
+
+withhome <- subset(h1, status=="With home")
+homeless <- subset(h1, status=="Homeless")
+whsample <- sample_n(withhome, 1500)
+
+
+h1 <- rbind(whsample, homeless)
+table(h1$status,h1$homeless)
+
+
+
+h2 <- h1
+set.seed(1234)
+h2 <- h2[sample(nrow(h2)),] # randomize rows
+
+head(h2$homeless, n=20)
+
+## CHECKING CELL SIZE FOR n<10 - AGGREGATE WITH OTHER LEVELS TO GET LARGER CELL SIZE 
+## WHEN n <10
+
+## CHECKING FOR MISSING VALUES AND CODING THESE AS NA
+
+
+table(h2$sex)              
+# replacing "unknown" values from predictors with NA
+levels(h2$sex)[levels(h2$sex)=="U"] <- NA
+
+
+table(h2$homeless, h2$LCOD)
+
+h2$LCOD3cat <- fct_collapse(h2$LCOD,
+                            LCOD.Chronic = c("Alzheimers", "Cancer", "Heart Dis.", "Chronic Lwr Resp Dis.", "Stroke", "Diabetes", "Chronic Liver dis./cirrh."),
+                            LCOD.ExtCause = c("Injury-unintentional", "Suicide-all"),
+                            LCOD.Other = c("Flu", "Other"))
+
+table(h2$homeless, h2$LCOD3cat)
+
+
+table(h2$homeless, h2$dplacecode)
+# collapsing "hospital", "in transport", "unknown" to "other" to 
+# reduce number of dummy vars by collapsing cells with < 10 deaths
+
+h2$dplace5cat <- fct_collapse(h2$dplacecode,
+                              ER = c("ER", "In transport"),
+                              Hospital = c("Hospital", "Hospital inpatient"),
+                              Home = "Home",
+                              Hospice.LngTrmCare = c("Hospice","Nursing home/Longterm care"),
+                              Other = c( "Other", "Unknown", "Other person's home"))
+
+table(h2$dplacecode, h2$dplace5cat)
+
+
+
+table(h2$homeless, h2$educ)
+# collapsing factors to eliminate cell size < 10 and create more educational groups that make more sense in this analysis
+h2$educ4cat <- fct_collapse(h2$educ,
+                         NoHSDiploma = c("<=8th grade", "9-12th gr., no diploma"),
+                         HSGrad.GED = "H.S. grad/GED",
+                         HSDipl.OrMore = c("Associate's", "Bachelors", "Some college","Masters", "Doctorate/Professional"),
+                         Unknown = "Unknown")
+
+table(h2$educ, h2$educ4cat)
+
+table(h2$homeless, h2$raceethnic5)
+
+# collapsing factors WHERE POSSIBLE to eliminate cell size < 10 
+h2$race6cat <- fct_collapse(h2$raceethnic5,
+                               AIAN.NH = "AIAN NH",
+                               AsianPI.NH = "Asian/PI NH",
+                               Black.NH = "Black NH",
+                               Hispanic = "Hispanic",
+                               White.NH = "White NH",
+                               Other.Unk = c("Other", "Unknown"))
+
+table(h2$raceethnic5, h2$race6cat)
+
+table(h2$homeless, h2$manner)
+# collapsing factors to get rid of pendings (n= 0)
+
+h2$manner <- fct_collapse(h2$manner,
+                          Accident = "Accident",
+                          Homicide = "Homicide",
+                          Natural = "Natural",
+                          Suicide = "Suicide",
+                          Undet.Pending = c("Undetermined", "Pending"))
+
+table(h2$homeless, h2$age5cat)
+# collapse factors to get rid of empty cells 
+
+h2$age4cat <- fct_collapse(h2$age5cat,
+                           "<29yrs" = c("<18yrs", "18-29yrs"),
+                           "30to44yrs" ="30-44yrs",
+                           "45to64yrs" = "45-64yrs",
+                           "65+yrs" ="65+ yrs")
+
+table(h2$age5cat,h2$age4cat)
+
+table(h2$homeless, h2$substance)
+
+names(h2)[names(h2)=="status"] <- "homelessFac"
+str(h2)
+
+
+h2<- na.omit(h2)
+
+str(h2)
+
+
+h3 <- h2
+
+h2 <- h2[, c(-2, -4, -5, -6, -7)]
+str(h2)
+
+```
+
+
+
+### SPLIT DATA INTO TRAINING AND TESTING SUBSETS
+
+```{r}
+set.seed(1234)
+split = sample.split(h2$homeless, SplitRatio = 0.65)
+HTrain = subset(h2, split==TRUE)
+HTest = subset(h2, split==FALSE)
+```
+
+
+### CREATE MODEL
+
+In this attempt I use the dataset that does not retain "unknown" values as valid levels in factor variables.
+
+I specified the reference categories in each factor variable within the model. 
+  
+```{r LogReg model}
+
+# set reference levels for each dummy variable to be created
+HTrain$sex <- relevel(HTrain$sex, ref = "F")
+HTrain$race6cat <-relevel(HTrain$race6cat, ref = "White.NH")
+HTrain$manner <- relevel(HTrain$manner, ref = "Natural")
+HTrain$dplace5cat <- relevel(HTrain$dplace5cat, ref = "Home")
+HTrain$educ4cat <- relevel(HTrain$educ4cat, ref =  "HSDipl.OrMore")
+HTrain$age4cat <- relevel(HTrain$age4cat, ref = "65+yrs")
+HTrain$injury <- relevel(HTrain$injury, ref = "No injury")
+HTrain$substance <- relevel(HTrain$substance, ref = "No Substance abuse")
+HTrain$LCOD3cat <- relevel(HTrain$LCOD3cat, ref = "LCOD.Other")
+HTrain$homelessFac <- relevel(HTrain$homelessFac, ref = "With home")
+
+
+## model 1 with all independent variables except "injury" because of potential for multicollinearity (with manner="accident")
+
+model.LR1 <- glm(homeless ~ sex + race6cat + dplace5cat + educ4cat + age4cat + manner + substance + LCOD3cat,
+                 data = HTrain, 
+                 family = "binomial") 
+  
+
+summary(model.LR1)
+library(Publish)
+publish(model.LR1)
+
+varImp(model.LR1)
+```
+
+
+####  Evaluating logistic regression model 1 performance
+
+  1. Residuals - 50% of the errors in predictions (between 1st and 3rd quartiles) are within an odds ratio of 0.95 to 0.98 away from the true value.
+  2. A number of independent variables are statistically significantly positively associated with the dependent variable (homelessness at death). Many of these make sense given the relationship between homeless status at death and these independent variables as seen in the exploratory data anlaysis phase. These include: 
+    - being male, 
+    - being American Indian/Native American non-Hispanic, 
+    - being Hispanic, 
+    - dying from an accidental cause, an undetermined cause, or homicide (manner of death), 
+    - dying in a location designated by the death certifier as "other" or "other person's home",
+    - age at death from 18 to 64 years old,
+    - dying of alcohol or drug induced causes,
+    - dying of influenza or heart disease.
+  3. The ROC curve indicates an AUC of almost 97% indicating that the model has high sensitivity and specificity. 
+    
+    
+### APPLY MODEL 1 TO THE TEST DATA SET TO EVALUATE MODEL
+
+I set the threshold probability level at 0.5 i.e. if the model predicts that there's a greater than 0.5 probability that the observation is homeless then it is classified as a homeless death.  Tabulating the predicted values against the actual recorded ones gives the confusion matrix.
+
+```{r}
+predict.LR1 <- predict(model.LR1, type = "response", newdata = HTest)
+
+tbl.LR1 <-table(HTest$homeless, predict.LR1 > 0.50)
+tbl.LR1
+
+accuracy.LR1 <- round(((tbl.LR1["0","FALSE"] + tbl.LR1["1","TRUE"])/(tbl.LR1["0","FALSE"] + tbl.LR1["1","TRUE"] + tbl.LR1["1","FALSE"]  + tbl.LR1["0","TRUE"]))*100,1)
+                                                                 
+accuracy.LR1
+
+bltbl <- table(h2$homeless)
+bltbl
+
+
+```
+
+
+Model accuracy is `r accuracy.LR1`. 
+
+The baseline accuracy is 1500/(1500+1091) = 58% i.e. if all outcomes were predicted as the most common value (in this case '0' or "With home") my baseline prediction would be accurate for 58% of the observations.
+
+
+
+
+## ROC curve
+
+```{r}
+library(ROCR)
+
+ROCRpred.LR1 <- prediction(predict.LR1, HTest$homeless)
+
+ROCRperf.LR1 <- performance(ROCRpred.LR1, "tpr", "fpr")
+
+plot(ROCRperf.LR1, colorize=TRUE, print.cutoffs.at = seq(0,1, by=0.1), text.adj = c(-0.2, 1.7))
+
+```
+
+
+
+### Logistic regression model 2 - with crossvalidation in Caret package
+
+```{r}
+## model 2 doing step wise regression
+ctrl.LR2 <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE)
+
+
+str(h2$homelessFac)
+model.lr2 <-train(homelessFac ~ sex + race6cat + dplace5cat + educ4cat + age4cat + manner + substance + LCOD3cat,
+                  data = HTrain, 
+                  family = "binomial",
+                  trControl = ctrl.LR2, tuneLength = 5) 
+
+predict.lr2 <- predict(model.lr2, newdata = HTest)
+
+confusionMatrix(data = predict.lr2, HTest$homelessFac)
+
+```
+
+
+
+
+II. NAIVE BAYES CLASSIFIER
+## 
+
+```{r}
+# get data and restrict to only literal fields
+#the literal field in this dataset is called "CODliteral" and contains 
+#Cause of death lines a-d, other significant conditions line, and injury
+#occurrance literal field.
+
+literal <- read.csv("HomelessFinal.csv", stringsAsFactors = FALSE)
+literal <- subset(literal, select = c(status, CODliteral))
+str(literal)
+
+# set "status" to factor
+
+literal$status <- factor(literal$status)
+str(literal$status)
+table(literal$status)
+
+# to remove the problem of unbalanced data I will restrict the "with home" class to about 7,500 randomly selected records
+
+h <- subset(literal, status=="Homeless")
+wh <- subset(literal, status=="With home")
+summary(h)
+summary(wh)
+wh_sample <- sample_n(wh, 1500)
+
+literal2 <- rbind(wh_sample, h)
+literal2 <- literal2[sample(nrow(literal2)), ] #randomize order of rows so rows aren't ordered by class
+str(literal2)
+table(literal2$status)
+```
+
+
+### Prepare data for text analysis
+
+```{r}
+library(tm)
+h_corpus <- Corpus(VectorSource(literal2$CODliteral))
+print(h_corpus)
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "probable", "with", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local",  "morbid" ,"multiple" ,  "noninvasive" ,  "nonspecific" ,   "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "abuse", "unknown", "if", "cause", "death", "use", "in", "with")
+
+#standardize all content
+
+h_corpus_clean <- h_corpus %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(removeWords, CODstop) %>%
+  tm_map(wordStem, language = "eng") %>%
+  tm_map(stripWhitespace)
+  
+h_dtm <- DocumentTermMatrix(h_corpus_clean)
+h_dtm
+
+
+
+```
+
+
+### Creating training and test datasets
+
+```{r}
+
+
+split <- sample.split(literal2$status, SplitRatio = 0.70) # creating training:testing data sets 70:30
+
+h.raw.train <- literal2[split, ]
+h.raw.test <- literal2[-split, ]
+
+prop.table(table(h.raw.train$status))
+prop.table(table(h.raw.test$status))
+
+
+h.cleancorpus.train <- h_corpus_clean[split]
+h.cleancorpus.test <- h_corpus_clean[-split]
+
+h.dtm.train <- h_dtm[split,]
+h.dtm.test <- h_dtm[-split,]
+
+```
+
+
+### Transform sparse matrix into data structure to train model
+
+Eliminate words appearing in fewer than 5 records.
+
+```{r}
+
+freqWords <- findFreqTerms(h.dtm.train, 5) #keeps words that appear at least 5 times
+
+
+#filter DTM to keep only terms appearing 5 times or more
+htrain.filtered <- h.dtm.train[,freqWords]
+htest.filtered <- h.dtm.test[,freqWords]
+
+
+#Create function to convert counts to Yes/No variable indicating presence/absence of word
+
+convertCounts <- function(x) {
+  x <- ifelse(x > 0, "Present", "Absent")
+  x <- factor(x)
+}
+
+
+h.train.final <- apply(htrain.filtered, MARGIN = 2, convertCounts) #Margin = 2: apply filter to columns
+h.test.final <- apply(htest.filtered, MARGIN = 2, convertCounts)
+
+```
+
+### (A) NAIVE BAYES MODEL using package e1071
+
+```{r, echo=FALSE}
+#train model
+
+h.model.nb1 <- naiveBayes(h.train.final, h.raw.train$status, laplace = 1, trainControl(method = 'cv', number = 10))
+
+#use model to predict with test data
+
+h.predict.nb1<- predict(h.model.nb1, h.test.final)
+
+#Evaluate accuracy of model by crosstabulating with raw data
+
+CrossTable(h.predict.nb1, h.raw.test$status, 
+           prop.chisq = FALSE,
+           prop.t = FALSE,
+           prop.r = FALSE,
+           dnn = c("predicted", "actual"))
+
+confusionMatrix(h.predict.nb1, h.raw.test$status, positive = "Homeless")
+
+```
+
+
+
+### (B) NAIVE BAYES CLASSIFIER using packages caret and klaR
+
+```{r, echo=FALSE}
+
+library(caret)
+library(klaR)
+ctrl <- trainControl(method = "cv", number = 10)
+grid <- data.frame(fL=1, usekernel=FALSE, adjust=1)
+h.model.nb2 = train(h.train.final, h.raw.train$status,
+                  method = "nb",
+                  tuneGrid = grid,
+                trControl= ctrl)
+
+h.model.nb2
+
+h.predict.nb2 = predict(h.model.nb2, h.test.final)
+
+confusionMatrix(h.predict.nb2, h.raw.test$status, positive = "Homeless")
+```
+
+
+## III. RANDOM FORESTS
+
+### A. using randomForests package - ntree = 500
+
+```{r}
+##
+library(randomForest)
+library(caTools)
+# use h2 data set created for logistic regression
+
+# Split into training and testing sets 70:30 (random)
+
+split2 = sample.split(h2$homelessFac, SplitRatio = 0.70)
+train.rf = subset(h2, split2==TRUE)
+test.rf = subset(h2, split2==FALSE)
+
+prop.table(table(train.rf$homelessFac))
+prop.table(table(test.rf$homelessFac))
+
+
+# create a random forest model with default parameters
+
+rfmodel1 <-randomForest(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                        data = train.rf,
+                        importance=TRUE,
+                        mtry=sqrt(8),
+                        ntree=500,
+                        na.action = na.roughfix)
+
+rfmodel1
+importance(rfmodel1)
+```
+
+
+```{r}
+# predicting on test/validation data
+
+predict.rf1 <- predict(rfmodel1, test.rf, type = "response")
+
+# check classification accuracy - using test/validation data
+
+tbl.RF1 <- table(predict.rf1, test.rf$homelessFac)
+
+accuracy.RF1 <- round(((tbl.RF1["Homeless","Homeless"] + tbl.RF1["With home","With home"])/(tbl.RF1["Homeless","Homeless"] + tbl.RF1["With home","With home"] + tbl.RF1["With home","Homeless"] + tbl.RF1["Homeless","With home"]))*100, 1)
+
+accuracy.RF1
+```
+`
+
+Accuracy of random forests model 1 (using randomForests package) on test data set  is `accuracy.RF1`.
+
+
+### B. using randomForests package - ntree = 1000
+
+```{r}
+## ntree = 1000
+library(randomForest)
+library(caTools)
+
+# create a random forest model with default parameters
+
+rfmodel2 <-randomForest(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                        data = train.rf,
+                        importance=TRUE,
+                        mtry=sqrt(8),
+                        ntree=1000,
+                        na.action = na.roughfix)
+
+rfmodel2
+importance(rfmodel2)
+```
+
+```{r}
+##predictive accuracty of rf model2
+
+# predicting on test/validation data
+
+predict.rf2 <- predict(rfmodel2, test.rf, type = "response")
+
+# check classification accuracy - using test/validation data
+
+tbl.RF2 <- table(predict.rf2, test.rf$homelessFac)
+
+accuracy.RF2 <- round(((tbl.RF2["Homeless","Homeless"] + tbl.RF2["With home","With home"])/(tbl.RF2["Homeless","Homeless"] + tbl.RF2["With home","With home"] + tbl.RF2["With home","Homeless"] + tbl.RF2["Homeless","With home"]))*100, 1)
+
+accuracy.RF2
+```
+
+Accuracy of random forests model 1 (using randomForests package) on test data set  is `accuracy.RF2`.
+
+
+
+### C. using randomForests package - ntree = 1500
+```{r}
+## ntree = 1500
+library(randomForest)
+library(caTools)
+
+# create a random forest model with default parameters
+
+rfmodel3 <-randomForest(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                        data = train.rf,
+                        importance=TRUE,
+                        mtry=sqrt(8),
+                        ntree=1500,
+                        na.action = na.roughfix)
+
+rfmodel3
+importance(rfmodel3)
+```
+
+
+```{r}
+##predictive accuracty of rf model 3
+
+# predicting on test/validation data
+
+predict.rf3 <- predict(rfmodel3, test.rf, type = "response")
+
+# check classification accuracy - using test/validation data
+
+tbl.RF3 <- table(predict.rf3, test.rf$homelessFac)
+
+accuracy.RF3 <- round(((tbl.RF3["Homeless","Homeless"] + tbl.RF3["With home","With home"])/(tbl.RF3["Homeless","Homeless"] + tbl.RF3["With home","With home"] + tbl.RF3["With home","Homeless"] + tbl.RF3["Homeless","With home"]))*100, 1)
+
+accuracy.RF3
+```
+
+Accuracy of random forests model 1 (using randomForests package) on test data set  is `accuracy.RF3`.
+
+
+
+### D. Random Forests using caret package
+```{r}
+# Random forests using caret package - ntree=500, mtry range from 1 to 8 features.
+library(caret)
+str(train.rf)
+control <- trainControl(method = "repeatedcv", number = 10, repeats = 10, search = "grid")
+tunegrid <- expand.grid(.mtry = c(1:8))
+model.rfgrid <- train(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                      data = h2,
+                      method = "rf",
+                      tuneGrid = tunegrid,
+                      trControl = control,
+                      na.action = na.roughfix)
+print(model.rfgrid)
+plot(model.rfgrid)
+```
+
