@@ -1,0 +1,639 @@
+---
+title: "II. Classification of Homeless Deaths: exploratory data analysis"
+author: "Maya Bhat-Gregerson"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  github_document:
+      toc: true
+      toc_depth: 3
+---
+
+```{r message=FALSE}
+
+library(magrittr)
+library(tidyverse)
+library(stringr)
+library(knitr)
+library(naniar)
+library(data.table)
+library(lubridate)
+library(stringr)
+library(scales)
+library(cowplot)
+library(quanteda)
+library(tm)
+library(tinytex)
+
+knitr::opts_chunk$set(message = FALSE, error=FALSE, warning = FALSE, echo = TRUE, tidy = TRUE, fig.width = 9, fig.align = "center")
+
+```
+
+
+# EXPLORATORY DATA ANALYSIS
+
+##  A. Missing values 
+
+
+Missing values in any of the attributes in either HDR or death certificate data may be useful in the upcoming machine learning phase as it is very likely that a key distinction between decedents who were homeless vs. those who had permanent homes is that their records cannot be completed due to lack of information from family members or other "informants".
+
+
+```{r}
+#homeless data
+miss_var_summary(h)
+str(h)
+
+#with home sample data
+miss_var_summary(wh)
+str(wh)
+
+```
+
+
+## B. Analysis of select variables
+
+To conduct exploratory data analysis I appended the homeless and 'with home' death records after adding a new variable to the two data sets indicating the homeless status of each death.
+ 
+
+### 1. Place of death type
+
+Figure 1a below shows that homeless individuals were more likely to die in places marked as "other" on the death certificate or in emergency rooms compared with decedents who had permanent homes.  Decedents with permanent homes were more likely to die in their own homes, or in long term care/nursing home facilities. Death certifiers who report "other" in the place of death variable have the option of entering literal text to provide additional details about the location.  Analysis of this text field may shed some light on why a large proportion of homeless decedents have place of death marked as "other".
+
+There is a statistically significant association between homeless status and place of death type (p < 0.05).
+
+```{r}
+# Chi square - checking # of expected values in each cell
+
+placetable <-table(EDAdf$dplacecode, EDAdf$status)
+placechi<-chisq.test(placetable)
+placechi$expected
+
+# recode to remove cells (in homeless status vs. place of death type contingency table) with expected count <=5
+# small cells recoded as 
+
+EDAdf$dplace2 <- NA
+EDAdf$dplace2 <- ifelse(EDAdf$dplacecode=="Home", "Home", 
+                        ifelse(EDAdf$dplacecode=="Other", "Other",
+                               ifelse(EDAdf$dplacecode=="ER", "ER/Outpatient", 
+                                      ifelse(EDAdf$dplacecode=="Hospital inpatient", "Hospital inpatient",
+                                             ifelse(EDAdf$dplacecode=="Nursing home/Longterm care","Nursing home/Longterm care",
+                                                    ifelse(EDAdf$dplacecode== "Hospice", "Hospice", "Other"))))))
+
+EDAdf$dplace2 <-factor(EDAdf$dplace2)
+
+placetable2 <- table(EDAdf$dplace2, EDAdf$status)
+p <- addmargins(placetable2)
+p
+placechi2 <- chisq.test(placetable2)
+placechi2$expected
+
+
+# bar plot of recoded place of death vs. homeless status
+theme_set(theme_cowplot(font_size = 10))
+plotplace <- ggplot(subset(EDAdf, !is.na(dplace2)), aes(x=dplace2, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Place of death type 2", title = "Figure 1a. Place of death type by 
+       homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.0)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotplace + theme(panel.spacing.x = unit(2.5, "lines"))
+
+#Chi square test 
+
+placechi2
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+place2.res<-round(placechi2$residuals, 3)
+
+corrplot::corrplot(place2.res, title = "Figure 1b. Pearson residuals for home status v. place of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+
+```
+
+
+###  2.  Age group
+
+Homeless decedents died at younger ages compared with decedents with homes. Almost 75% of decedents with homes were 65 years or older compared with almost 10% of the homeless decedent population.  In contrast the highest proportion of deaths among homeless (almost 59%) occurred in the 45 to 64 year old population.
+
+There is a statistically significant association between homeless status and age at death (p < 0.05). Figure 2b is a plot of the Pearson chi square residuals for each age and homeless status category.  Homeless deaths were most strongly positively associated with being 30-44 years and most strongly negatively associated with being 65 years or older.
+
+ 
+```{r}
+agegrptble <- table(EDAdf$age5cat, EDAdf$status)
+
+# Chi square - checking # of expected values in each cell
+agegrpchi<-chisq.test(agegrptble)
+agegrpchi$expected
+
+# Bar Graph
+theme_set(theme_cowplot(font_size = 10))
+plotage <- ggplot(EDAdf, aes(x=age5cat, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            vjust = -0.5, size=3) +
+  labs(y="Percent", x = "Age groups", title = "Figure 2a. Age distribution by homeless 
+       status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill=FALSE)
+
+plotage + theme(panel.spacing.x = unit(2.5, "lines"))
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+
+agegrpchi
+
+agegrp.res<-round(agegrpchi$residuals, 3)
+
+corrplot::corrplot(agegrp.res, title = "Figure 2b. Pearson residuals for home status and age group", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+
+
+
+###  3. Gender
+
+Far more homeless men die than homeless women, whereas the deaths are more balanced between genders among decedents with homes. There is a statistically significant association between gender and homeless status (p <0.05).  It is possible that homeless shelters tend to prioritize women in providing temporary housing resulting in lower proportions of women in the homeless population, and consequently, deaths among homeless.
+
+```{r}
+
+gendertable <- table(EDAdf$sex, EDAdf$status)
+
+# Chi square - checking # of expected values in each cell
+genderchi<-chisq.test(gendertable)
+genderchi$expected
+
+
+EDAdf$sex2 <- NA
+EDAdf$sex2 <- ifelse(EDAdf$sex=="M", "Male", 
+                        ifelse(EDAdf$sex=="F", "Female", NA))
+EDAdf <- mutate_at(EDAdf, vars(sex2), as.factor)
+
+theme_set(theme_cowplot(font_size = 10))
+plotsex2 <- ggplot(subset(EDAdf, !is.na(sex2)), aes(x=sex2, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            vjust = -0.5, size=3) +
+  labs(y="Percent", x = "Gender", title = "Figure 3a. Gender distribution by homeless 
+       status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill=FALSE)
+
+plotsex2 + theme(panel.spacing.x = unit(2.5, "lines"))
+
+
+# Chi square test of independence 
+gendertable2 <- table(EDAdf$sex2, EDAdf$status)
+genderchi2<-chisq.test(gendertable2)
+genderchi2
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+gender.res2<-round(genderchi2$residuals, 3)
+
+corrplot::corrplot(gender.res2, title = "Figure 3b. Pearson residuals for home status and gender", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+```
+
+
+### 4a.  Race/ethnicity - 5 groups with Hispanic as race
+
+Homeless status among King County decedents is statistically significantly associated with race and ethnicity (p < 0.05) with  larger proportions of non-Hispanic Black and American Indian/American Native among homeless decedents compared with those who had permanent homes.  Conversely, a smaller proportion of homeless decedents were non-Hispanic Asians or non-Hispanic Whites.  The proportion of Hispanic deaths was the same regardless of homeless status.
+
+Estimates from 2017 show that White non Hispanics made up 61% of the total population of King County while Asians and Pacific Islander/Native Hawaiians contributed 18%, Black non-Hispanics made up 6%, Hispanics contributed 10%, and multiracial groups contributed the remaining 5%. The American Indian/American Native population overall in King County was approximately 1%.
+
+Figure 4b. shows the contributions of the various race/ethnicity by homeless status cells to the overall chi square statistic.  Of note is the strong positive correlation between homeless at death and being either American Indian or Black non-Hispanic.  Conversely, being Asian was strongly negatively correlated with homelessness at death.
+
+
+```{r}
+
+
+# Chi square - checking expected values of cells
+
+raceth5table <- table(EDAdf$raceethnic5, EDAdf$status)
+raceth5chi<-chisq.test(raceth5table)
+raceth5chi$expected
+
+# bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotraceeth5 <- ggplot(EDAdf, aes(x=raceethnic5, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Race/Ethnicity", title = "Figure 4a. Racial/Ethnic distribution
+       (5 grps) by homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  coord_flip() +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.0)) +
+  guides(fill=FALSE)
+
+plotraceeth5 + theme(panel.spacing.x = unit(2.5, "lines"))
+
+# Chi square test of independence
+raceth5chi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+raceth5.res<-round(raceth5chi$residuals, 3)
+
+corrplot::corrplot(raceth5.res, title = "Figure 4b. Pearson residuals for home status and Race/Ethnicity (5 grps)", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+```
+
+### 5. Manner of death
+
+Manner of death refers to whether a person died as a result of natural causes, homicide, suicide, or an accident.  In some instances where there is insufficient circumstantial evidence of intent the manner of death is marked as 'undetermined'.  Manner of death is reported by medical providers completing death certificates via a check box with mutually exclusive options.
+
+Over 45% of homeless deaths were accidental deaths compared to less than 6% of deaths to those with permanent homes.  In contrast the vast majority of deaths among those with homes (almost 92%) were natural deaths. 5.6% of homeless deaths were homicides compared to almost 0% among the decedents with permanent homes. Over 7% of homeless deaths were by suicide and another 5.8% were due to homicide compared with 2% and 0.5% respectively among decedents with homes.
+
+Manner of death is statistically significantly associated with homeless status (p < 0.05). 
+
+```{r}
+# Chi square - checking expected counts
+mannertable <- table(EDAdf$manner, EDAdf$status)
+mannertable
+mannerchi<-chisq.test(mannertable)
+mannerchi$expected
+
+# recode to remove cells with expected count less than 5
+
+EDAdf$manner2 <- NA
+EDAdf$manner2 <- ifelse(EDAdf$manner=="Accident", "Accident", 
+                        ifelse(EDAdf$manner=="Undetermined", "Undetermined",
+                               ifelse(EDAdf$manner=="Homicide", "Homicide", 
+                                      ifelse(EDAdf$manner=="Natural", "Natural",
+                                             ifelse(EDAdf$manner=="Suicide","Suicide",NA)))))
+
+EDAdf <- mutate_at(EDAdf, vars(manner2), as.factor)
+
+#bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotmanner2 <- ggplot(subset(EDAdf, !is.na(manner2)), aes(x=manner2, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            hjust = -0.5, size=3) +
+  labs(y="Percent", x = "Manner of death", 
+title = "Table 5a. Distribution of manner of 
+       death by homeless status", 
+caption = "Homeless:n=1,093; With home:n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0.0, 1.1)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotmanner2 + theme(panel.spacing.x = unit(2.5, "lines"))
+
+
+# Chi square - test of independence
+mannertable2 <- table(EDAdf$manner2, EDAdf$status)
+mannerchi2<-chisq.test(mannertable2)
+mannerchi2$expected
+mannerchi2
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+manner.res2<-round(mannerchi2$residuals, 3)
+
+corrplot::corrplot(manner.res2, title = "Table 5b. Pearson residuals for home status and manner of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+
+
+```
+
+
+### 6. Leading causes of death
+
+There are clear differences in leading causes of death between decedents who were homeless and those with homes at the time of death. As we saw above in Figure 5a., homeless decedents were more likely to die of accidental manner of death.  Figure 6a. shows that over 44% of homeless deaths were due to unintentional injury.  The bar plot also indicates that homeless decedents were also more likely than decedents with homes to die of chronic liver disease/cirrhosis (5.3% vs. 1.5% respectively) and suicide (7.4% vs. 1.8% respectively). Fewer homeless decedents had a chronic disease as the underlying cause of death compared to decedents with homes. As the majority of homeless decedents died at younger ages the relatively low proportions of death due to chronic illness (which tend to manifest and affect people in older age groups) is not surprising.
+
+Unintended injury deaths, suicides, and chronic liver disease had the strongest positive associations with homeless status and contributed to a statistically significant association between the two variables (p <0.05).
+
+
+```{r}
+
+# Chi square  - checking for expected cell size counts of < 5
+
+lcodtable<- table(EDAdf$LCOD, EDAdf$status)
+lcodchi<-chisq.test(lcodtable)
+lcodchi$expected
+
+#bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotlcod <- ggplot(EDAdf, aes(x=LCOD, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
+            hjust = -0.25, size=3) +
+  labs(y="Percent", x = "Leading Cause of Death", title = "Leading cause of death
+       by homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotlcod + theme(panel.spacing.x = unit(2.5, "lines"))
+
+#Chi square test
+lcodchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+lcod.res<-round(lcodchi$residuals, 3)
+
+corrplot::corrplot(lcod.res, title = "Pearson residuals for home status and 10 leading causes of death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+
+### 7. Unintentional injury sub-groups
+
+A closer examination of unintentional injury deaths reveals that unintentional poisioning accounted for 32.6% of homeless deaths and motor vehicle related causes resulted in an additional 5.2% homeless deaths in King County.  These proportions are far greater among the homeless compared with decedents with permanent homes. In stark contrast, relatively few decedents with permanent homes died of any unintended injury (5.4%).
+
+Unintentional injury and homeless status are statistically signficantly associations (p < 0.05) with unintentional poisoning having a strong positive correlation with homeless status.
+
+
+```{r}
+
+
+# Chi square  - checking if expected cell size counts are < 5
+injurytable <- table(EDAdf$injury, EDAdf$status)
+injurychi<-chisq.test(injurytable)
+injurychi$observed
+injurychi$expected
+
+
+#bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotinjury <- ggplot(EDAdf, aes(x=injury, group = status, fill=status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count", 
+            hjust = -0.20, size=3) +
+  labs(y="Percent", x = "Unintentional injury type", title = "Figure 7a. Leading unintentional 
+       injury deaths by homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotinjury + theme(panel.spacing.x = unit(2.0, "lines"))
+
+# Chi square test of independence
+injurychi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+injury.res<-round(injurychi$residuals, 3)
+
+corrplot::corrplot(injury.res, title = "Figure 7b. Pearson residuals for home status and unintentional injury death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+### 8. Drug and alcohol induced causes of death
+
+Unintentional poisoning is often associated with substance abuse and alcohol or drug-related deaths.  Figure 8a shows more details about specific causes that contributed to unintentional poisoning deaths among homeless decedents. Drug-induced causes contributed over 32% of homeless deaths (compared with 1.9% of deaths to decedents with homes).  In addition, alcohol-induced causes contributed over 8% of homeless deaths compared with 1.6% of deaths among decedents with homes. Drug and alcohol induced deaths were statistically significantly associated with homeless status (p < 0.05) with drug-induced causes of death having the strongest positive correlation with homeless status.
+
+
+```{r}
+# Chi square  - checking if expected cell size counts are < 5
+satable <- table(EDAdf$substance, EDAdf$status)
+sachi<-chisq.test(satable)
+sachi$observed
+sachi$expected
+
+#bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotsubstance <- ggplot(EDAdf, aes(x=substance, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
+            hjust = -0.25, size=3) +
+  labs(y="Percent", title = "Table 8a. Alcohol-related and drug-induced deaths by homeless
+       status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+plotsubstance + theme(panel.spacing.x = unit(2.5, "lines"))
+
+# Chi square test of independence 
+
+sachi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+sa.res<-round(sachi$residuals, 3)
+
+corrplot::corrplot(sa.res, title = "Table 8b. Pearson residuals for home status and type of unintentional subst death", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+### 9. Educational attainment
+
+The educational attainment of almost 24% of homeless decedents could not be ascertained and this may not be surprising as many details about this population may be difficult to verify. Among homeless decedents for whom educational attainment could be ascertained over 60% had a high school diploma, GED, or less education.  In comparison, decedents with permanent homes tended to have more formal education with a larger proportion having an Associates or Bachelors degree or higher compared with homeless decedents.  Educational attainment is also statistically significantly associated with homeless status (p < 0.05). As figure 9b indicates having less than a high school education was strongly positively correlated with being homeless while having an associates or bachelors degree was strongly negatively correlated with being homeless.
+
+```{r}
+
+# Chi square  - checking for expected counts < 5
+eductable <- table(EDAdf$educ, EDAdf$status)
+educchi<-chisq.test(eductable)
+educchi$expected
+
+#recoding unknown educational status among homeless based on armed forces participation,
+#collapsing individual groups
+EDAdf$educ2 <- NA
+EDAdf$educ2 <- ifelse(EDAdf$educ=="<=8th grade", "Less than H.S. grad", 
+  ifelse(EDAdf$educ=="9-12th gr., no diploma", "Less than H.S. grad",
+   ifelse(EDAdf$educ=="H.S. grad/GED", "H.S. grad/GED", 
+     ifelse(EDAdf$educ=="Unknown" & EDAdf$military=="Y", "H.S. grad/GED",
+        ifelse(EDAdf$educ=="Some college","Some college",
+          ifelse(EDAdf$educ=="Associate's","Associates/Bachelors",
+            ifelse(EDAdf$educ=="Bachelors","Associates/Bachelors",
+              ifelse(EDAdf$educ=="Masters","Masters/Doctorate/Professional",
+                ifelse(EDAdf$educ=="Doctorate/Professional","Masters/Doctorate/Professional",
+                  ifelse(EDAdf$educ=="Unknown","Unknown", NA))))))))))
+
+#barplot
+theme_set(theme_cowplot(font_size = 10))
+ploteduc2 <- ggplot(EDAdf, aes(x=educ2, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
+            hjust = -0.25, size=3) +
+  labs(y="Percent", x = "Educational attainment", title = "Figure 9a. Educational attainment
+       by homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent, limits = c(0,0.5)) +
+  coord_flip() +
+  guides(fill=FALSE)
+
+ploteduc2 + theme(panel.spacing.x = unit(2.5, "lines"))
+
+#Chi Square test of independence
+eductable2 <- table(EDAdf$educ2, EDAdf$status)
+educchi2<-chisq.test(eductable2)
+educchi2
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+educ.res2<-round(educchi2$residuals, 3)
+
+corrplot::corrplot(educ.res2, title = "Figure 9b. Pearson residuals for home status and educational attainment", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+### 10. Military service
+
+Armed forces participation was difficult to ascertain for over 11% of homeless decedents.  Among those for whom military service information was available, homeless status was negatively correlated with armed forces participation (p < 0.05).
+
+```{r}
+
+# Chi square  - checking for expected counts < 5
+miltable <- table(EDAdf$military, EDAdf$status)
+milchi<-chisq.test(miltable)
+milchi$expected
+
+#bar plot
+theme_set(theme_cowplot(font_size = 10))
+plotmilitary <- ggplot(EDAdf, aes(x=military, group = status, fill = status)) +
+  geom_bar(aes(y=..prop..), stat="count", color = "slategrey") +
+  geom_text(aes(label = scales::percent(..prop..), y=..prop..), stat="count",
+            vjust = -0.5, size=3) +
+  labs(y="Percent", x = "Armed Forces participation", title = "Figure 10a. Armed Forces 
+       participation by homeless status", caption = "Homeless: n=1,093; With home: 
+       n = 174,292") +
+  facet_grid(.~status) + 
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill=FALSE)
+
+plotmilitary + theme(panel.spacing.x = unit(2.5, "lines"))
+
+#Chi Square test of independence
+milchi
+
+# Plot of Pearson residuals - Color intensity is proportional to the correlation coefficients. 
+mil.res<-round(milchi$residuals, 3)
+
+corrplot::corrplot(mil.res, title = "Figure 10b. Pearson residuals: homeless status by armed forces participation", method = "color", cl.pos = "r", cl.align = "l", cl.ratio = 0.75, tl.srt=45,outline = TRUE, tl.cex = 0.8, mar=c(0,0,5,0),is.corr = FALSE)
+
+```
+
+
+## C. Text analysis of cause of death text fields
+
+Examining literal fields in death certificates may provide some insight into whether death certifiers used these fields to identify homeless individuals or whether there are certain recurring themes that are not captured by the underlying cause of death ICD 10 codes. The text fields contain the raw, unprcessed cause of death information  For this part of the analysis I examine cause of death literals (concatenating the four part 1 lines and the part 2 contributing causes fields where medical certifiers can enter free text to describe what decease or injury caused a decedent's death).
+
+I used the bag of words method to analyse the concatenated text fields.  In addition to creating tokens consisting of single word stems, I also created a customized dictionary of "stop words" to remove commonly used words that do not contribute to an overall understanding of causes and context of death.
+
+The keyness plot below compares relative frequence of cause of death terms for decedents with homes vs. without homes. The chi square test shows the strength of the relationship between home status and dying of a particular cause of death.
+
+The first plot looks at the differences between homeless and with home decedents by the 25 most commonly used individual words in the cause of death fields.  
+
+```{r fig.width=9, fig.height=7}
+
+T <- EDAdf
+
+T$doc_id <-as.character(T$certno)
+T$text <- T$CODliteral
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "use")
+
+
+T <- select(T, doc_id, text, everything())
+
+T$text <- tolower(T$text)
+T$text <- removeWords(T$text, CODstop)
+  
+T.corpus <- corpus(T)
+
+T.dtm <- dfm(T.corpus, 
+           tolower = TRUE, 
+           remove = stopwords("english"),
+           stem = TRUE, 
+           remove_punct=TRUE, 
+           groups = "status", 
+           remove_numbers = TRUE)
+
+
+T.keyness = textstat_keyness(T.dtm, target = "Homeless")
+textplot_keyness(T.keyness, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
+                 color = c("#EC7063","#4DB6AC"))
+
+
+```
+
+
+In the following plot, I repeat the above text analysis and plot two word combinations that show up most frequently by homeless status i.e. ngrams=2
+
+Drug and alcohol use are most strongly correlated with homeless deaths as are deaths deaths due to environmental exposure/hypothermia.  In comparison deaths to 'with home' decedents are most strongly associated with chronic diseases such as lung cancer and dementia, or conditions associated with old age such as aspirational pneumonia.  
+
+
+```{r fig.width=9, fig.height=7}
+
+T <- EDAdf
+
+T$doc_id <-as.character(T$certno)
+T$text <- T$CODliteral
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "acute", "chronic", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "blunt", "force", "metastatic", "cell", "mellitus", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "advanced", "probable", "with", "hemorrhage", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local" ,  "malignant" ,  "morbid" ,"multiple" ,  "neurodegenerative" ,  "noninvasive" ,  "nonspecific" ,  "opportunistic" ,  "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "self-induced" ,  "self-inflicted" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "exposure", "abuse", "unknown", "if", "cause", "death", "use", "in")
+
+
+T <- select(T, doc_id, text, everything())
+
+T$text <- tolower(T$text)
+T$text <- removeWords(T$text, CODstop)
+  
+T.corpus <- corpus(T)
+
+T.dtm3 <- dfm(T.corpus, 
+           tolower = TRUE, 
+           remove = stopwords("english"),
+           stem = TRUE, 
+           remove_punct=TRUE, 
+           groups = "status", 
+           remove_numbers = TRUE,
+           ngrams=2)
+
+
+T.keyness3 <- textstat_keyness(T.dtm3, target = "Homeless")
+textplot_keyness(T.keyness3, margin = 0.1, labelcolor = "black", labelsize = 3, n=25L,
+                 color = c("#EC7063","#4DB6AC"))
+
+```
+
+## D. Discussion of findings from exploratory data analysis
+
+Based on the exploratory data analysis above the features that are statistically significantly associated with homeless statust include age, gender, manner of death (i.e. natural, suicide, homicide, or accidental), leading cause of death (broad groupings of ICD-10 codes for the diseases or injuries that account for the greatest number of deaths), educational attainment, race/ethnicity, and military service. Among causes of death, unintended injuries, primarily unintentional poisoning by drugs accounts for a large proportion of homeless deaths.
+
+Analysis of raw text in the cause of death text fields reinforced findings from earlier analysis and also provided some additional insight into circumstances of death that was not apparent by simply analyzing a single underlying cause of death code for each death. Cause of death classification results in an oversimplification of the events leading to death and valuable details may be lost by analyzing ICD 10 codes alone.  The two keyness plots above (particularly the second one) indicate that multiple illicit drugs were detected in the numerous drug overdose deaths or that there was a combination of both alcohol and illicit drugs present in the body at the time of death.  Another new piece of information is that in many of the homeless deaths a key contributor to death was exposure to environmental cold resulting in hypothermia or leading to carbon monoxide poisoning (perhaps due to unsafe heating sources.  The keyness plots also show the contrast between the types of deaths among homeless decedents and those with permanent homes.  Decedents with homes were much more likely to die of chronic diseases characteristic of older age compared with accidents and injuries that led to the majority of homeless deaths.
+
+
+In the next and final section of this project I will use features that are highly correlated with the outcome variable to train machine learning models using different methods to classify deaths by homeless status.
+
+## APPENDICES
+
+### Appendix A - Data dictionary for Washington State Mortality Data
+
+```{r}
+dd <- read.csv("DthDataDictionary.csv")
+library(kableExtra)
+
+dd %>%
+  kable() %>%
+  kable_styling(full_width = F, font_size = 10) %>%
+  column_spec(2, width = "15em") %>%
+  column_spec(3, width = "40em")
+
+```
+
