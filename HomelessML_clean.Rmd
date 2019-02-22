@@ -313,6 +313,7 @@ ctrl.LR2 <- trainControl(method = "repeatedcv", number = 10, savePredictions = T
 model.lr2 <-train(homelessFac ~ sex + race6cat + dplace5cat + educ4cat + age4cat + manner + substance + LCOD3cat,
                   data = HTrain, 
                   family = "binomial",
+                  method = "glm",
                   trControl = ctrl.LR2, tuneLength = 5) 
 
 ```
@@ -625,11 +626,13 @@ Accuracy of random forests model 1 (using randomForests package) on test data se
 # Random forests using caret package - ntree=500, mtry range from 1 to 8 features.
 library(caret)
 str(train.rf)
-control <- trainControl(method = "repeatedcv", number = 10, repeats = 10, search = "grid")
-tunegrid <- expand.grid(.mtry = c(1:8))
+control <- trainControl(method = "repeatedcv", number = 10, repeats =3, search = "grid")
+tunegrid <- expand.grid(.mtry = c(1:8), .ntree=c(500, 1000, 1500))
+set.seed(1234)
 model.rfgrid <- train(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
                       data = h2,
-                      method = "rf",
+                      method = "customRF",
+                      metric = metric,
                       tuneGrid = tunegrid,
                       trControl = control,
                       na.action = na.roughfix)
