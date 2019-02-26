@@ -2,6 +2,7 @@
 title: "II. Classification of Homeless Deaths: exploratory data analysis"
 author: "Maya Bhat-Gregerson"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
+always_allow_html: yes
 output: 
   github_document:
       toc: true
@@ -23,6 +24,7 @@ library(cowplot)
 library(quanteda)
 library(tm)
 library(tinytex)
+library(here)
 
 knitr::opts_chunk$set(message = FALSE, error=FALSE, warning = FALSE, echo = TRUE, tidy = TRUE, fig.width = 9, fig.align = "center")
 
@@ -39,9 +41,11 @@ Missing values in any of the attributes in either HDR or death certificate data 
 
 ```{r}
 #homeless data
+h <- read_csv("h.csv")
 miss_var_summary(h)
 str(h)
 
+wh<- read_csv("wh.csv")
 #with home sample data
 miss_var_summary(wh)
 str(wh)
@@ -63,6 +67,7 @@ There is a statistically significant association between homeless status and pla
 ```{r}
 # Chi square - checking # of expected values in each cell
 
+EDAdf <- read_csv("HomelessFinal.csv")
 placetable <-table(EDAdf$dplacecode, EDAdf$status)
 placechi<-chisq.test(placetable)
 placechi$expected
