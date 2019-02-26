@@ -1,5 +1,5 @@
 ---
-title: "I. Classification of Homeless Deaths: data cleaning and preparation"
+title: "Part 1 - Classification of Homeless Deaths: data cleaning and preparation"
 author: "Maya Bhat-Gregerson"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: 
@@ -23,6 +23,7 @@ library(cowplot)
 library(quanteda)
 library(tm)
 library(tinytex)
+library(here)
 
 knitr::opts_chunk$set(message = FALSE, error=FALSE, warning = FALSE, echo = TRUE, tidy = TRUE, fig.width = 9, fig.align = "center")
 ```
@@ -759,6 +760,9 @@ stdnames <- c("certno", "dcounty", "attclass", "sex","brgrace", "hispanic", "man
 
 colnames(h) <- stdnames
 colnames(wh) <- stdnames
+
+write_csv(h, "C:/Users/mbg0303/Documents/IntroDSCapstone/h.csv")
+write_csv(wh, "C:/Users/mbg0303/Documents/IntroDSCapstone/wh.csv")
 
 EDAdf<- rbind(h, wh)
 EDAdf$status <- as.factor(EDAdf$status)
