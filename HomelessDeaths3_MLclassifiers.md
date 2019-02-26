@@ -1,4 +1,4 @@
-1.  Classification of Homeless Deaths: training machine learning models
+Part 3 - Classification of Homeless Deaths: training machine learning models
 ================
 Maya Bhat-Gregerson
 February 26, 2019
@@ -19,7 +19,7 @@ February 26, 2019
     -   [(A) Naive Bayes model 1](#a-naive-bayes-model-1)
     -   [(B) Naive Bayes classfier 2](#b-naive-bayes-classfier-2)
     -   [(C) Comparison of accuracy of the two Naive Bayes classfiers](#c-comparison-of-accuracy-of-the-two-naive-bayes-classfiers)
--   [III. RANDOM FORESTS](#iii.-random-forests)
+-   [III. RANDOM FOREST](#iii.-random-forest)
     -   [A. Split data into training and testing data sets](#a.-split-data-into-training-and-testing-data-sets)
     -   [B. Training preliminary Random Forest models using caret package](#b.-training-preliminary-random-forest-models-using-caret-package)
         -   [1. Identifying optimal number of variables to use in decision trees](#identifying-optimal-number-of-variables-to-use-in-decision-trees)
@@ -59,7 +59,7 @@ knitr::opts_chunk$set(fig.width = 9, fig.align = "center", message = FALSE, warn
 INTRODUCTION
 ------------
 
-This is the third and final section of this project in which I train machine learning models that can classify deaths by homeless status.
+This is the third and final section of this project in which I train machine learning models that can classify deaths by homeless status. The first part focused on deata cleaning and preparation can be accessed at <https://github.com/mbg9700/IntroDSCapstone/blob/master/HomelessDeaths1_DataCleaning.md> and the second part on exploratory data analysis can be accessed at <https://github.com/mbg9700/IntroDSCapstone/blob/master/HomelessDeaths2_ExploratoryDataAnalysis.md>.
 
 In the exploratory data analysis phase I was able to identify a number of independent variables that are strongly associated with homelessness. These features include sex, race and ethnicity (5 groups including Hispanic as race), place of death (e.g. home, hospital, hospice, etc), manner of death (natural, homicide, suicide, accident, or undetermined), leading cause of death (groupings of ICD 10 codes), educational attainment, age group, type of injury involved in death (no injury, motor vehicle injury, fall, poisoning), and whether underlying cause of death was due to drug or alcohol use. All predictors are categorical variables.
 
@@ -97,7 +97,7 @@ table(h1$status)
 
     ## 
     ##  Homeless With home 
-    ##      1093    174298
+    ##      1093    174300
 
 ``` r
 table(as.numeric(h1$status))
@@ -105,7 +105,7 @@ table(as.numeric(h1$status))
 
     ## 
     ##      1      2 
-    ##   1093 174298
+    ##   1093 174300
 
 ``` r
 h1$status <- relevel(h1$status, ref = "With home")
@@ -118,7 +118,7 @@ table(h1$homeless)
 
     ## 
     ##      1      2 
-    ## 174298   1093
+    ## 174300   1093
 
 ``` r
 h1$homeless[h1$homeless == 1] <- 0
@@ -132,7 +132,7 @@ str(h1$status)
 str(h1$homeless)
 ```
 
-    ##  num [1:175391] 1 1 1 1 1 1 1 1 1 1 ...
+    ##  num [1:175393] 1 1 1 1 1 1 1 1 1 1 ...
 
 ``` r
 table(h1$status, h1$homeless)
@@ -140,7 +140,7 @@ table(h1$status, h1$homeless)
 
     ##            
     ##                  0      1
-    ##   With home 174298      0
+    ##   With home 174300      0
     ##   Homeless       0   1093
 
 ``` r
@@ -212,7 +212,7 @@ table(h2$sex)
 
     ## 
     ##    F    M    U 
-    ##  924 1669    0
+    ##  936 1657    0
 
 ``` r
 # replacE 'unknown' values from predictors with NA
@@ -224,11 +224,11 @@ table(h2$homeless, h2$LCOD)
 
     ##    
     ##     Alzheimers Cancer Chronic Liver dis./cirrh. Chronic Lwr Resp Dis.
-    ##   0         80    326                        21                    68
+    ##   0         99    360                        22                    67
     ##   1          0     28                        58                     8
     ##    
     ##     Diabetes Flu Heart Dis. Injury-unintentional Other Stroke Suicide-all
-    ##   0       40  20        314                   83   441     81          26
+    ##   0       36  18        308                   82   408     77          23
     ##   1       18  20        155                  487   228     10          81
 
 ``` r
@@ -244,7 +244,7 @@ table(h2$homeless, h2$LCOD3cat)
 
     ##    
     ##     LCOD.Chronic LCOD.Other LCOD.ExtCause
-    ##   0          930        461           109
+    ##   0          969        426           105
     ##   1          277        248           568
 
 ``` r
@@ -254,11 +254,11 @@ table(h2$homeless, h2$dplacecode)
 
     ##    
     ##      ER Home Hospice Hospital Hospital inpatient In transport
-    ##   0  28  412      55        0                556            1
+    ##   0  29  426      60        2                549            1
     ##   1  49  100       8        0                272            1
     ##    
     ##     Nursing home/Longterm care Other Other person's home Unknown
-    ##   0                        399    49                   0       0
+    ##   0                        380    53                   0       0
     ##   1                         37   624                   2       0
 
 ``` r
@@ -272,14 +272,14 @@ table(h2$dplacecode, h2$dplace5cat)
 
     ##                             
     ##                               ER Home Hospice.LngTrmCare Hospital Other
-    ##   ER                          77    0                  0        0     0
-    ##   Home                         0  512                  0        0     0
-    ##   Hospice                      0    0                 63        0     0
-    ##   Hospital                     0    0                  0        0     0
-    ##   Hospital inpatient           0    0                  0      828     0
+    ##   ER                          78    0                  0        0     0
+    ##   Home                         0  526                  0        0     0
+    ##   Hospice                      0    0                 68        0     0
+    ##   Hospital                     0    0                  0        2     0
+    ##   Hospital inpatient           0    0                  0      821     0
     ##   In transport                 2    0                  0        0     0
-    ##   Nursing home/Longterm care   0    0                436        0     0
-    ##   Other                        0    0                  0        0   673
+    ##   Nursing home/Longterm care   0    0                417        0     0
+    ##   Other                        0    0                  0        0   677
     ##   Other person's home          0    0                  0        0     2
     ##   Unknown                      0    0                  0        0     0
 
@@ -290,11 +290,11 @@ table(h2$homeless, h2$educ)
 
     ##    
     ##     <=8th grade 9-12th gr., no diploma Associate's Bachelors
-    ##   0         120                    104          73       231
+    ##   0         120                     88          82       249
     ##   1          36                    179          25        28
     ##    
     ##     Doctorate/Professional H.S. grad/GED Masters Some college Unknown
-    ##   0                     38           508      62          244     120
+    ##   0                     37           466      78          241     139
     ##   1                      2           398      10          109     306
 
 ``` r
@@ -309,14 +309,14 @@ table(h2$educ, h2$educ4cat)
     ##                         
     ##                          NoHSDiploma HSDipl.OrMore HSGrad.GED Unknown
     ##   <=8th grade                    156             0          0       0
-    ##   9-12th gr., no diploma         283             0          0       0
-    ##   Associate's                      0            98          0       0
-    ##   Bachelors                        0           259          0       0
-    ##   Doctorate/Professional           0            40          0       0
-    ##   H.S. grad/GED                    0             0        906       0
-    ##   Masters                          0            72          0       0
-    ##   Some college                     0           353          0       0
-    ##   Unknown                          0             0          0     426
+    ##   9-12th gr., no diploma         267             0          0       0
+    ##   Associate's                      0           107          0       0
+    ##   Bachelors                        0           277          0       0
+    ##   Doctorate/Professional           0            39          0       0
+    ##   H.S. grad/GED                    0             0        864       0
+    ##   Masters                          0            88          0       0
+    ##   Some college                     0           350          0       0
+    ##   Unknown                          0             0          0     445
 
 ``` r
 # RACE/ETHNICITY
@@ -325,7 +325,7 @@ table(h2$homeless, h2$raceethnic5)
 
     ##    
     ##     AIAN NH Asian/PI NH Black NH Hispanic Other Unknown White NH
-    ##   0      12         101       65       42    10     101     1169
+    ##   0      12         108       74       30    16     116     1144
     ##   1      75          24      157       95    21       7      714
 
 ``` r
@@ -341,12 +341,12 @@ table(h2$raceethnic5, h2$race6cat)
     ##              
     ##               AIAN.NH AsianPI.NH Black.NH Hispanic Other.Unk White.NH
     ##   AIAN NH          87          0        0        0         0        0
-    ##   Asian/PI NH       0        125        0        0         0        0
-    ##   Black NH          0          0      222        0         0        0
-    ##   Hispanic          0          0        0      137         0        0
-    ##   Other             0          0        0        0        31        0
-    ##   Unknown           0          0        0        0       108        0
-    ##   White NH          0          0        0        0         0     1883
+    ##   Asian/PI NH       0        132        0        0         0        0
+    ##   Black NH          0          0      231        0         0        0
+    ##   Hispanic          0          0        0      125         0        0
+    ##   Other             0          0        0        0        37        0
+    ##   Unknown           0          0        0        0       123        0
+    ##   White NH          0          0        0        0         0     1858
 
 ``` r
 # MANNER OF DEATH
@@ -355,7 +355,7 @@ table(h2$homeless, h2$manner)
 
     ##    
     ##     Accident Homicide Natural Pending Suicide Undetermined
-    ##   0       89        7    1370       0      26            8
+    ##   0       84        7    1378       0      23            8
     ##   1      496       61     394       0      81           60
 
 ``` r
@@ -371,7 +371,7 @@ table(h2$homeless, h2$age5cat)
 
     ##    
     ##     <18yrs 18-29yrs 30-44yrs 45-64yrs 65+ yrs
-    ##   0     31       35       65      272    1097
+    ##   0     26       21       54      312    1087
     ##   1      0       84      264      643     101
 
 ``` r
@@ -385,11 +385,11 @@ table(h2$age5cat, h2$age4cat)
 
     ##           
     ##            <29yrs 30to44yrs 45to64yrs 65+yrs
-    ##   <18yrs       31         0         0      0
-    ##   18-29yrs    119         0         0      0
-    ##   30-44yrs      0       329         0      0
-    ##   45-64yrs      0         0       915      0
-    ##   65+ yrs       0         0         0   1198
+    ##   <18yrs       26         0         0      0
+    ##   18-29yrs    105         0         0      0
+    ##   30-44yrs      0       318         0      0
+    ##   45-64yrs      0         0       955      0
+    ##   65+ yrs       0         0         0   1188
 
 ``` r
 # SUBSTANCE USE
@@ -398,7 +398,7 @@ table(h2$homeless, h2$substance)
 
     ##    
     ##     Alcohol-induced Drug-induced No Substance abuse
-    ##   0              23           39               1438
+    ##   0              23           31               1446
     ##   1              91          357                645
 
 ``` r
@@ -408,22 +408,22 @@ str(h2)
 ```
 
     ## 'data.frame':    2591 obs. of  16 variables:
-    ##  $ sex        : Factor w/ 2 levels "F","M": 1 2 2 2 2 2 1 1 2 2 ...
-    ##  $ raceethnic5: Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 3 2 7 7 7 3 7 7 7 2 ...
-    ##  $ manner     : Factor w/ 5 levels "Accident","Homicide",..: 3 4 1 3 1 3 3 3 2 3 ...
-    ##  $ dplacecode : Factor w/ 10 levels "ER","Home","Hospice",..: 5 5 8 8 8 8 5 2 8 2 ...
-    ##  $ educ       : Factor w/ 9 levels "<=8th grade",..: 3 6 8 6 9 6 2 6 6 4 ...
-    ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 2 3 4 4 4 5 5 4 5 ...
-    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 9 8 7 8 7 2 9 9 2 ...
+    ##  $ sex        : Factor w/ 2 levels "F","M": 1 2 2 2 2 2 1 2 2 1 ...
+    ##  $ raceethnic5: Factor w/ 7 levels "AIAN NH","Asian/PI NH",..: 7 2 7 7 7 3 7 2 7 4 ...
+    ##  $ manner     : Factor w/ 5 levels "Accident","Homicide",..: 3 4 1 3 1 3 3 1 2 3 ...
+    ##  $ dplacecode : Factor w/ 10 levels "ER","Home","Hospice",..: 7 5 8 8 8 8 2 5 8 7 ...
+    ##  $ educ       : Factor w/ 9 levels "<=8th grade",..: 2 6 8 6 9 6 6 4 6 1 ...
+    ##  $ age5cat    : Factor w/ 5 levels "<18yrs","18-29yrs",..: 5 2 3 4 4 4 5 3 4 5 ...
+    ##  $ LCOD       : Factor w/ 11 levels "Alzheimers","Cancer",..: 7 9 8 7 8 7 10 8 9 1 ...
     ##  $ homelessFac: Factor w/ 2 levels "With home","Homeless": 1 2 2 2 2 2 1 1 2 1 ...
-    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 5 2 5 2 2 2 2 2 ...
-    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 3 3 2 3 2 3 3 3 3 3 ...
+    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 5 2 5 2 2 5 2 2 ...
+    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 3 3 2 3 2 3 3 2 3 3 ...
     ##  $ homeless   : num  0 1 1 1 1 1 0 0 1 0 ...
-    ##  $ LCOD3cat   : Factor w/ 3 levels "LCOD.Chronic",..: 1 2 3 1 3 1 1 2 2 1 ...
-    ##  $ dplace5cat : Factor w/ 5 levels "ER","Home","Hospice.LngTrmCare",..: 4 4 5 5 5 5 4 2 5 2 ...
-    ##  $ educ4cat   : Factor w/ 4 levels "NoHSDiploma",..: 2 3 2 3 4 3 1 3 3 2 ...
-    ##  $ race6cat   : Factor w/ 6 levels "AIAN.NH","AsianPI.NH",..: 3 2 6 6 6 3 6 6 6 2 ...
-    ##  $ age4cat    : Factor w/ 4 levels "<29yrs","30to44yrs",..: 4 1 2 3 3 3 4 4 3 4 ...
+    ##  $ LCOD3cat   : Factor w/ 3 levels "LCOD.Chronic",..: 1 2 3 1 3 1 1 3 2 1 ...
+    ##  $ dplace5cat : Factor w/ 5 levels "ER","Home","Hospice.LngTrmCare",..: 3 4 5 5 5 5 2 4 5 3 ...
+    ##  $ educ4cat   : Factor w/ 4 levels "NoHSDiploma",..: 1 3 2 3 4 3 3 2 3 1 ...
+    ##  $ race6cat   : Factor w/ 6 levels "AIAN.NH","AsianPI.NH",..: 6 2 6 6 6 3 6 2 6 4 ...
+    ##  $ age4cat    : Factor w/ 4 levels "<29yrs","30to44yrs",..: 4 1 2 3 3 3 4 2 3 4 ...
     ##  - attr(*, "na.action")= 'omit' Named int  1810 2446
     ##   ..- attr(*, "names")= chr  "1077" "963"
 
@@ -439,17 +439,17 @@ str(h2)
 ```
 
     ## 'data.frame':    2591 obs. of  11 variables:
-    ##  $ sex        : Factor w/ 2 levels "F","M": 1 2 2 2 2 2 1 1 2 2 ...
-    ##  $ manner     : Factor w/ 5 levels "Accident","Homicide",..: 3 4 1 3 1 3 3 3 2 3 ...
+    ##  $ sex        : Factor w/ 2 levels "F","M": 1 2 2 2 2 2 1 2 2 1 ...
+    ##  $ manner     : Factor w/ 5 levels "Accident","Homicide",..: 3 4 1 3 1 3 3 1 2 3 ...
     ##  $ homelessFac: Factor w/ 2 levels "With home","Homeless": 1 2 2 2 2 2 1 1 2 1 ...
-    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 5 2 5 2 2 2 2 2 ...
-    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 3 3 2 3 2 3 3 3 3 3 ...
+    ##  $ injury     : Factor w/ 5 levels "MV - all","No injury",..: 2 2 5 2 5 2 2 5 2 2 ...
+    ##  $ substance  : Factor w/ 3 levels "Alcohol-induced",..: 3 3 2 3 2 3 3 2 3 3 ...
     ##  $ homeless   : num  0 1 1 1 1 1 0 0 1 0 ...
-    ##  $ LCOD3cat   : Factor w/ 3 levels "LCOD.Chronic",..: 1 2 3 1 3 1 1 2 2 1 ...
-    ##  $ dplace5cat : Factor w/ 5 levels "ER","Home","Hospice.LngTrmCare",..: 4 4 5 5 5 5 4 2 5 2 ...
-    ##  $ educ4cat   : Factor w/ 4 levels "NoHSDiploma",..: 2 3 2 3 4 3 1 3 3 2 ...
-    ##  $ race6cat   : Factor w/ 6 levels "AIAN.NH","AsianPI.NH",..: 3 2 6 6 6 3 6 6 6 2 ...
-    ##  $ age4cat    : Factor w/ 4 levels "<29yrs","30to44yrs",..: 4 1 2 3 3 3 4 4 3 4 ...
+    ##  $ LCOD3cat   : Factor w/ 3 levels "LCOD.Chronic",..: 1 2 3 1 3 1 1 3 2 1 ...
+    ##  $ dplace5cat : Factor w/ 5 levels "ER","Home","Hospice.LngTrmCare",..: 3 4 5 5 5 5 2 4 5 3 ...
+    ##  $ educ4cat   : Factor w/ 4 levels "NoHSDiploma",..: 1 3 2 3 4 3 3 2 3 1 ...
+    ##  $ race6cat   : Factor w/ 6 levels "AIAN.NH","AsianPI.NH",..: 6 2 6 6 6 3 6 2 6 4 ...
+    ##  $ age4cat    : Factor w/ 4 levels "<29yrs","30to44yrs",..: 4 1 2 3 3 3 4 2 3 4 ...
 
 ### B. Split data into training and testing subsets and specify reference level for factor predictors
 
@@ -497,43 +497,43 @@ summary(model.LR1)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -3.5241  -0.2459  -0.1239   0.2083   3.0622  
+    ## -3.4280  -0.2466  -0.1056   0.2025   2.9691  
     ## 
     ## Coefficients:
     ##                              Estimate Std. Error z value Pr(>|z|)    
-    ## (Intercept)                   -5.8019     0.4062 -14.284  < 2e-16 ***
-    ## sexM                           0.9483     0.2248   4.219 2.46e-05 ***
-    ## race6catAIAN.NH                2.4657     0.6415   3.843 0.000121 ***
-    ## race6catAsianPI.NH            -1.5971     0.5297  -3.015 0.002571 ** 
-    ## race6catBlack.NH               0.7897     0.3401   2.322 0.020219 *  
-    ## race6catHispanic               0.7278     0.4233   1.719 0.085546 .  
-    ## race6catOther.Unk             -3.5688     0.4892  -7.295 2.99e-13 ***
-    ## dplace5catER                   2.0611     0.5181   3.978 6.96e-05 ***
-    ## dplace5catHospice.LngTrmCare   0.8058     0.3550   2.270 0.023218 *  
-    ## dplace5catHospital             0.9361     0.2726   3.434 0.000595 ***
-    ## dplace5catOther                3.6031     0.3262  11.047  < 2e-16 ***
-    ## educ4catNoHSDiploma            1.1366     0.2906   3.911 9.19e-05 ***
-    ## educ4catHSGrad.GED             1.2489     0.2519   4.958 7.13e-07 ***
-    ## educ4catUnknown                3.9134     0.3534  11.074  < 2e-16 ***
-    ## age4cat<29yrs                  0.2272     0.4028   0.564 0.572773    
-    ## age4cat30to44yrs               2.3507     0.3365   6.985 2.84e-12 ***
-    ## age4cat45to64yrs               2.3445     0.2444   9.592  < 2e-16 ***
-    ## mannerAccident                 1.8005     0.9167   1.964 0.049516 *  
-    ## mannerHomicide                 2.2751     0.7434   3.060 0.002211 ** 
-    ## mannerUndet.Pending            3.0024     0.7065   4.250 2.14e-05 ***
-    ## mannerSuicide                  2.0199     1.0201   1.980 0.047701 *  
-    ## substanceAlcohol-induced       1.2467     0.4116   3.029 0.002453 ** 
-    ## substanceDrug-induced          1.7017     0.3729   4.564 5.03e-06 ***
-    ## LCOD3catLCOD.Other             0.1557     0.2507   0.621 0.534559    
-    ## LCOD3catLCOD.ExtCause         -0.3212     0.9476  -0.339 0.734643    
+    ## (Intercept)                   -6.3019     0.4305 -14.638  < 2e-16 ***
+    ## sexM                           1.2161     0.2294   5.302 1.15e-07 ***
+    ## race6catAIAN.NH                1.0168     0.5278   1.927 0.054028 .  
+    ## race6catAsianPI.NH            -1.6331     0.6059  -2.696 0.007028 ** 
+    ## race6catBlack.NH               0.3205     0.3282   0.976 0.328879    
+    ## race6catHispanic               0.5601     0.4227   1.325 0.185176    
+    ## race6catOther.Unk             -3.6148     0.4705  -7.683 1.55e-14 ***
+    ## dplace5catER                   1.4929     0.4742   3.148 0.001643 ** 
+    ## dplace5catHospice.LngTrmCare   1.1153     0.3544   3.147 0.001651 ** 
+    ## dplace5catHospital             1.1616     0.2756   4.215 2.50e-05 ***
+    ## dplace5catOther                3.8980     0.3313  11.764  < 2e-16 ***
+    ## educ4catNoHSDiploma            1.6846     0.2976   5.661 1.51e-08 ***
+    ## educ4catHSGrad.GED             0.9944     0.2479   4.011 6.05e-05 ***
+    ## educ4catUnknown                4.0952     0.3626  11.294  < 2e-16 ***
+    ## age4cat<29yrs                  0.9363     0.4261   2.197 0.028003 *  
+    ## age4cat30to44yrs               2.9871     0.3552   8.410  < 2e-16 ***
+    ## age4cat45to64yrs               2.2424     0.2399   9.349  < 2e-16 ***
+    ## mannerAccident                 0.6839     0.8218   0.832 0.405299    
+    ## mannerHomicide                 2.4351     0.7760   3.138 0.001700 ** 
+    ## mannerUndet.Pending            2.8497     0.7052   4.041 5.32e-05 ***
+    ## mannerSuicide                  0.6989     0.9326   0.749 0.453633    
+    ## substanceAlcohol-induced       1.5912     0.4531   3.512 0.000446 ***
+    ## substanceDrug-induced          1.2446     0.3538   3.517 0.000436 ***
+    ## LCOD3catLCOD.Other             0.3783     0.2541   1.489 0.136552    
+    ## LCOD3catLCOD.ExtCause          1.0369     0.8586   1.208 0.227185    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
     ##     Null deviance: 2292.33  on 1683  degrees of freedom
-    ## Residual deviance:  747.11  on 1659  degrees of freedom
-    ## AIC: 797.11
+    ## Residual deviance:  742.85  on 1659  degrees of freedom
+    ## AIC: 792.85
     ## 
     ## Number of Fisher Scoring iterations: 6
 
@@ -560,37 +560,37 @@ publish(model.LR1)
 
     ##    Variable              Units OddsRatio          CI.95     p-value 
     ##         sex                  F       Ref                            
-    ##                              M      2.58    [1.66;4.01]     < 1e-04 
+    ##                              M      3.37    [2.15;5.29]     < 1e-04 
     ##    race6cat           White.NH       Ref                            
-    ##                        AIAN.NH     11.77   [3.35;41.39]   0.0001213 
-    ##                     AsianPI.NH      0.20    [0.07;0.57]   0.0025711 
-    ##                       Black.NH      2.20    [1.13;4.29]   0.0202186 
-    ##                       Hispanic      2.07    [0.90;4.75]   0.0855459 
+    ##                        AIAN.NH      2.76    [0.98;7.78]   0.0540279 
+    ##                     AsianPI.NH      0.20    [0.06;0.64]   0.0070280 
+    ##                       Black.NH      1.38    [0.72;2.62]   0.3288791 
+    ##                       Hispanic      1.75    [0.76;4.01]   0.1851760 
     ##                      Other.Unk      0.03    [0.01;0.07]     < 1e-04 
     ##  dplace5cat               Home       Ref                            
-    ##                             ER      7.85   [2.84;21.68]     < 1e-04 
-    ##             Hospice.LngTrmCare      2.24    [1.12;4.49]   0.0232183 
-    ##                       Hospital      2.55    [1.49;4.35]   0.0005951 
-    ##                          Other     36.71  [19.37;69.57]     < 1e-04 
+    ##                             ER      4.45   [1.76;11.27]   0.0016431 
+    ##             Hospice.LngTrmCare      3.05    [1.52;6.11]   0.0016511 
+    ##                       Hospital      3.19    [1.86;5.48]     < 1e-04 
+    ##                          Other     49.30  [25.75;94.39]     < 1e-04 
     ##    educ4cat      HSDipl.OrMore       Ref                            
-    ##                    NoHSDiploma      3.12    [1.76;5.51]     < 1e-04 
-    ##                     HSGrad.GED      3.49    [2.13;5.71]     < 1e-04 
-    ##                        Unknown     50.07 [25.05;100.08]     < 1e-04 
+    ##                    NoHSDiploma      5.39    [3.01;9.66]     < 1e-04 
+    ##                     HSGrad.GED      2.70    [1.66;4.39]     < 1e-04 
+    ##                        Unknown     60.05 [29.50;122.22]     < 1e-04 
     ##     age4cat             65+yrs       Ref                            
-    ##                         <29yrs      1.26    [0.57;2.76]   0.5727731 
-    ##                      30to44yrs     10.49   [5.43;20.29]     < 1e-04 
-    ##                      45to64yrs     10.43   [6.46;16.84]     < 1e-04 
+    ##                         <29yrs      2.55    [1.11;5.88]   0.0280031 
+    ##                      30to44yrs     19.83   [9.88;39.77]     < 1e-04 
+    ##                      45to64yrs      9.42   [5.88;15.07]     < 1e-04 
     ##      manner            Natural       Ref                            
-    ##                       Accident      6.05   [1.00;36.50]   0.0495159 
-    ##                       Homicide      9.73   [2.27;41.77]   0.0022106 
-    ##                  Undet.Pending     20.13   [5.04;80.41]     < 1e-04 
-    ##                        Suicide      7.54   [1.02;55.66]   0.0477013 
+    ##                       Accident      1.98    [0.40;9.92]   0.4052988 
+    ##                       Homicide     11.42   [2.49;52.25]   0.0017002 
+    ##                  Undet.Pending     17.28   [4.34;68.84]     < 1e-04 
+    ##                        Suicide      2.01   [0.32;12.51]   0.4536328 
     ##   substance No Substance abuse       Ref                            
-    ##                Alcohol-induced      3.48    [1.55;7.79]   0.0024526 
-    ##                   Drug-induced      5.48   [2.64;11.39]     < 1e-04 
+    ##                Alcohol-induced      4.91   [2.02;11.93]   0.0004455 
+    ##                   Drug-induced      3.47    [1.74;6.95]   0.0004356 
     ##    LCOD3cat       LCOD.Chronic       Ref                            
-    ##                     LCOD.Other      1.17    [0.71;1.91]   0.5345591 
-    ##                  LCOD.ExtCause      0.73    [0.11;4.65]   0.7346430
+    ##                     LCOD.Other      1.46    [0.89;2.40]   0.1365519 
+    ##                  LCOD.ExtCause      2.82   [0.52;15.18]   0.2271855
 
 Table 2 above converts the coefficients in the model summary above into odds ratios with 95% confidence intervals. The odds ratio values indicate the odds of having the characteristic for a person who died homeless compared to someone who had a permanent home at the time of death. For most of the predictors odds ratios confirm the association with the outcome seen in Table 1.
 
@@ -601,30 +601,30 @@ varImp(model.LR1)
 ```
 
     ##                                 Overall
-    ## sexM                          4.2187728
-    ## race6catAIAN.NH               3.8434368
-    ## race6catAsianPI.NH            3.0148500
-    ## race6catBlack.NH              2.3222658
-    ## race6catHispanic              1.7193760
-    ## race6catOther.Unk             7.2946736
-    ## dplace5catER                  3.9777854
-    ## dplace5catHospice.LngTrmCare  2.2698231
-    ## dplace5catHospital            3.4338479
-    ## dplace5catOther              11.0472828
-    ## educ4catNoHSDiploma           3.9111534
-    ## educ4catHSGrad.GED            4.9577926
-    ## educ4catUnknown              11.0744347
-    ## age4cat<29yrs                 0.5639721
-    ## age4cat30to44yrs              6.9853070
-    ## age4cat45to64yrs              9.5917697
-    ## mannerAccident                1.9641220
-    ## mannerHomicide                3.0603760
-    ## mannerUndet.Pending           4.2495589
-    ## mannerSuicide                 1.9800201
-    ## substanceAlcohol-induced      3.0291301
-    ## substanceDrug-induced         4.5636896
-    ## LCOD3catLCOD.Other            0.6210616
-    ## LCOD3catLCOD.ExtCause         0.3389558
+    ## sexM                          5.3018939
+    ## race6catAIAN.NH               1.9266127
+    ## race6catAsianPI.NH            2.6955124
+    ## race6catBlack.NH              0.9763741
+    ## race6catHispanic              1.3249854
+    ## race6catOther.Unk             7.6830634
+    ## dplace5catER                  3.1481443
+    ## dplace5catHospice.LngTrmCare  3.1467242
+    ## dplace5catHospital            4.2147633
+    ## dplace5catOther              11.7644122
+    ## educ4catNoHSDiploma           5.6605656
+    ## educ4catHSGrad.GED            4.0107203
+    ## educ4catUnknown              11.2939394
+    ## age4cat<29yrs                 2.1972431
+    ## age4cat30to44yrs              8.4102040
+    ## age4cat45to64yrs              9.3487679
+    ## mannerAccident                0.8321952
+    ## mannerHomicide                3.1381475
+    ## mannerUndet.Pending           4.0409444
+    ## mannerSuicide                 0.7493723
+    ## substanceAlcohol-induced      3.5115486
+    ## substanceDrug-induced         3.5174894
+    ## LCOD3catLCOD.Other            1.4887550
+    ## LCOD3catLCOD.ExtCause         1.2076408
 
 Table 3 indicates that place of death is reported as "other", race/ethnicity reported as "other", being 45 to 64 years old at death, being 30 to 44 years old at death, and having a cause of death related to substance use were some of the most important predictors contributing to the model. These results reaffirm the results shown in Table 1 as those same variables had higher coefficients and were flagged as being highly statistically signficantly associated with the outcome. On the other hand, there were some predictors in the model 1 summary table (Table 1) that also had higher coefficient values and were highly statistically signficant that did not appear to contribute as much to the model as the predictors mentioned above.
 
@@ -641,22 +641,76 @@ tbl.LR1
 
     ##        
     ##           0   1
-    ##   FALSE 490  58
-    ##   TRUE   35 324
+    ##   FALSE 500  56
+    ##   TRUE   25 326
 
 ``` r
-accuracy_LR1 <- round(((tbl.LR1["FALSE", "0"] + tbl.LR1["TRUE", "1"])/(tbl.LR1["FALSE", 
+accuracyLR1 <- round(((tbl.LR1["FALSE", "0"] + tbl.LR1["TRUE", "1"])/(tbl.LR1["FALSE", 
     "0"] + tbl.LR1["TRUE", "1"] + tbl.LR1["FALSE", "1"] + tbl.LR1["TRUE", "0"])) * 
     100, 1)
 
-accuracy_LR1
+sensitivityLR1 <- round((tbl.LR1["TRUE", "1"]/(tbl.LR1["TRUE", "1"] + tbl.LR1["TRUE", 
+    "0"])) * 100, 1)
+specificityLR1 <- round((tbl.LR1["FALSE", "0"]/(tbl.LR1["FALSE", "0"] + tbl.LR1["FALSE", 
+    "1"])) * 100, 1)
+
+# Formula for calculating Kappa statistic is Pr(a) - Pr(e)/1-Pr(e) where
+# pr(a) is the proportion of the confusion matrix where there is actual
+# agreement between predicted and true values and pre(e) is the expected
+# agreement between prediction and true values if chance alone led to a
+# match.
+
+T <- gmodels::CrossTable(tbl.LR1)
 ```
 
-    ## [1] 89.7
+    ## 
+    ##  
+    ##    Cell Contents
+    ## |-------------------------|
+    ## |                       N |
+    ## | Chi-square contribution |
+    ## |           N / Row Total |
+    ## |           N / Col Total |
+    ## |         N / Table Total |
+    ## |-------------------------|
+    ## 
+    ##  
+    ## Total Observations in Table:  907 
+    ## 
+    ##  
+    ##              |  
+    ##              |         0 |         1 | Row Total | 
+    ## -------------|-----------|-----------|-----------|
+    ##        FALSE |       500 |        56 |       556 | 
+    ##              |    98.637 |   135.562 |           | 
+    ##              |     0.899 |     0.101 |     0.613 | 
+    ##              |     0.952 |     0.147 |           | 
+    ##              |     0.551 |     0.062 |           | 
+    ## -------------|-----------|-----------|-----------|
+    ##         TRUE |        25 |       326 |       351 | 
+    ##              |   156.246 |   214.736 |           | 
+    ##              |     0.071 |     0.929 |     0.387 | 
+    ##              |     0.048 |     0.853 |           | 
+    ##              |     0.028 |     0.359 |           | 
+    ## -------------|-----------|-----------|-----------|
+    ## Column Total |       525 |       382 |       907 | 
+    ##              |     0.579 |     0.421 |           | 
+    ## -------------|-----------|-----------|-----------|
+    ## 
+    ## 
 
-The accuracy of logistic regression model 1 is 89.7.
+``` r
+pr_a <- sum(T$prop.tbl[1], T$prop.tbl[4])
+pr_e <- ((T$prop.tbl[2] + T$prop.tbl[4]) * (T$prop.tbl[3] + T$prop.tbl[4])) + 
+    ((T$prop.tbl[1] + T$prop.tbl[3]) * (T$prop.tbl[1] + T$prop.tbl[2]))
 
-Logistic regression model 1 has a sensitivity of 90.3 and specificity of 89.4
+kappaLR1 <- round(((pr_a - pr_e)/(1 - pr_e)) * 100, 1)
+# kappaLR1
+```
+
+The accuracy of logistic regression model 1 is 91.1% with a Kappa statistic of 81.5%.
+
+Logistic regression model 1 has a sensitivity of 92.9% and specificity of 89.9%.
 
 The baseline accuracy is 1500/(1500+1091) = 58% i.e. if all outcomes were predicted as the most common value (in this case '0' or "With home") my baseline prediction would be accurate for 58% of the observations.
 
@@ -692,9 +746,9 @@ print(ROCauc_LR1@y.values)
 ```
 
     ## [[1]]
-    ## [1] 0.9577612
+    ## [1] 0.9665894
 
-The area under the curve (AUC) is 0.9577612
+The area under the curve (AUC) is 0.9665894
 
 Based on the ROC curve in Figure 1 a 0.5 probability threshold for classifying deaths as homeless vs. with home achieved the highest sensitivity (true positive rate) but decreased the specificity (1-False positive rate). I will need to check with program staff to see if it is more important to them to achieve a higher specificity (reduce false positives as much as possible) in which case I will rase the threshold to 0.8.
 
@@ -709,34 +763,7 @@ model.lr2 <- train(homelessFac ~ sex + race6cat + dplace5cat + educ4cat + age4ca
     manner + substance + LCOD3cat, data = HTrain, family = "binomial", method = "glm", 
     trControl = ctrl.LR2, tuneLength = 5)
 # allowParallel = TRUE)
-varImp(model.lr2)
 ```
-
-    ## glm variable importance
-    ## 
-    ##   only 20 most important variables shown (out of 24)
-    ## 
-    ##                              Overall
-    ## educ4catUnknown               100.00
-    ## dplace5catOther                99.75
-    ## age4cat45to64yrs               86.19
-    ## race6catOther.Unk              64.79
-    ## age4cat30to44yrs               61.91
-    ## educ4catHSGrad.GED             43.02
-    ## `substanceDrug-induced`        39.35
-    ## mannerUndet.Pending            36.43
-    ## sexM                           36.14
-    ## dplace5catER                   33.90
-    ## educ4catNoHSDiploma            33.27
-    ## race6catAIAN.NH                32.64
-    ## dplace5catHospital             28.83
-    ## mannerHomicide                 25.35
-    ## `substanceAlcohol-induced`     25.06
-    ## race6catAsianPI.NH             24.93
-    ## race6catBlack.NH               18.47
-    ## dplace5catHospice.LngTrmCare   17.99
-    ## mannerSuicide                  15.29
-    ## mannerAccident                 15.14
 
 #### 2b. Model 2: evaluate logistic regression model 2 using test data
 
@@ -757,30 +784,30 @@ cmlr2
     ## 
     ##            Reference
     ## Prediction  With home Homeless
-    ##   With home       490       58
-    ##   Homeless         35      324
+    ##   With home       500       56
+    ##   Homeless         25      326
     ##                                           
-    ##                Accuracy : 0.8975          
-    ##                  95% CI : (0.8759, 0.9164)
+    ##                Accuracy : 0.9107          
+    ##                  95% CI : (0.8902, 0.9284)
     ##     No Information Rate : 0.5788          
-    ##     P-Value [Acc > NIR] : < 2e-16         
+    ##     P-Value [Acc > NIR] : < 2.2e-16       
     ##                                           
-    ##                   Kappa : 0.788           
-    ##  Mcnemar's Test P-Value : 0.02253         
+    ##                   Kappa : 0.8148          
+    ##  Mcnemar's Test P-Value : 0.0008581       
     ##                                           
-    ##             Sensitivity : 0.8482          
-    ##             Specificity : 0.9333          
-    ##          Pos Pred Value : 0.9025          
-    ##          Neg Pred Value : 0.8942          
+    ##             Sensitivity : 0.8534          
+    ##             Specificity : 0.9524          
+    ##          Pos Pred Value : 0.9288          
+    ##          Neg Pred Value : 0.8993          
     ##              Prevalence : 0.4212          
-    ##          Detection Rate : 0.3572          
-    ##    Detection Prevalence : 0.3958          
-    ##       Balanced Accuracy : 0.8908          
+    ##          Detection Rate : 0.3594          
+    ##    Detection Prevalence : 0.3870          
+    ##       Balanced Accuracy : 0.9029          
     ##                                           
     ##        'Positive' Class : Homeless        
     ## 
 
-The accuracy of the logistic regression model 2 is almost identical to that of the first logistic regression model. However, the sensitivity for logistic regression model 2 is 84.8 which is lower than the sensitivity of model 1 (90.3) while the specificity of model 2 is 93.3 which is higher than the specificity for model 1 (89.4).
+The accuracy of the logistic regression model 2 is almost identical to that of the first logistic regression model. However, the sensitivity for logistic regression model 2 is 85.3 which is lower than the sensitivity of model 1 (92.9) while the specificity of model 2 is 95.2 which is higher than the specificity for model 1 (89.9).
 
 II. NAIVE BAYES CLASSIFIER
 --------------------------
@@ -799,7 +826,7 @@ literal <- subset(literal, select = c(status, CODliteral))
 str(literal)
 ```
 
-    ## 'data.frame':    175391 obs. of  2 variables:
+    ## 'data.frame':    175393 obs. of  2 variables:
     ##  $ status    : chr  "Homeless" "Homeless" "Homeless" "Homeless" ...
     ##  $ CODliteral: chr  "COMBINED OPIATE (HEROIN), METHAMPHETAMINE, AND DIPHENHYDRAMINE INTOXICATION     TOXIC USE OF DRUGS" "UNDETERMINED     FOUND DEAD IN JAIL CELL." "ACUTE METHAMPHETAMINE INTOXICATION    HYPERTENSIVE AND ATHEROSCLEROTIC CARDIOVASCULAR DISEASE TOXIC USE OF A DRUG" "ACUTE COMBINED METHAMPHETAMINE AND DEXTROMETHORPHAN INTOXICATION    ATHEROSCLEROTIC AND HYPERTENSIVE CARDIOVASC"| __truncated__ ...
 
@@ -818,7 +845,7 @@ table(literal$status)
 
     ## 
     ##  Homeless With home 
-    ##      1093    174298
+    ##      1093    174300
 
 ``` r
 # to remove the problem of unbalanced data I will restrict the 'with home'
@@ -839,8 +866,8 @@ summary(wh)
 ```
 
     ##        status        CODliteral       
-    ##  Homeless :     0   Length:174298     
-    ##  With home:174298   Class :character  
+    ##  Homeless :     0   Length:174300     
+    ##  With home:174300   Class :character  
     ##                     Mode  :character
 
 ``` r
@@ -853,7 +880,7 @@ str(literal2)
 
     ## 'data.frame':    2593 obs. of  2 variables:
     ##  $ status    : Factor w/ 2 levels "Homeless","With home": 2 1 1 2 2 2 1 1 2 1 ...
-    ##  $ CODliteral: chr  "ALZHEIMERS DEMENTIA    CVA W/ RESIDUAL PARTIAL PARESIS.  BREAST CANCER W/ SOME METASTASIS. " "ACUTE ETHANOL INTOXICATION    CHRONIC ETHANOLISM CONSUMED EXCESS OF ETHANOL" "COMBINED METHADONE, COCAINE AND CLONAZEPAM INTOXICATION     TOXIC USE OF DRUGS" "ELECTROLYTE DISTURBANCES DYSPHAGIA ADULT FAILURE TO THRIVE SEVERE DEMENTIA HTN, CHF, COPD " ...
+    ##  $ CODliteral: chr  "ASTHMA LOW GRADE LYMPHOMA    " "ACUTE ETHANOL INTOXICATION    CHRONIC ETHANOLISM CONSUMED EXCESS OF ETHANOL" "COMBINED METHADONE, COCAINE AND CLONAZEPAM INTOXICATION     TOXIC USE OF DRUGS" "ACUTE METHADONE INTOXICATION     TOXIC USE OF A DRUG" ...
 
 ``` r
 table(literal2$status)
@@ -917,10 +944,10 @@ h_dtm <- DocumentTermMatrix(h_corpus_clean)
 h_dtm
 ```
 
-    ## <<DocumentTermMatrix (documents: 2593, terms: 1962)>>
-    ## Non-/sparse entries: 17505/5069961
+    ## <<DocumentTermMatrix (documents: 2593, terms: 1991)>>
+    ## Non-/sparse entries: 17495/5145168
     ## Sparsity           : 100%
-    ## Maximal term length: 29
+    ## Maximal term length: 24
     ## Weighting          : term frequency (tf)
 
 ### Creating training and test datasets
@@ -1009,25 +1036,25 @@ cmnb1
     ## 
     ##            Reference
     ## Prediction  Homeless With home
-    ##   Homeless       887       129
-    ##   With home      206      1370
+    ##   Homeless       886       130
+    ##   With home      207      1369
     ##                                           
-    ##                Accuracy : 0.8708          
-    ##                  95% CI : (0.8572, 0.8834)
+    ##                Accuracy : 0.87            
+    ##                  95% CI : (0.8564, 0.8827)
     ##     No Information Rate : 0.5783          
     ##     P-Value [Acc > NIR] : < 2.2e-16       
     ##                                           
-    ##                   Kappa : 0.7325          
-    ##  Mcnemar's Test P-Value : 3.291e-05       
+    ##                   Kappa : 0.7309          
+    ##  Mcnemar's Test P-Value : 3.473e-05       
     ##                                           
-    ##             Sensitivity : 0.8115          
-    ##             Specificity : 0.9139          
-    ##          Pos Pred Value : 0.8730          
-    ##          Neg Pred Value : 0.8693          
+    ##             Sensitivity : 0.8106          
+    ##             Specificity : 0.9133          
+    ##          Pos Pred Value : 0.8720          
+    ##          Neg Pred Value : 0.8687          
     ##              Prevalence : 0.4217          
-    ##          Detection Rate : 0.3422          
+    ##          Detection Rate : 0.3418          
     ##    Detection Prevalence : 0.3920          
-    ##       Balanced Accuracy : 0.8627          
+    ##       Balanced Accuracy : 0.8619          
     ##                                           
     ##        'Positive' Class : Homeless        
     ## 
@@ -1049,7 +1076,7 @@ h.model.nb2
     ## Naive Bayes 
     ## 
     ## 1815 samples
-    ##  405 predictor
+    ##  407 predictor
     ##    2 classes: 'Homeless', 'With home' 
     ## 
     ## No pre-processing
@@ -1058,7 +1085,7 @@ h.model.nb2
     ## Resampling results:
     ## 
     ##   Accuracy   Kappa    
-    ##   0.8721693  0.7357374
+    ##   0.8638941  0.7186694
     ## 
     ## Tuning parameter 'fL' was held constant at a value of 1
     ## Tuning
@@ -1077,27 +1104,27 @@ cmnb2
     ## 
     ##            Reference
     ## Prediction  Homeless With home
-    ##   Homeless       903       138
-    ##   With home      190      1361
-    ##                                        
-    ##                Accuracy : 0.8735       
-    ##                  95% CI : (0.86, 0.886)
-    ##     No Information Rate : 0.5783       
-    ##     P-Value [Acc > NIR] : < 2.2e-16    
-    ##                                        
-    ##                   Kappa : 0.7389       
-    ##  Mcnemar's Test P-Value : 0.004863     
-    ##                                        
-    ##             Sensitivity : 0.8262       
-    ##             Specificity : 0.9079       
-    ##          Pos Pred Value : 0.8674       
-    ##          Neg Pred Value : 0.8775       
-    ##              Prevalence : 0.4217       
-    ##          Detection Rate : 0.3484       
-    ##    Detection Prevalence : 0.4016       
-    ##       Balanced Accuracy : 0.8671       
-    ##                                        
-    ##        'Positive' Class : Homeless     
+    ##   Homeless       895       136
+    ##   With home      198      1363
+    ##                                           
+    ##                Accuracy : 0.8711          
+    ##                  95% CI : (0.8576, 0.8838)
+    ##     No Information Rate : 0.5783          
+    ##     P-Value [Acc > NIR] : < 2.2e-16       
+    ##                                           
+    ##                   Kappa : 0.7338          
+    ##  Mcnemar's Test P-Value : 0.0008445       
+    ##                                           
+    ##             Sensitivity : 0.8188          
+    ##             Specificity : 0.9093          
+    ##          Pos Pred Value : 0.8681          
+    ##          Neg Pred Value : 0.8732          
+    ##              Prevalence : 0.4217          
+    ##          Detection Rate : 0.3453          
+    ##    Detection Prevalence : 0.3978          
+    ##       Balanced Accuracy : 0.8641          
+    ##                                           
+    ##        'Positive' Class : Homeless        
     ## 
 
 ### (C) Comparison of accuracy of the two Naive Bayes classfiers
@@ -1154,7 +1181,7 @@ Kappa
 73 %
 </td>
 <td style="text-align:right;">
-74 %
+73 %
 </td>
 </tr>
 <tr>
@@ -1165,7 +1192,7 @@ Sensitivity
 81 %
 </td>
 <td style="text-align:right;">
-83 %
+82 %
 </td>
 </tr>
 <tr>
@@ -1181,14 +1208,14 @@ Specificity
 </tr>
 </tbody>
 </table>
-III. RANDOM FORESTS
--------------------
+III. RANDOM FOREST
+------------------
 
-Random forests classifier is an ensemble method that uses the prediction information generated by multiple individual models into a more accurate, single model. One advantage of using this method is that the biases of individual models do not carry disproportionate weight. Another benefit is that this type of classifier operates more efficiently than individual models because each model in the random forests ensemble is fed a random subset of the training data rather than the entire training data set as with individual models.
+Random forest classifier is an ensemble method that uses the prediction information generated by multiple individual models into a more accurate, single model. One advantage of using this method is that the biases of individual models do not carry disproportionate weight. Another benefit is that this type of classifier operates more efficiently than individual models because each model in the random forest ensemble is fed a random subset of the training data rather than the entire training data set as with individual models.
 
-Random forests models predict the class of an observation by using a decision tree or flow-chart method where each successive split in a branch of the decision tree is designed to separate data into increasingly homogeneous classes based on the attributes of the observations. The target classes are the homeless status of the decedent as with the logistic regression and Naive Bayes classifiers, and the attributes of the decedents are the same features used in the logistic regression models i.e. sex, age, place of death, race/ethnicity, educational attainment, whether or not the underlying cause of death was substance-related, whether the underlying cause of death was chronic, injury-related, or other.
+Random forest models predict the class of an observation by using a decision tree or flow-chart method where each successive split in a branch of the decision tree is designed to separate data into increasingly homogeneous classes based on the attributes of the observations. The target classes are the homeless status of the decedent as with the logistic regression and Naive Bayes classifiers, and the attributes of the decedents are the same features used in the logistic regression models i.e. sex, age, place of death, race/ethnicity, educational attainment, whether or not the underlying cause of death was substance-related, whether the underlying cause of death was chronic, injury-related, or other.
 
-In this section I will train a final random forests model after training preliminary models to identify the best values for tuning parameters.
+In this section I will train a final random forest model after training preliminary models to identify the best values for tuning parameters.
 
 ### A. Split data into training and testing data sets
 
@@ -1253,17 +1280,17 @@ model.rf1
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##   1     0.8330969  0.6469951
-    ##   2     0.8770664  0.7479671
-    ##   3     0.8803849  0.7558175
-    ##   4     0.8852585  0.7664508
-    ##   5     0.8847890  0.7657168
-    ##   6     0.8816931  0.7593235
-    ##   7     0.8790969  0.7536595
-    ##   8     0.8767279  0.7488104
+    ##   1     0.8362671  0.6523756
+    ##   2     0.8797036  0.7511093
+    ##   3     0.8848587  0.7636725
+    ##   4     0.8908203  0.7766801
+    ##   5     0.8933746  0.7825626
+    ##   6     0.8928125  0.7815042
+    ##   7     0.8904064  0.7765431
+    ##   8     0.8899304  0.7753174
     ## 
     ## Kappa was used to select the optimal model using the largest value.
-    ## The final value used for the model was mtry = 4.
+    ## The final value used for the model was mtry = 5.
 
 ``` r
 plot(model.rf1)
@@ -1305,17 +1332,17 @@ summary(results)
     ## 
     ## Accuracy 
     ##           Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-    ## 500  0.8453039 0.8748330 0.8950276 0.8908617 0.9009623 0.9281768    0
-    ## 1000 0.8453039 0.8731027 0.8950276 0.8899429 0.9005525 0.9281768    0
-    ## 1500 0.8453039 0.8748330 0.8950276 0.8904954 0.9005525 0.9281768    0
-    ## 2000 0.8453039 0.8748330 0.8950276 0.8908627 0.9048327 0.9281768    0
+    ## 500  0.8571429 0.8858372 0.9033149 0.8998685 0.9103500 0.9505495    0
+    ## 1000 0.8516484 0.8895028 0.9060773 0.8996863 0.9116022 0.9450549    0
+    ## 1500 0.8461538 0.8896545 0.9033149 0.8996863 0.9116022 0.9450549    0
+    ## 2000 0.8461538 0.8858372 0.9033149 0.8995032 0.9116022 0.9450549    0
     ## 
     ## Kappa 
-    ##           Min.   1st Qu.   Median      Mean   3rd Qu.      Max. NA's
-    ## 500  0.6870163 0.7488570 0.786847 0.7786422 0.8010220 0.8533682    0
-    ## 1000 0.6870163 0.7438129 0.786847 0.7768221 0.8000425 0.8533682    0
-    ## 1500 0.6870163 0.7476232 0.786847 0.7779546 0.8000425 0.8544206    0
-    ## 2000 0.6870163 0.7476232 0.786847 0.7787339 0.8060481 0.8544206    0
+    ##           Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+    ## 500  0.7093723 0.7703485 0.8028107 0.7962749 0.8187733 0.8999145    0
+    ## 1000 0.6976744 0.7741949 0.8079030 0.7958933 0.8206605 0.8889838    0
+    ## 1500 0.6859362 0.7776039 0.8024464 0.7958847 0.8206605 0.8889838    0
+    ## 2000 0.6859362 0.7703485 0.8024464 0.7955111 0.8206605 0.8889838    0
 
 ``` r
 lattice::dotplot(results)
@@ -1323,7 +1350,7 @@ lattice::dotplot(results)
 
 <img src="HomelessDeaths3_MLclassifiers_files/figure-markdown_github/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
 
-While the mean value of the Kappa statistic is almost identical regardless of how many trees are used in the model, the maximum accuracy was obtained using 1,500 trees. Using mtry of 5 and ntree of 1,500 I will run a final random forests model.
+While the mean value of the Kappa statistic is almost identical regardless of how many trees are used in the model, the maximum accuracy was obtained using 1,500 trees. Using mtry of 5 and ntree of 1,500 I will run a final random forest model.
 
 ### C. Final Random Forests model
 
@@ -1333,8 +1360,6 @@ Based on the exploration above I selected tuning options of mtry = 5 (number of 
 
 ``` r
 ## ntree = 1500 and mtry = 5
-
-
 model.rf1.fin <- randomForest(homelessFac ~ sex + race6cat + manner + educ4cat + 
     LCOD3cat + age4cat + substance + injury, data = train.rf, importance = TRUE, 
     mtry = 5, ntree = 1500, na.action = na.roughfix)
@@ -1349,94 +1374,548 @@ model.rf1.fin
     ##                      Number of trees: 1500
     ## No. of variables tried at each split: 5
     ## 
-    ##         OOB estimate of  error rate: 11.41%
+    ##         OOB estimate of  error rate: 11.36%
     ## Confusion matrix:
     ##           With home Homeless class.error
-    ## With home       925      125   0.1190476
-    ## Homeless         82      682   0.1073298
-
-``` r
-varImp(model.rf1.fin)
-```
-
-    ##           With home  Homeless
-    ## sex        40.53121  40.53121
-    ## race6cat   54.80827  54.80827
-    ## manner     57.24380  57.24380
-    ## educ4cat  112.81222 112.81222
-    ## LCOD3cat   11.68764  11.68764
-    ## age4cat    99.24220  99.24220
-    ## substance  32.88450  32.88450
-    ## injury     19.72395  19.72395
-
-The table above shows that the features that were most important in classifying deaths by homeless atatus were sex, race/ethnicity, educational status, age group, and substance use related cause of death.
+    ## With home       940      110   0.1047619
+    ## Homeless         96      668   0.1256545
 
 #### 2. Evaluating accuracy of Random Forests model 1 (final) with test data
 
 ``` r
 ## predictive accuracy of final random forest model on test data
-
+library(randomForest)
+library(caret)
 predictrf.final <- predict(model.rf1.fin, test.rf, type = "response")
 
 # check classification accuracy - using test/validation data
 
 tbl.RF2 <- table(predictrf.final, test.rf$homelessFac)
 
-cmrf_1 <- confusionMatrix(data = predictrf.final, test.rf$homelessFac)
-cmrf_1
+cmrf1 <- confusionMatrix(data = predictrf.final, test.rf$homelessFac)
+cmrf1
 ```
 
     ## Confusion Matrix and Statistics
     ## 
     ##            Reference
     ## Prediction  With home Homeless
-    ##   With home       405       38
-    ##   Homeless         45      289
-    ##                                          
-    ##                Accuracy : 0.8932         
-    ##                  95% CI : (0.8693, 0.914)
-    ##     No Information Rate : 0.5792         
-    ##     P-Value [Acc > NIR] : <2e-16         
-    ##                                          
-    ##                   Kappa : 0.7815         
-    ##  Mcnemar's Test P-Value : 0.5102         
-    ##                                          
-    ##             Sensitivity : 0.9000         
-    ##             Specificity : 0.8838         
-    ##          Pos Pred Value : 0.9142         
-    ##          Neg Pred Value : 0.8653         
-    ##              Prevalence : 0.5792         
-    ##          Detection Rate : 0.5212         
-    ##    Detection Prevalence : 0.5701         
-    ##       Balanced Accuracy : 0.8919         
-    ##                                          
-    ##        'Positive' Class : With home      
+    ##   With home       413       54
+    ##   Homeless         37      273
+    ##                                           
+    ##                Accuracy : 0.8829          
+    ##                  95% CI : (0.8582, 0.9046)
+    ##     No Information Rate : 0.5792          
+    ##     P-Value [Acc > NIR] : < 2e-16         
+    ##                                           
+    ##                   Kappa : 0.758           
+    ##  Mcnemar's Test P-Value : 0.09349         
+    ##                                           
+    ##             Sensitivity : 0.9178          
+    ##             Specificity : 0.8349          
+    ##          Pos Pred Value : 0.8844          
+    ##          Neg Pred Value : 0.8806          
+    ##              Prevalence : 0.5792          
+    ##          Detection Rate : 0.5315          
+    ##    Detection Prevalence : 0.6010          
+    ##       Balanced Accuracy : 0.8763          
+    ##                                           
+    ##        'Positive' Class : With home       
     ## 
 
-Accuracy of random forests model 1 (using randomForests package) on test data set is 89.3% and Kappa statistic is 78.2%.
+Accuracy of random forest model 1 (using randomForests package) on test data set is 88.3% and Kappa statistic is 75.8%.
 
 IV. Discussion
 --------------
 
 ### A. Comparing model performance
 
-The three methods for classifying deaths by homeless status that I tried were logistic regression, Naive Bayes classification, and random forests. The three methods achieved accuracy levels ranging from the low 70% to the low 80% range. The table below shows a comparison of the overall accuracy, Kappa statistic, and sensitivity and specificity. The Kappa statistic is a measure of accuracy that takes into account the possibility that agreement between actual and predicted classes occurred by chance. It is useful when data are imbalanced. In this project I achieved balance between the two classes by undersampling the "with home" decedents.
+The three methods for classifying deaths by homeless status that I tried were logistic regression, Naive Bayes classification, and random forest. The three methods achieved accuracy levels ranging from the low 70% to the low 80% range. The table below shows a comparison of the overall accuracy, Kappa statistic, and sensitivity and specificity. The Kappa statistic is a measure of accuracy that takes into account the possibility that agreement between actual and predicted classes occurred by chance. It is useful when data are imbalanced. In this project I achieved balance between the two classes by undersampling the "with home" decedents.
 
 ``` r
 # insert comparison table of 3 models
+Accuracy <- c(paste(round(cmnb1$overall[1] * 100), "%"), paste(round(cmnb2$overall[1] * 
+    100), "%"), paste(accuracyLR1, "%"), paste(round(cmlr2$overall[1] * 100), 
+    "%"), paste(round(cmrf1$overall[1] * 100), "%"))
+
+Kappa <- c(paste(round(cmnb1$overall[2] * 100), "%"), paste(round(cmnb2$overall[2] * 
+    100), "%"), paste(kappaLR1, "%"), paste(round(cmlr2$overall[2] * 100), "%"), 
+    paste(round(cmrf1$overall[2] * 100), "%"))
+
+Sensitivity <- c(paste(round(cmnb1$byClass[1] * 100), "%"), paste(round(cmnb2$byClass[1] * 
+    100), "%"), paste(sensitivityLR1, "%"), paste(round(cmlr2$byClass[1] * 100), 
+    "%"), paste(round(cmrf1$byClass[1] * 100), "%"))
+
+Specificity <- c(paste(round(cmnb1$byClass[2] * 100), "%"), paste(round(cmnb2$byClass[2] * 
+    100), "%"), paste(specificityLR1, "%"), paste(round(cmlr2$byClass[2] * 100), 
+    "%"), paste(round(cmrf1$byClas[2] * 100), "%"))
+
+modelcompare <- rbind(Accuracy, Kappa, Sensitivity, Specificity)
+modelcompare <- data.frame(modelcompare)
+names(modelcompare) <- c("Naive Bayes <br> Model 1", "Naive Bayes <br> Model 2", 
+    "Logistic Regression <br> Model 1", "Logistic Regression <br> Model 2", 
+    "Random Forests Model")
+
+formattable::formattable(modelcompare)
 ```
+
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Naive Bayes <br> Model 1
+</th>
+<th style="text-align:right;">
+Naive Bayes <br> Model 2
+</th>
+<th style="text-align:right;">
+Logistic Regression <br> Model 1
+</th>
+<th style="text-align:right;">
+Logistic Regression <br> Model 2
+</th>
+<th style="text-align:right;">
+Random Forests Model
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Accuracy
+</td>
+<td style="text-align:right;">
+87 %
+</td>
+<td style="text-align:right;">
+87 %
+</td>
+<td style="text-align:right;">
+91.1 %
+</td>
+<td style="text-align:right;">
+91 %
+</td>
+<td style="text-align:right;">
+88 %
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Kappa
+</td>
+<td style="text-align:right;">
+73 %
+</td>
+<td style="text-align:right;">
+73 %
+</td>
+<td style="text-align:right;">
+81.5 %
+</td>
+<td style="text-align:right;">
+81 %
+</td>
+<td style="text-align:right;">
+76 %
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sensitivity
+</td>
+<td style="text-align:right;">
+81 %
+</td>
+<td style="text-align:right;">
+82 %
+</td>
+<td style="text-align:right;">
+92.9 %
+</td>
+<td style="text-align:right;">
+85 %
+</td>
+<td style="text-align:right;">
+92 %
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Specificity
+</td>
+<td style="text-align:right;">
+91 %
+</td>
+<td style="text-align:right;">
+91 %
+</td>
+<td style="text-align:right;">
+89.9 %
+</td>
+<td style="text-align:right;">
+95 %
+</td>
+<td style="text-align:right;">
+83 %
+</td>
+</tr>
+</tbody>
+</table>
+``` r
+modelcompare
+```
+
+    ##             Naive Bayes <br> Model 1 Naive Bayes <br> Model 2
+    ## Accuracy                        87 %                     87 %
+    ## Kappa                           73 %                     73 %
+    ## Sensitivity                     81 %                     82 %
+    ## Specificity                     91 %                     91 %
+    ##             Logistic Regression <br> Model 1
+    ## Accuracy                              91.1 %
+    ## Kappa                                 81.5 %
+    ## Sensitivity                           92.9 %
+    ## Specificity                           89.9 %
+    ##             Logistic Regression <br> Model 2 Random Forests Model
+    ## Accuracy                                91 %                 88 %
+    ## Kappa                                   81 %                 76 %
+    ## Sensitivity                             85 %                 92 %
+    ## Specificity                             95 %                 83 %
+
+The logistic regression models and the random forest model appear to have the highest overall accuracy (in the 90-91% range) and higher Kappa statistics (79-81%). Importantly, logistic regression model 2 has a high specificity meaning that the deaths classified as homeless using this method are less likely to have false positive cases which is of greater value than having higher sensitivity.
 
 ### B. Importance of predictors to models
 
-The relative importance of features in the logistic regression model and the random forests model are similar.
+The relative importance of features in the logistic regression model and the random forest model are similar. The tables below show the relative importance of the predictors in training the models.
 
--   describe similarities and differences
+The variable importance table for logistic regression model 2 (first table below) indicates that educational attainment, place of death, age, race, sex, and substance-related cause of death were all important to training the model to distinguish between homeless decedents and those with homes. In the random forest model sex, race, age, educational attainment, and substance-relate cause of death were oncea agin important to training the classifier. In addition to these variables, manner of death was also important to the random forest model
 
+``` r
+VIlr <- varImp(model.lr2)
+VIrf <- varImp(model.rf1.fin)
+formattable::formattable(VIlr$importance)
+```
+
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Overall
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sexM
+</td>
+<td style="text-align:right;">
+41.3300506
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6catAIAN.NH
+</td>
+<td style="text-align:right;">
+10.6875728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6catAsianPI.NH
+</td>
+<td style="text-align:right;">
+17.6680263
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6catBlack.NH
+</td>
+<td style="text-align:right;">
+2.0608346
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6catHispanic
+</td>
+<td style="text-align:right;">
+5.2257011
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6catOther.Unk
+</td>
+<td style="text-align:right;">
+62.9474894
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dplace5catER
+</td>
+<td style="text-align:right;">
+21.7772432
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dplace5catHospice.LngTrmCare
+</td>
+<td style="text-align:right;">
+21.7643503
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dplace5catHospital
+</td>
+<td style="text-align:right;">
+31.4605398
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dplace5catOther
+</td>
+<td style="text-align:right;">
+100.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+educ4catNoHSDiploma
+</td>
+<td style="text-align:right;">
+44.5862504
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+educ4catHSGrad.GED
+</td>
+<td style="text-align:right;">
+29.6081359
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+educ4catUnknown
+</td>
+<td style="text-align:right;">
+95.7288143
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+`age4cat<29yrs`
+</td>
+<td style="text-align:right;">
+13.1444896
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+age4cat30to44yrs
+</td>
+<td style="text-align:right;">
+69.5488328
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+age4cat45to64yrs
+</td>
+<td style="text-align:right;">
+78.0695823
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mannerAccident
+</td>
+<td style="text-align:right;">
+0.7519074
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mannerHomicide
+</td>
+<td style="text-align:right;">
+21.6864868
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mannerUndet.Pending
+</td>
+<td style="text-align:right;">
+29.8825255
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mannerSuicide
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+`substanceAlcohol-induced`
+</td>
+<td style="text-align:right;">
+25.0764075
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+`substanceDrug-induced`
+</td>
+<td style="text-align:right;">
+25.1303410
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LCOD3catLCOD.Other
+</td>
+<td style="text-align:right;">
+6.7124834
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LCOD3catLCOD.ExtCause
+</td>
+<td style="text-align:right;">
+4.1603888
+</td>
+</tr>
+</tbody>
+</table>
+``` r
+formattable::formattable(VIrf)
+```
+
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+With home
+</th>
+<th style="text-align:right;">
+Homeless
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sex
+</td>
+<td style="text-align:right;">
+34.50397
+</td>
+<td style="text-align:right;">
+34.50397
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+race6cat
+</td>
+<td style="text-align:right;">
+83.88713
+</td>
+<td style="text-align:right;">
+83.88713
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+manner
+</td>
+<td style="text-align:right;">
+65.93217
+</td>
+<td style="text-align:right;">
+65.93217
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+educ4cat
+</td>
+<td style="text-align:right;">
+125.61764
+</td>
+<td style="text-align:right;">
+125.61764
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+LCOD3cat
+</td>
+<td style="text-align:right;">
+21.65476
+</td>
+<td style="text-align:right;">
+21.65476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+age4cat
+</td>
+<td style="text-align:right;">
+105.09423
+</td>
+<td style="text-align:right;">
+105.09423
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+substance
+</td>
+<td style="text-align:right;">
+30.88561
+</td>
+<td style="text-align:right;">
+30.88561
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+injury
+</td>
+<td style="text-align:right;">
+21.46157
+</td>
+<td style="text-align:right;">
+21.46157
+</td>
+</tr>
+</tbody>
+</table>
 ### C. Next steps
 
 The accuracy of the models depends on the amount of information used to train the models both in terms of the number of observations and also in terms of the number of relevant predictors. Additional labeled records for decedents who died homeless in King County, WA will be useful in validating the accuracy of the models trained in this project.
 
-To improve the logistic regression and random forests models I will examine two predictors (leading causes of death and substance abuse-related cause of death) to check further for multicollinearity. Specifically, I will recode the leading cause of death variable to exclude any ICD-10 code that also appears in the substance-use related cause of death variable in order to keep them independent of each other.
+To improve the logistic regression and random forest models I will examine two predictors (leading causes of death and substance abuse-related cause of death) to check further for multicollinearity. Specifically, I will recode the leading cause of death variable to exclude any ICD-10 code that also appears in the substance-use related cause of death variable in order to keep them independent of each other.
 
 To improve the Naive Bayes classifier I will include the text field that captures the residential street address of the decedent as well as the field capturing location of injury (which is completed if the death was caused by injury). It is possible that death certifiers use some type of convention to indicate homelessness e.g. reporting a street corner where decedent was found if the death occurred on a street. This text in combination with the cause of death text may be useful in creating an even more accurate classifier.
 
