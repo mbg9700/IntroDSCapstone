@@ -1,0 +1,691 @@
+---
+title: "III. Classification of Homeless Deaths: training machine learning models"
+author: "Maya Bhat-Gregerson"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  github_document:
+      toc: TRUE
+      toc_depth: 4
+---
+
+```{r message=FALSE}
+
+library(caTools)
+library(magrittr)
+library(tidyverse)
+library(knitr)
+library(epiDisplay)
+library(ROCR)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(e1071)
+library(gmodels)
+library(randomForest)
+library(caret)
+library(klaR)
+library(plyr)
+library(doParallel)
+
+#cls <- makeCluster(4)
+#registerDoParallel(cls)
+
+knitr::opts_chunk$set(fig.width = 9, fig.align = "center", message = FALSE, warning = FALSE, echo = TRUE, tidy = TRUE)
+```
+
+## INTRODUCTION
+
+This is the third and final section of this project in which I train machine learning models that can classify deaths by homeless status.
+
+In the exploratory data analysis phase I was able to identify a number of independent variables that are strongly associated with homelessness.  These features include sex, race and ethnicity (5 groups including Hispanic as race), place of death (e.g. home, hospital, hospice, etc), manner of death (natural, homicide, suicide, accident, or undetermined), leading cause of death (groupings of ICD 10 codes), educational attainment, age group, type of injury involved in death (no injury, motor vehicle injury, fall, poisoning), and whether underlying cause of death was due to drug or alcohol use.  All predictors are categorical variables.
+
+
+## I. LOGISTIC REGRESSION MODEL
+
+### A. Read, subset, and prepare data
+
+I trained a number of logistic regression models and made modifications with each iteration to improve performance as measured by the relative AIC of the models.  Some of the changes I made from one attempt to the next include:
+
+  - removing predictors that did not add information to the model (as indicated by the AIC value in the summary statistics),
+  - removing predictors that were not strongly correlated with the outcome in the model (as indicated by the asterisks in the summary statistics),
+  - aggregating levels within predictor variables to achieve a minimum cell size of 10 when the predictor was tabulated against the outcome,
+  - addressing data imbalance by reducing the number of observations.  I included all deaths to homeless individuals (n = 1,090) and undersampled deaths among persons with home reducing this number from roughly 174,000 observations to 1,500 randomly selected deaths.
+
+
+```{r}
+#READ FINAL HOMELESS FILE (CREATED AT THE END OF DATA WRANGLING PHASE)
+
+homeless <- read.csv("HomelessFinal.csv")
+h1 <- subset(homeless, select= c("sex", "raceethnic5", "manner", "dplacecode", "educ", "age5cat", "LCOD", "status", "injury", "substance"))
+
+#CONVERT 'STATUS' VARIABLE (HOMELESS STATUS) TO NUMERIC VARIABLE AND CREATE A DUPLICATE VARIABLE
+#CALLED 'HOMELESS' THAT IS THEN RECODED FROM VALUES 1 = HOMELESS, 2 = WITH HOME TO
+#0 = WITH HOME AND 1 = HOMELESS FOR USE IN LOGISTIC REGRESSION MODEL
+str(h1$status)
+
+table(h1$status)
+table(as.numeric(h1$status))
+h1$status <- relevel(h1$status, ref = "With home")
+
+
+h1$homeless <- h1$status
+h1$homeless <-as.numeric(h1$homeless)
+table(h1$homeless)
+h1$homeless[h1$homeless==1]<-0
+h1$homeless[h1$homeless==2]<-1
+str(h1$status)
+str(h1$homeless)
+table(h1$status,h1$homeless)
+
+#TO CREATE A BALANCED DATASET LIMIT OBSERVATIONS TO ALL HOMELESS AND 1,500 DECEDENTS WITH HOME.
+
+withhome <- subset(h1, status=="With home")
+homeless <- subset(h1, status=="Homeless")
+withhome_sample <- sample_n(withhome, 1500)
+h1 <- rbind(withhome_sample, homeless)
+table(h1$status,h1$homeless)
+
+#RENAME 'STATUS' TO 'HOMELESSFAC' (HOMELESS STATUS AS FACTOR)
+names(h1)[names(h1)=="status"] <- "homelessFac"
+str(h1$homeless)
+str(h1$homelessFac)
+table(h1$homeless, h1$homelessFac)
+
+#CREATE A COPY OF THE FINAL DATA SET JUST IN CASE...
+h2 <- h1
+
+#SET SEED TO REPLICATE MODEL OUTCOMES
+set.seed(1234)
+
+#RANDOMIZE ROWS
+h2 <- h2[sample(nrow(h2)),] 
+head(h2$homelessFac, n=20)
+
+
+#RUN CROSSTABULATIONS WITH OUTCOME VARIABLE x EACH OF THE PREDICTOR VARIABLES
+#CHECK CELL SIZE FOR n<10 - AGGREGATE LEVELS TO GET LARGER CELL SIZE WHEN n <10
+
+#ALSO CHECK FOR MISSING VALUES AND CODETHESE AS NA
+
+#SEX
+table(h2$sex)              
+#replacE "unknown" values from predictors with NA
+levels(h2$sex)[levels(h2$sex)=="U"] <- NA
+
+#LEADING CAUSES OF DEATH
+table(h2$homeless, h2$LCOD)
+#create new variable with aggregated levels 
+#reduce from 10 to 3 levels: chronic, external cause (injury), and other leading causes of death
+h2$LCOD3cat <- fct_collapse(h2$LCOD,
+                            LCOD.Chronic = c("Alzheimers", "Cancer", "Heart Dis.", "Chronic Lwr Resp Dis.", "Stroke", "Diabetes", "Chronic Liver dis./cirrh."),
+                            LCOD.ExtCause = c("Injury-unintentional", "Suicide-all"),
+                            LCOD.Other = c("Flu", "Other"))
+
+table(h2$homeless, h2$LCOD3cat)
+
+#DEATH PLACE CODE
+table(h2$homeless, h2$dplacecode)
+#create new variable with 5 instead of 10 levels
+h2$dplace5cat <- fct_collapse(h2$dplacecode,
+                              ER = c("ER", "In transport"),
+                              Hospital = c("Hospital", "Hospital inpatient"),
+                              Home = "Home",
+                              Hospice.LngTrmCare = c("Hospice","Nursing home/Longterm care"),
+                              Other = c( "Other", "Unknown", "Other person's home"))
+
+table(h2$dplacecode, h2$dplace5cat)
+
+#EDUCATIONAL ATTAINMENT
+table(h2$homeless, h2$educ)
+#create new variable with 4 instead of 10 levels
+h2$educ4cat <- fct_collapse(h2$educ,
+                         NoHSDiploma = c("<=8th grade", "9-12th gr., no diploma"),
+                         HSGrad.GED = "H.S. grad/GED",
+                         HSDipl.OrMore = c("Associate's", "Bachelors", "Some college","Masters", "Doctorate/Professional"),
+                         Unknown = "Unknown")
+
+table(h2$educ, h2$educ4cat)
+
+
+#RACE/ETHNICITY
+table(h2$homeless, h2$raceethnic5)
+
+#collapse 'other' and 'unknown' levels into one
+
+h2$race6cat <- fct_collapse(h2$raceethnic5,
+                               AIAN.NH = "AIAN NH",
+                               AsianPI.NH = "Asian/PI NH",
+                               Black.NH = "Black NH",
+                               Hispanic = "Hispanic",
+                               White.NH = "White NH",
+                               Other.Unk = c("Other", "Unknown"))
+
+table(h2$raceethnic5, h2$race6cat)
+
+#MANNER OF DEATH
+table(h2$homeless, h2$manner)
+# collapsing factors to get rid of pendings (n= 0)
+
+h2$manner <- fct_collapse(h2$manner,
+                          Accident = "Accident",
+                          Homicide = "Homicide",
+                          Natural = "Natural",
+                          Suicide = "Suicide",
+                          Undet.Pending = c("Undetermined", "Pending"))
+
+#AGE GROUP
+table(h2$homeless, h2$age5cat)
+#collapse factors to get rid of empty cells 
+
+h2$age4cat <- fct_collapse(h2$age5cat,
+                           "<29yrs" = c("<18yrs", "18-29yrs"),
+                           "30to44yrs" ="30-44yrs",
+                           "45to64yrs" = "45-64yrs",
+                           "65+yrs" ="65+ yrs")
+
+table(h2$age5cat,h2$age4cat)
+
+#SUBSTANCE USE
+table(h2$homeless, h2$substance)
+
+#OMIT OBSERVATIONS WITH NA VALUES
+h2<- na.omit(h2)
+str(h2)
+
+#SAVE ALL CHANGES TO DATAFRAME 'h3' AS BACKUP
+h3 <- h2
+h2<- h3
+#DROP VARIABLES THAT WERE RECODED TO NEW VARIABLES WITH DIFFERENT LEVELS (SEE ABOVE)
+h2 <- h2[, c(-2, -4, -5, -6, -7)]
+
+str(h2)
+```
+
+
+### B. Split data into training and testing subsets and specify reference level for factor predictors
+
+```{r}
+set.seed(1234)
+split = sample.split(h2$homeless, SplitRatio = 0.65)
+HTrain = subset(h2, split==TRUE)
+HTest = subset(h2, split==FALSE)
+
+# set reference levels for each dummy variable to be created
+HTrain$sex <- relevel(HTrain$sex, ref = "F")
+HTrain$race6cat <-relevel(HTrain$race6cat, ref = "White.NH")
+HTrain$manner <- relevel(HTrain$manner, ref = "Natural")
+HTrain$dplace5cat <- relevel(HTrain$dplace5cat, ref = "Home")
+HTrain$educ4cat <- relevel(HTrain$educ4cat, ref =  "HSDipl.OrMore")
+HTrain$age4cat <- relevel(HTrain$age4cat, ref = "65+yrs")
+HTrain$injury <- relevel(HTrain$injury, ref = "No injury")
+HTrain$substance <- relevel(HTrain$substance, ref = "No Substance abuse")
+HTrain$LCOD3cat <- relevel(HTrain$LCOD3cat, ref = "LCOD.Chronic")
+HTrain$homelessFac <- relevel(HTrain$homelessFac, ref = "With home")
+
+```
+
+
+### C. Train and evaluate models
+  
+#### 1a. Model 1: train logistic regression model using package e1071
+
+I trained the first logistic regression model using all predictors except 'injury' (whether the death was caused by homicide, suicide or unintentional injury) because of the high likelihood of multicollinearity with dummy variable manner:suicide and dummy variable injury: suicide. 
+  
+```{r LogReg model}
+model.LR1 <- glm(homelessFac ~ sex + race6cat + dplace5cat + educ4cat + age4cat + manner + substance + LCOD3cat,
+                 data = HTrain, 
+                 family = "binomial") 
+```
+
+**Table 1 - Summary of logistic regression model 1**
+```{r}
+summary(model.LR1)
+```
+
+The summary of model 1 in Table 1 above shows:
+
+  1. A number of the predictors are statistically significantly positively associated with being homelessness at death. Many of these make sense given the relationship between homeless status at death and these independent variables as seen in the exploratory data anlaysis phase. These include: 
+    - being male, 
+    - being American Indian/Native American non-Hispanic,
+    - being African American and non-Hispanic,
+    - dying in a location designated by the death certifier as "other", "hospital", or "ER",
+    - having a high school diploma/GED or less (compared with having some college or higher education), 
+    - being between 30 and 64 years old at the time of death,
+    - manner of death being homicide or undetermined,
+    - dying of drug induced causes,
+    - dying of alcohol induced causes.
+    
+  2. Being non-Hispanic Asian or Pacific Islander is significantly negatively associated with being homeless at death.
+  
+**Table 2 - Logistic regression model 1 odds ratios and confidence intervals**
+```{r}
+library(Publish)
+publish(model.LR1)
+```
+
+Table 2 above converts the coefficients in the model summary above into odds ratios with 95% confidence intervals. The odds ratio values indicate the odds of having the characteristic for a person who died homeless compared to someone who had a permanent home at the time of death.  For most of the predictors odds ratios confirm the association with the outcome seen in Table 1.  
+
+
+**Table 3 - Relative importance of predictors to logistic regression model 1** 
+```{r}
+varImp(model.LR1)
+```
+
+Table 3 indicates that place of death is reported as "other", race/ethnicity reported as "other", being 45 to 64 years old at death, being 30 to 44 years old at death, and having a cause of death related to substance use were some of the most important predictors contributing to the model.  These results reaffirm the results shown in Table 1 as those same variables had higher coefficients and were flagged as being highly statistically signficantly associated with the outcome.  On the other hand, there were some predictors in the model 1 summary table (Table 1) that also had higher coefficient values and were highly statistically signficant that did not appear to contribute as much to the model as the predictors mentioned above.
+  
+#### 1b. Model 1: evaluate model 1 performance on test data 
+
+I set the threshold probability level at 0.5 i.e. if the model predicts that there's a greater than 0.5 probability that the observation is homeless then it is classified as a homeless death.  Tabulating the predicted values against the actual recorded ones gives the confusion matrix.
+
+```{r}
+predict.LR1 <- predict(model.LR1, type = "response", newdata = HTest)
+
+tbl.LR1 <-table(predict.LR1 > 0.50, HTest$homeless)
+tbl.LR1
+
+accuracy_LR1 <- round(((tbl.LR1["FALSE", "0"] + tbl.LR1["TRUE","1"])/(tbl.LR1["FALSE","0"] + tbl.LR1["TRUE","1"] + tbl.LR1["FALSE","1"]  + tbl.LR1["TRUE","0"]))*100,1)
+                                                                 
+accuracy_LR1
+```
+
+The accuracy of logistic regression model 1 is `r round(((tbl.LR1["FALSE", "0"] + tbl.LR1["TRUE","1"])/(tbl.LR1["FALSE","0"] + tbl.LR1["TRUE","1"] + tbl.LR1["FALSE","1"]  + tbl.LR1["TRUE","0"]))*100,1)`.
+
+Logistic regression model 1 has a sensitivity of `r round((tbl.LR1["TRUE","1"]/(tbl.LR1["TRUE","1"]+ tbl.LR1["TRUE","0"]))*100,1)` and specificity of `r round((tbl.LR1["FALSE","0"]/(tbl.LR1["FALSE","0"]+tbl.LR1["FALSE","1"]))*100,1)`
+
+The baseline accuracy is 1500/(1500+1091) = 58% i.e. if all outcomes were predicted as the most common value (in this case '0' or "With home") my baseline prediction would be accurate for 58% of the observations.
+
+Compared to the baseline accuracy logistic regression model 1 is considerably more accurate.
+
+
+**Figure 1. ROC curve for logistic regression model 1**
+
+```{r}
+library(ROCR)
+
+ROCpred_LR1 <- prediction(predict.LR1, HTest$homeless)
+
+table(HTest$homeless, HTest$homelessFac)
+
+ROCcurve.LR1 <- performance(ROCpred_LR1, "tpr", "fpr")
+ROCauc_LR1 <- performance(ROCpred_LR1, measure = "auc") 
+
+plot(ROCcurve.LR1, colorize=TRUE, print.cutoffs.at = seq(0,1, by=0.1), text.adj = c(-0.2, 1.7))
+print(ROCauc_LR1@y.values)
+```
+
+The area under the curve (AUC) is `r ROCauc_LR1@y.values`
+
+Based on the ROC curve in Figure 1 a 0.5 probability threshold for classifying deaths as homeless vs. with home achieved the highest sensitivity (true positive rate) but decreased the specificity (1-False positive rate).  I will need to check with program staff to see if it is more important to them to achieve a higher specificity (reduce false positives as much as possible) in which case I will rase the threshold to 0.8.
+
+#### 2a. Model 2: train logistic regression model with crossvalidation in Caret package
+
+I created my second logistic regression model using the Caret package.  The package allowed me to specify tuning parameter values such as using ten-fold crossvalidation to get an average of the  model run 10 times.
+
+```{r}
+ctrl.LR2 <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE)
+
+model.lr2 <-train(homelessFac ~ sex + race6cat + dplace5cat + educ4cat + age4cat + manner + substance + LCOD3cat,
+                  data = HTrain, 
+                  family = "binomial",
+                  method = "glm",
+                  trControl = ctrl.LR2, 
+                  tuneLength = 5)
+                  #allowParallel = TRUE) 
+varImp(model.lr2)
+```
+
+
+#### 2b. Model 2: evaluate logistic regression model 2 using test data
+
+```{r}
+predict.lr2 <- predict(model.lr2, newdata = HTest)
+
+str(predict.lr2)
+
+
+cmlr2 <-confusionMatrix(data = predict.lr2, HTest$homelessFac, positive = "Homeless")
+cmlr2
+
+```
+The accuracy of the logistic regression model 2 is almost identical to that of the first logistic regression model.  However, the sensitivity for logistic regression model 2 is `r round(cmlr2$byClass[1]*100, 1)` which is lower than the sensitivity of model 1 (`r round((tbl.LR1["TRUE","1"]/(tbl.LR1["TRUE","1"]+ tbl.LR1["TRUE","0"]))*100,1)`) while the specificity of model 2 is `r round(cmlr2$byClass[2]*100,1)` which is higher than the specificity for model 1 (`r round((tbl.LR1["FALSE","0"]/(tbl.LR1["FALSE","0"]+tbl.LR1["FALSE","1"]))*100,1)`).
+
+
+## II. NAIVE BAYES CLASSIFIER
+
+In this section, I train two Naive Bayes classifiers using the text fields that contain cause of death information. The two models are differnt only in the packages used to create them.
+  
+I begin by reading in the data and selecting only the homeless status of the decedent and the feature that contains a concatenation of cause of death lines a, b, c, d, other significant conditions contributing to death, and injury description fields on the death certificate.  I also reduced the number of "with home" decedents to a random sample 1,500 deaths to avoid problems associated with data imbalance.
+
+```{r}
+# get data and restrict to only literal fields
+#the literal field in this dataset is called "CODliteral" and contains 
+#Cause of death lines a-d, other significant conditions line, and injury
+#occurrance literal field.
+
+literal <- read.csv("HomelessFinal.csv", stringsAsFactors = FALSE)
+literal <- subset(literal, select = c(status, CODliteral))
+str(literal)
+
+# set "status" to factor
+
+literal$status <- factor(literal$status)
+str(literal$status)
+table(literal$status)
+
+# to remove the problem of unbalanced data I will restrict the "with home" class to about 7,500 randomly selected records
+
+h <- subset(literal, status=="Homeless")
+wh <- subset(literal, status=="With home")
+summary(h)
+summary(wh)
+wh_sample <- sample_n(wh, 1500)
+
+literal2 <- rbind(wh_sample, h)
+literal2 <- literal2[sample(nrow(literal2)), ] #randomize order of rows so rows aren't ordered by class
+str(literal2)
+table(literal2$status)
+```
+
+
+### Prepare data for text analysis
+
+The variable containg cause of death literals is processed to remove common words that do not contribute useful infomration that may distinguish between homeless and with home status among decedents but that occur frequently.  In addition to this words appearing on the cause of death fields are standardized by removing capital letters, punctuation marks, numbers, extra white space, and finally, by limiting them to their word roots.
+
+```{r}
+library(tm)
+h_corpus <- VCorpus(VectorSource(literal2$CODliteral))
+print(h_corpus)
+
+#CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "and", "failure", "type", "stage", "end", "natural", "on", "unspecified", "arrest", "atrial", "fibrilation", "congestive", "history", "diastolic", "probable", "with", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local",  "morbid" ,"multiple" ,  "noninvasive" ,  "nonspecific" ,   "parasitic" , " pathological" ,  "perforated" ,  "primary",  "rheumatic" ,  "second-degree" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "abuse", "unknown", "if", "cause", "death", "use", "in", "with")
+
+CODstop <- c("disease", "combination", "an", "the", "a", "of", "effects", "combined", "due", "to", "by", "and", "failure", "intoxication", "type", "stage", "end", "natural", "on", "unspecified", "arrest", "atrial", "fibrilation", "coronary", "congestive", "history", "diastolic", "probable", "with", "multiple", "small", "non", "event" ,"advanced" ,  "asymptomatic" ,  "autoimmune" ,  "benign"  ,  "clinical" ,  "communicable" ,"congenital" ,  "degenerative" ,  "febrile" ,  "first-degree" ,  "foca" ,  "fungal" ,  "generalized" ,  "inactive" ,  "infectious" , "inflammatory" ,  "invasive" ,  "local",  "morbid" ,"multiple" ,  "noninvasive" ,  "nonspecific" ,   "parasitic" , " pathological" ,  "perforated" ,  "primary" ,  "psychiatric" ,  "rheumatic" ,  "second-degree" ,  "severe" ,  "sporadic" ,  "suspected" ,  "systemic" ,  "terminal" ,  "third-degree" , " unresponsive ",  "untreated" ,  "viral" ,  "virulent" ,  "wasting", "abuse", "unknown", "if", "cause", "death", "use", "in", "with")
+
+#standardize all content
+
+h_corpus_clean <- h_corpus %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(removeWords, CODstop) %>%
+  tm_map(wordStem, language = "eng") %>%
+  tm_map(stripWhitespace)
+  
+h_corpus_clean <- tm_map(h_corpus_clean, PlainTextDocument) # this line puts the corpus back into the correct data type
+h_dtm <- DocumentTermMatrix(h_corpus_clean)
+h_dtm
+```
+
+
+### Creating training and test datasets
+
+The training data set consists of 70% of the total data set.  
+
+```{r}
+split <- sample.split(literal2$status, SplitRatio = 0.70) # creating training:testing data sets 70:30
+
+h.raw.train <- literal2[split, ]
+h.raw.test <- literal2[-split, ]
+
+prop.table(table(h.raw.train$status))
+prop.table(table(h.raw.test$status))
+
+
+h.cleancorpus.train <- h_corpus_clean[split]
+h.cleancorpus.test <- h_corpus_clean[-split]
+
+set.seed(1234)
+h.dtm.train <- h_dtm[split,]
+h.dtm.test <- h_dtm[-split,]
+
+```
+
+
+### Transform sparse matrix into data structure to train model
+
+Eliminate words appearing in fewer than 5 records.
+
+```{r}
+
+freqWords <- findFreqTerms(h.dtm.train, 5) #keeps words that appear at least 5 times
+
+
+#filter DTM to keep only terms appearing 5 times or more
+htrain.filtered <- h.dtm.train[,freqWords]
+htest.filtered <- h.dtm.test[,freqWords]
+
+
+#Create function to convert counts to Yes/No variable indicating presence/absence of word
+
+convertCounts <- function(x) {
+  x <- ifelse(x > 0, "Present", "Absent")
+  x <- factor(x)
+}
+
+h.train.final <- apply(htrain.filtered, MARGIN = 2, convertCounts) #Margin = 2: apply filter to columns
+h.test.final <- apply(htest.filtered, MARGIN = 2, convertCounts)
+
+```
+
+### (A) Naive Bayes model 1
+
+For the first Naive Bayes model I used the R package e1071 to train the classifier.  I added ten-fold crossvalidation to the model so that an average of all 10 models can be used as the final classifier.
+
+```{r warning=FALSE}
+#train model
+
+h.model.nb1 <- naiveBayes(h.train.final, h.raw.train$status, laplace = 1, trainControl(method = 'cv', number = 10))
+
+#use model to predict with test data
+
+h.predict.nb1<- predict(h.model.nb1, h.test.final)
+
+#Evaluate accuracy of model by crosstabulating with raw data
+
+# CrossTable(h.predict.nb1, h.raw.test$status, 
+#            prop.chisq = FALSE,
+#            prop.t = FALSE,
+#            prop.r = FALSE,
+#            dnn = c("predicted", "actual"))
+
+cmnb1<-confusionMatrix(h.predict.nb1, h.raw.test$status, positive = "Homeless") # positive argument sets the level that is considered "positive" or indicates the presence of the attribute of interest
+cmnb1
+```
+
+
+### (B) Naive Bayes classfier 2 
+
+For the second version of a Naive Bayes model I used packages caret and klaR. Once again, I incorporated ten-fold cross validation in the method.
+
+```{r warning=FALSE}
+
+ctrl <- trainControl(method = "cv", number = 10)
+grid <- data.frame(fL=1, usekernel=FALSE, adjust=0)  # fL = 1 sets the Laplace correction to 1
+
+h.model.nb2 = train(h.train.final, h.raw.train$status,
+                  method = "nb",
+                  tuneGrid = grid,
+                trControl= ctrl)  
+
+h.model.nb2
+
+h.predict.nb2 = predict(h.model.nb2, h.test.final)
+
+cmnb2<-confusionMatrix(h.predict.nb2, h.raw.test$status, positive = "Homeless")
+cmnb2
+```
+
+
+### (C) Comparison of accuracy of the two Naive Bayes classfiers
+
+The table below compares the accuracy of the two Naive Bayes models. The two models are nearly identical in terms of overall accuracy, Kappa statistic, sensitivity, and specificity.
+
+```{r}
+Accuracy <- c(paste(round(cmnb1$overall[1]*100),"%"), paste(round(cmnb2$overall[1]*100),"%"))
+Kappa <- c(paste(round(cmnb1$overall[2]*100),"%"), paste(round(cmnb2$overall[2]*100), "%"))
+Sensitivity<- c(paste(round(cmnb1$byClass[1]*100),"%"), paste(round(cmnb2$byClass[1]*100), "%"))
+Specificity<- c(paste(round(cmnb1$byClass[2]*100), "%"), paste(round(cmnb2$byClass[2]*100), "%"))
+
+nbcompare <- rbind(Accuracy, Kappa, Sensitivity, Specificity)
+nbcompare <- data.frame(nbcompare)
+names(nbcompare) <- c("Naive Bayes <br> Model 1", "Naive Bayes <br> Model 2")
+
+formattable::formattable(nbcompare)
+```
+
+
+
+## III. RANDOM FORESTS
+
+Random forests classifier is an ensemble method that uses the prediction information generated by multiple individual models into a more accurate, single model. One advantage of using this method is that the biases of individual models do not carry disproportionate weight.  Another benefit is that this type of classifier operates more efficiently than individual models because each  model in the random forests ensemble is fed a random subset of the training data rather than the entire training data set as with individual models.
+
+Random forests models predict the class of an observation by using a decision tree or flow-chart method where each successive split in a branch of the decision tree is designed to separate data into increasingly homogeneous classes based on the attributes of the observations.  The target classes are the homeless status of the decedent as with the logistic regression and Naive Bayes classifiers, and the attributes of the decedents are the same features used in the logistic regression models i.e. sex, age, place of death, race/ethnicity, educational attainment, whether or not the underlying cause of death was substance-related, whether the underlying cause of death was chronic, injury-related, or other. 
+
+In this section I will train a final random forests model after training preliminary models to identify the best values for tuning parameters.
+
+### A. Split data into training and testing data sets
+
+```{r}
+##
+library(randomForest)
+library(caTools)
+# use h2 data set created for logistic regression
+
+# Split into training and testing sets 70:30 (random)
+
+split2 = sample.split(h2$homelessFac, SplitRatio = 0.70)
+train.rf = subset(h2, split2==TRUE)
+test.rf = subset(h2, split2==FALSE)
+
+prop.table(table(train.rf$homelessFac))
+prop.table(table(test.rf$homelessFac))
+
+```
+
+
+### B. Training preliminary Random Forest models using caret package
+
+#### 1. Identifying optimal number of variables to use in decision trees
+
+I used the caret package to identify the best values for tuning parameters mtry and ntrees. In the first step below, I tuned the 'mtry' option to search for the number of variables (from 1 to the maximum of 8) the model will use at each split to further subdivide the data. For this first round I left the number of trees (individual decision trees created) at the default value of 500.  In the next step I will explore how many trees to grow to yield the most accurate results. I also included ten-fold crossvalidation to improve the performance.
+
+```{r}
+
+library(randomForest)
+library(caTools)
+
+# create a random forest model with default parameters
+controlrf<- trainControl(method = "repeatedcv", number = 10, repeats = 3, search = "grid")
+set.seed(1234)
+mtry = c(1:8)
+tunegrid = expand.grid(.mtry = mtry)
+model.rf1<-train(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                        data = train.rf,
+                        importance=TRUE,
+                        metric = "Kappa",
+                        tuneGrid = tunegrid,
+                        method = "rf",
+                        na.action = na.roughfix)
+
+model.rf1
+plot(model.rf1)
+ 
+```
+
+After trying a range of values of mtry from 1 to 8 - the number of predictors to randomly selected as candidates at each split - the plot above indicates that using 5 predictors gives the greatest Kappa (accuracy) value.  
+
+#### 2. Identifying optimal number of decision trees to grow
+
+Using the same caret random forest model I will identify the number of trees to grow (ntrees) to get the most accurate model. I look at the differences between creating 500, 1000, 1500, and 2000 trees in terms of model accuracy in classifying deaths.  While caret does not have a tuning option for the ntree parameter it is possible to try different values for this parameter using a for loop.
+
+```{r}
+
+control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
+tunegrid <- expand.grid(.mtry=5)
+modelrf1.list <- list()
+for (ntree in c(500, 1000, 1500, 2000)) {
+	set.seed(1234)
+	fit <- train(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury, data=train.rf, method="rf", metric="Kappa", tuneGrid=tunegrid, trControl=control, ntree=ntree)
+	key <- toString(ntree)
+	modelrf1.list[[key]] <- fit
+}
+
+
+# compare results
+results <- resamples(modelrf1.list)
+summary(results)
+lattice::dotplot(results)
+
+```
+
+While the mean value of the Kappa statistic is almost identical regardless of how many trees are used in the model, the maximum accuracy was obtained using 1,500 trees. Using mtry of 5 and ntree of 1,500 I will run a final random forests model.
+
+### C. Final Random Forests model
+
+####  1. Training the final model
+
+Based on the exploration above I selected tuning options of mtry = 5 (number of features to select at each split of the decision trees) and ntree = 1,500 (number of decision trees to create in the ensemble). In this final model I used the randomForest package to train the final model. Using the randomForest package for this final version of the model allows me to specify both mtry and ntree.  In this instance, it may not be necessary to specify ntree because of the similarities in the accuracy obtained between the best value of 1,500 and the caret default value of 500 trees.
+
+```{r}
+## ntree = 1500 and mtry = 5
+
+
+model.rf1.fin <-randomForest(homelessFac ~ sex + race6cat + manner + educ4cat + LCOD3cat + age4cat + substance + injury,
+                        data = train.rf,
+                        importance=TRUE,
+                        mtry=5,
+                        ntree=1500,
+                        na.action = na.roughfix)
+
+model.rf1.fin
+varImp(model.rf1.fin)
+```
+
+The table above shows that the features that were most important in classifying deaths by homeless atatus were sex, race/ethnicity, educational status, age group, and substance use related cause of death. 
+
+#### 2. Evaluating accuracy of Random Forests model 1 (final) with test data
+
+```{r}
+##predictive accuracy of final random forest model on test data
+
+predictrf.final <- predict(model.rf1.fin, test.rf, type = "response")
+
+# check classification accuracy - using test/validation data
+
+tbl.RF2 <- table(predictrf.final, test.rf$homelessFac)
+
+cmrf_1<-confusionMatrix(data = predictrf.final, test.rf$homelessFac)
+cmrf_1
+
+```
+
+
+Accuracy of random forests model 1 (using randomForests package) on test data set is `r round(cmrf_1$overall['Accuracy']*100,1)`% and Kappa statistic is `r round(cmrf_1$overall['Kappa']*100, 1)`%.
+  
+
+## IV. Discussion
+
+### A. Comparing model performance
+The three methods for classifying deaths by homeless status that I tried were logistic regression, Naive Bayes classification, and random forests. The three methods achieved accuracy levels ranging from the low 70% to the low 80% range.  The table below shows a comparison of the overall accuracy, Kappa statistic, and sensitivity and specificity.  The Kappa statistic is a measure of accuracy that takes into account the possibility that agreement between actual and predicted classes occurred by chance.  It is useful when data are imbalanced.  In this project I achieved balance between the two classes by undersampling the "with home" decedents.
+
+```{r}
+#insert comparison table of 3 models
+
+```
+
+### B. Importance of predictors to models
+
+The relative importance of features in the logistic regression model and the random forests model are similar. 
+
+ - describe similarities and differences
+
+### C. Next steps
+
+The accuracy of the models depends on the amount of information used to train the models both in terms of the number of observations and also in terms of the number of relevant predictors.  Additional labeled records for decedents who died homeless in King County, WA will be useful in validating the accuracy of the models trained in this project.  
+
+To improve the logistic regression and random forests models I will examine two predictors (leading causes of death and substance abuse-related cause of death) to check further for multicollinearity.  Specifically, I will recode the leading cause of death variable to exclude any ICD-10 code that also appears in the substance-use related cause of death variable in order to keep them independent of each other.  
+
+To improve the Naive Bayes classifier I will include the text field that captures the residential street address of the decedent as well as the field capturing location of injury (which is completed if the death was caused by injury). It is possible that death certifiers use some type of convention to indicate homelessness e.g. reporting a street corner where decedent was found if the death occurred on a street. This text in combination with the cause of death text may be useful in creating an even more accurate classifier.
+
+Finally, I will apply these models to labeled death data from another county in Washington State to evaluate the accuracy of the model in classifying deaths occurring outside of King County where the modeled data were obtained.
+
