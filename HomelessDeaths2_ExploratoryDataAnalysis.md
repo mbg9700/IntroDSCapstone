@@ -1,4 +1,4 @@
-1.  Classification of Homeless Deaths: exploratory data analysis
+Part 2 - Classification of Homeless Deaths: exploratory data analysis
 ================
 Maya Bhat-Gregerson
 February 26, 2019
@@ -54,23 +54,84 @@ h <- read_csv("h.csv")
 miss_var_summary(h)
 ```
 
-    ## # A tibble: 2 x 3
-    ##   variable   n_miss pct_miss
-    ##   <chr>       <int>    <dbl>
-    ## 1 CODliteral      1   0.0915
-    ## 2 status          0   0
+    ## # A tibble: 28 x 3
+    ##    variable   n_miss pct_miss
+    ##    <chr>       <int>    <dbl>
+    ##  1 residence      60   17.9  
+    ##  2 rcounty        11    3.28 
+    ##  3 rcity          11    3.28 
+    ##  4 occupcode      10    2.99 
+    ##  5 brgrace         6    1.79 
+    ##  6 manner          1    0.299
+    ##  7 UCOD            1    0.299
+    ##  8 age5cat         1    0.299
+    ##  9 CODliteral      1    0.299
+    ## 10 certno          0    0    
+    ## # ... with 18 more rows
 
 ``` r
 str(h)
 ```
 
-    ## Classes 'spec_tbl_df', 'tbl_df', 'tbl' and 'data.frame': 1093 obs. of  2 variables:
-    ##  $ status    : chr  "Homeless" "Homeless" "Homeless" "Homeless" ...
-    ##  $ CODliteral: chr  "COMBINED OPIATE (HEROIN), METHAMPHETAMINE, AND DIPHENHYDRAMINE INTOXICATION     TOXIC USE OF DRUGS" "UNDETERMINED     FOUND DEAD IN JAIL CELL." "ACUTE METHAMPHETAMINE INTOXICATION    HYPERTENSIVE AND ATHEROSCLEROTIC CARDIOVASCULAR DISEASE TOXIC USE OF A DRUG" "ACUTE COMBINED METHAMPHETAMINE AND DEXTROMETHORPHAN INTOXICATION    ATHEROSCLEROTIC AND HYPERTENSIVE CARDIOVASC"| __truncated__ ...
+    ## Classes 'spec_tbl_df', 'tbl_df', 'tbl' and 'data.frame': 335 obs. of  28 variables:
+    ##  $ certno     : num  2.00e+09 2.01e+09 2.01e+09 2.00e+09 2.01e+09 ...
+    ##  $ dcounty    : chr  "KING" "KING" "KING" "KING" ...
+    ##  $ attclass   : num  1 2 2 2 1 2 1 1 2 2 ...
+    ##  $ sex        : chr  "M" "M" "M" "M" ...
+    ##  $ brgrace    : num  1 2 3 1 1 1 1 1 1 1 ...
+    ##  $ hispanic   : chr  "Y" "Y" "Y" "Y" ...
+    ##  $ manner     : chr  "Natural" "Homicide" "Accident" "Accident" ...
+    ##  $ rcounty    : chr  "KING" "KING" "ANCHORAGE" "THURSTON" ...
+    ##  $ rcity      : chr  "SEATTLE" "FEDERAL WAY" "ANCHORAGE" "OLYMPIA" ...
+    ##  $ rstateFIPS : chr  "WA" "WA" "AK" "WA" ...
+    ##  $ rzip       : chr  "98127" "98023" "99508" "98513" ...
+    ##  $ dcity      : chr  "SEATTLE" "FEDERAL WAY" "SEATTLE" "SEATTLE" ...
+    ##  $ dplacecode : num  4 1 4 1 4 1 4 4 1 4 ...
+    ##  $ dthyr      : num  2004 2005 2005 2004 2006 ...
+    ##  $ UCOD       : chr  "K703" "X950" "W100" "X440" ...
+    ##  $ educ       : chr  "Unknown" "H.S. grad/GED" "9-12th gr., no diploma" "9-12th gr., no diploma" ...
+    ##  $ marital    : chr  "S" "S" "S" "S" ...
+    ##  $ occupcode  : chr  "999" "825" "825" NA ...
+    ##  $ age5cat    : chr  "45-64yrs" "18-29yrs" "30-44yrs" "45-64yrs" ...
+    ##  $ LCOD       : chr  "Chronic Liver dis./cirrh." "Other" "Injury-unintentional" "Injury-unintentional" ...
+    ##  $ injury     : chr  "No injury" "No injury" "Unintentional fall" "Unintentional poisoning" ...
+    ##  $ substance  : chr  "Alcohol-induced" "No Substance abuse" "No Substance abuse" "Drug-induced" ...
+    ##  $ residence  : chr  "WA resident" "WA resident" "Out of state" "WA resident" ...
+    ##  $ raceethnic5: chr  "White NH" "Black NH" "AIAN NH" "White NH" ...
+    ##  $ raceethnic6: chr  "White NH" "Black NH" "AIAN NH" "White NH" ...
+    ##  $ CODliteral : chr  "ASPIRATION PNEUMONIA UPPER GI BLEED END STAGE LIVER DISEASE, CIRRHOSIS ETOH ABUSE" "GUNSHOT WOUNDS OF THE TRUNK     SHOT BY ASSAILANT" "CEREBRAL AD SPINAL CORD CONTUSIONS AND SUBDURAL HEMATOMA WITH SKULL AND VERTEBRAL FRACTURES BLUNT FORCE INJURY "| __truncated__ "ACUTE INTOXICATION COMBINED EFFECTS OF OPIATES, HEROIN, COCAINE, ETHANOL, CODEINE, AND DIPHENHYDRAMINE    TOXIC USE OF DRUGS" ...
+    ##  $ military   : chr  "U" "N" "N" "N" ...
+    ##  $ status     : chr  "Homeless" "Homeless" "Homeless" "Homeless" ...
     ##  - attr(*, "spec")=
     ##   .. cols(
-    ##   ..   status = col_character(),
-    ##   ..   CODliteral = col_character()
+    ##   ..   certno = col_double(),
+    ##   ..   dcounty = col_character(),
+    ##   ..   attclass = col_double(),
+    ##   ..   sex = col_character(),
+    ##   ..   brgrace = col_double(),
+    ##   ..   hispanic = col_character(),
+    ##   ..   manner = col_character(),
+    ##   ..   rcounty = col_character(),
+    ##   ..   rcity = col_character(),
+    ##   ..   rstateFIPS = col_character(),
+    ##   ..   rzip = col_character(),
+    ##   ..   dcity = col_character(),
+    ##   ..   dplacecode = col_double(),
+    ##   ..   dthyr = col_double(),
+    ##   ..   UCOD = col_character(),
+    ##   ..   educ = col_character(),
+    ##   ..   marital = col_character(),
+    ##   ..   occupcode = col_character(),
+    ##   ..   age5cat = col_character(),
+    ##   ..   LCOD = col_character(),
+    ##   ..   injury = col_character(),
+    ##   ..   substance = col_character(),
+    ##   ..   residence = col_character(),
+    ##   ..   raceethnic5 = col_character(),
+    ##   ..   raceethnic6 = col_character(),
+    ##   ..   CODliteral = col_character(),
+    ##   ..   military = col_character(),
+    ##   ..   status = col_character()
     ##   .. )
 
 ``` r
@@ -79,23 +140,84 @@ wh <- read_csv("wh.csv")
 miss_var_summary(wh)
 ```
 
-    ## # A tibble: 2 x 3
-    ##   variable   n_miss pct_miss
-    ##   <chr>       <int>    <dbl>
-    ## 1 CODliteral     58   0.0333
-    ## 2 status          0   0
+    ## # A tibble: 28 x 3
+    ##    variable   n_miss pct_miss
+    ##    <chr>       <int>    <dbl>
+    ##  1 brgrace     12158  20.7   
+    ##  2 occupcode    1384   2.35  
+    ##  3 UCOD           29   0.0493
+    ##  4 CODliteral     27   0.0459
+    ##  5 manner         19   0.0323
+    ##  6 dcity          12   0.0204
+    ##  7 age5cat         9   0.0153
+    ##  8 certno          0   0     
+    ##  9 dcounty         0   0     
+    ## 10 attclass        0   0     
+    ## # ... with 18 more rows
 
 ``` r
 str(wh)
 ```
 
-    ## Classes 'spec_tbl_df', 'tbl_df', 'tbl' and 'data.frame': 174298 obs. of  2 variables:
-    ##  $ status    : chr  "With home" "With home" "With home" "With home" ...
-    ##  $ CODliteral: chr  "CEREBROVASCULAR ACCIDENT DEMENTIA VASCULAR CONGESTIVE HEART FAILURE HYPERTENSIVE HEART DISEASE" "CORONARY ARTERY DISEASE CONGESTIVE HEART FAILURE   CHRONIC KIDNEY DISEASE, HYPERTENSION, ATRIAL MYXOMA" "ACUTE RESPIRATORY FAILURE WITH HYPOXIA ASPIRATION PNEUMONIA PULMONARY EMBOLISM IDIOPATHIC PULMONARY FIBROSIS AT"| __truncated__ "ACUTE ISCHEMIC CEREBRAL VASCULAR ACCIDENT" ...
+    ## Classes 'spec_tbl_df', 'tbl_df', 'tbl' and 'data.frame': 58862 obs. of  28 variables:
+    ##  $ certno     : num  2.02e+09 2.02e+09 2.02e+09 2.02e+09 2.02e+09 ...
+    ##  $ dcounty    : chr  "KING" "KING" "KING" "KING" ...
+    ##  $ attclass   : num  7 1 1 7 1 1 1 1 1 2 ...
+    ##  $ sex        : chr  "F" "F" "M" "M" ...
+    ##  $ brgrace    : num  1 1 1 1 10 1 1 1 5 1 ...
+    ##  $ hispanic   : chr  "Y" "Y" "Y" "Y" ...
+    ##  $ manner     : chr  "Natural" "Natural" "Natural" "Natural" ...
+    ##  $ rcounty    : chr  "KING" "KING" "KING" "KING" ...
+    ##  $ rcity      : chr  "BURIEN" "KENT" "WOODINVILLE" "REDMOND" ...
+    ##  $ rstateFIPS : chr  "WA" "WA" "WA" "WA" ...
+    ##  $ rzip       : chr  "98168" "98032" "98072" "98052" ...
+    ##  $ dcity      : chr  "SEATTLE" "NORMANDY PARK" "KIRKLAND" "KIRKLAND" ...
+    ##  $ dplacecode : num  5 1 4 7 4 5 4 4 0 0 ...
+    ##  $ dthyr      : num  2017 2017 2017 2017 2017 ...
+    ##  $ UCOD       : chr  "I110" "I251" "J841" "I640" ...
+    ##  $ educ       : chr  "Some college" "Some college" "Doctorate/Professional" "<=8th grade" ...
+    ##  $ marital    : chr  "D" "W" "M" "D" ...
+    ##  $ occupcode  : chr  "908" "362" "160" "290" ...
+    ##  $ age5cat    : chr  "65+ yrs" "65+ yrs" "65+ yrs" "45-64yrs" ...
+    ##  $ LCOD       : chr  "Heart Dis." "Heart Dis." "Other" "Stroke" ...
+    ##  $ injury     : chr  "No injury" "No injury" "No injury" "No injury" ...
+    ##  $ substance  : chr  "No Substance abuse" "No Substance abuse" "No Substance abuse" "No Substance abuse" ...
+    ##  $ residence  : chr  "WA resident" "WA resident" "WA resident" "WA resident" ...
+    ##  $ raceethnic5: chr  "White NH" "White NH" "White NH" "White NH" ...
+    ##  $ raceethnic6: chr  "White NH" "White NH" "White NH" "White NH" ...
+    ##  $ CODliteral : chr  "CEREBROVASCULAR ACCIDENT DEMENTIA VASCULAR CONGESTIVE HEART FAILURE HYPERTENSIVE HEART DISEASE" "CORONARY ARTERY DISEASE CONGESTIVE HEART FAILURE   CHRONIC KIDNEY DISEASE, HYPERTENSION, ATRIAL MYXOMA" "ACUTE RESPIRATORY FAILURE WITH HYPOXIA ASPIRATION PNEUMONIA PULMONARY EMBOLISM IDIOPATHIC PULMONARY FIBROSIS AT"| __truncated__ "ACUTE ISCHEMIC CEREBRAL VASCULAR ACCIDENT" ...
+    ##  $ military   : chr  "N" "N" "Y" "Y" ...
+    ##  $ status     : chr  "With home" "With home" "With home" "With home" ...
     ##  - attr(*, "spec")=
     ##   .. cols(
-    ##   ..   status = col_character(),
-    ##   ..   CODliteral = col_character()
+    ##   ..   certno = col_double(),
+    ##   ..   dcounty = col_character(),
+    ##   ..   attclass = col_double(),
+    ##   ..   sex = col_character(),
+    ##   ..   brgrace = col_double(),
+    ##   ..   hispanic = col_character(),
+    ##   ..   manner = col_character(),
+    ##   ..   rcounty = col_character(),
+    ##   ..   rcity = col_character(),
+    ##   ..   rstateFIPS = col_character(),
+    ##   ..   rzip = col_character(),
+    ##   ..   dcity = col_character(),
+    ##   ..   dplacecode = col_double(),
+    ##   ..   dthyr = col_double(),
+    ##   ..   UCOD = col_character(),
+    ##   ..   educ = col_character(),
+    ##   ..   marital = col_character(),
+    ##   ..   occupcode = col_character(),
+    ##   ..   age5cat = col_character(),
+    ##   ..   LCOD = col_character(),
+    ##   ..   injury = col_character(),
+    ##   ..   substance = col_character(),
+    ##   ..   residence = col_character(),
+    ##   ..   raceethnic5 = col_character(),
+    ##   ..   raceethnic6 = col_character(),
+    ##   ..   CODliteral = col_character(),
+    ##   ..   military = col_character(),
+    ##   ..   status = col_character()
     ##   .. )
 
 B. Analysis of select variables
@@ -120,16 +242,15 @@ placechi$expected
 
     ##                             
     ##                                  Homeless    With home
-    ##   ER                          20.11599095  3207.884009
-    ##   Home                       308.43896279 49186.561037
-    ##   Hospice                     37.42147634  5967.578524
-    ##   Hospital                     0.29289082    46.707109
-    ##   Hospital inpatient         386.26690917 61597.733091
-    ##   In transport                 0.49230585    78.507694
-    ##   Nursing home/Longterm care 296.46782939 47277.532171
-    ##   Other                       43.39769546  6920.602305
-    ##   Other person's home          0.04985376     7.950146
-    ##   Unknown                      0.05608548     8.943915
+    ##   ER                           5.30254912   931.697451
+    ##   Home                        87.87404767 15440.125952
+    ##   Hospice                      9.00358126  1581.996419
+    ##   Hospital inpatient         125.28616315 22013.713837
+    ##   In transport                 0.18674933    32.813251
+    ##   Nursing home/Longterm care  93.16527865 16369.834721
+    ##   Other                       14.14767640  2485.852324
+    ##   Other person's home          0.01697721     2.983023
+    ##   Unknown                      0.01697721     2.983023
 
 ``` r
 # recode to remove cells (in homeless status vs. place of death type
@@ -150,14 +271,14 @@ p
 ```
 
     ##                             
-    ##                              Homeless With home    Sum
-    ##   ER/Outpatient                    49      3179   3228
-    ##   Home                            100     49395  49495
-    ##   Hospice                           8      5997   6005
-    ##   Hospital inpatient              272     61712  61984
-    ##   Nursing home/Longterm care       37     47537  47574
-    ##   Other                           627      6480   7107
-    ##   Sum                            1093    174300 175393
+    ##                              Homeless With home   Sum
+    ##   ER/Outpatient                    16       921   937
+    ##   Home                             27     15501 15528
+    ##   Hospice                           2      1589  1591
+    ##   Hospital inpatient               89     22050 22139
+    ##   Nursing home/Longterm care        9     16454 16463
+    ##   Other                           192      2347  2539
+    ##   Sum                             335     58862 59197
 
 ``` r
 placechi2 <- chisq.test(placetable2)
@@ -165,13 +286,13 @@ placechi2$expected
 ```
 
     ##                             
-    ##                               Homeless With home
-    ##   ER/Outpatient               20.11599  3207.884
-    ##   Home                       308.43896 49186.561
-    ##   Hospice                     37.42148  5967.579
-    ##   Hospital inpatient         386.26691 61597.733
-    ##   Nursing home/Longterm care 296.46783 47277.532
-    ##   Other                       44.28883  7062.711
+    ##                                Homeless  With home
+    ##   ER/Outpatient                5.302549   931.6975
+    ##   Home                        87.874048 15440.1260
+    ##   Hospice                      9.003581  1581.9964
+    ##   Hospital inpatient         125.286163 22013.7138
+    ##   Nursing home/Longterm care  93.165279 16369.8347
+    ##   Other                       14.368380  2524.6316
 
 ``` r
 # bar plot of recoded place of death vs. homeless status
@@ -201,7 +322,7 @@ placechi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  placetable2
-    ## X-squared = 8184.1, df = 5, p-value < 2.2e-16
+    ## X-squared = 2365.1, df = 5, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -230,12 +351,12 @@ agegrpchi$expected
 ```
 
     ##           
-    ##             Homeless  With home
-    ##   <18yrs    19.15331   3056.847
-    ##   18-29yrs  19.19689   3063.803
-    ##   30-44yrs  41.98036   6700.020
-    ##   45-64yrs 209.87068  33495.129
-    ##   65+ yrs  801.79876 127966.201
+    ##              Homeless With home
+    ##   <18yrs     6.184872  1089.815
+    ##   18-29yrs   6.151013  1083.849
+    ##   30-44yrs  13.599946  2396.400
+    ##   45-64yrs  64.342981 11337.657
+    ##   65+ yrs  243.721189 42945.279
 
 ``` r
 # Bar Graph
@@ -265,7 +386,7 @@ agegrpchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  agegrptble
-    ## X-squared = 2936.8, df = 4, p-value < 2.2e-16
+    ## X-squared = 909.04, df = 4, p-value < 2.2e-16
 
 ``` r
 agegrp.res <- round(agegrpchi$residuals, 3)
@@ -290,10 +411,9 @@ genderchi$expected
 ```
 
     ##    
-    ##         Homeless    With home
-    ##   F 546.78354324 87195.216457
-    ##   M 546.19152988 87100.808470
-    ##   U   0.02492688     3.975073
+    ##     Homeless With home
+    ##   F 169.7665  29829.23
+    ##   M 165.2335  29032.77
 
 ``` r
 EDAdf$sex2 <- NA
@@ -327,7 +447,7 @@ genderchi2
     ##  Pearson's Chi-squared test with Yates' continuity correction
     ## 
     ## data:  gendertable2
-    ## X-squared = 499.52, df = 1, p-value < 2.2e-16
+    ## X-squared = 146.03, df = 1, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -359,13 +479,13 @@ raceth5chi$expected
 
     ##              
     ##                 Homeless  With home
-    ##   AIAN NH       9.758873   1556.241
-    ##   Asian/PI NH  79.379645  12658.620
-    ##   Black NH     56.010696   8931.989
-    ##   Hispanic     25.655990   4091.344
-    ##   Other         9.272799   1478.727
-    ##   Unknown      75.883650  12101.116
-    ##   White NH    837.038348 133481.962
+    ##   AIAN NH       2.478673   435.5213
+    ##   Asian/PI NH  18.703228  3286.2968
+    ##   Black NH     14.436289  2536.5637
+    ##   Hispanic      5.845820  1027.1542
+    ##   Other         2.224015   390.7760
+    ##   Unknown      68.836934 12095.1631
+    ##   White NH    222.475041 39090.5250
 
 ``` r
 # bar plot
@@ -394,7 +514,7 @@ raceth5chi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  raceth5table
-    ## X-squared = 945.65, df = 6, p-value < 2.2e-16
+    ## X-squared = 470.55, df = 6, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -424,12 +544,11 @@ mannertable
 
     ##               
     ##                Homeless With home
-    ##   Accident          496      9943
-    ##   Homicide           61       921
-    ##   Natural           394    159573
-    ##   Pending             0         1
-    ##   Suicide            81      3178
-    ##   Undetermined       60       662
+    ##   Accident          138      3302
+    ##   Homicide           19       330
+    ##   Natural           138     54014
+    ##   Suicide            23       996
+    ##   Undetermined       16       201
 
 ``` r
 mannerchi <- chisq.test(mannertable)
@@ -437,13 +556,12 @@ mannerchi$expected
 ```
 
     ##               
-    ##                    Homeless    With home
-    ##   Accident     6.500193e+01 1.037400e+04
-    ##   Homicide     6.114752e+00 9.758852e+02
-    ##   Natural      9.960881e+02 1.589709e+05
-    ##   Pending      6.226835e-03 9.937732e-01
-    ##   Suicide      2.029325e+01 3.238707e+03
-    ##   Undetermined 4.495775e+00 7.175042e+02
+    ##                  Homeless  With home
+    ##   Accident      19.415651  3420.5843
+    ##   Homicide       1.969786   347.0302
+    ##   Natural      305.638474 53846.3615
+    ##   Suicide        5.751322  1013.2487
+    ##   Undetermined   1.224766   215.7752
 
 ``` r
 # recode to remove cells with expected count less than 5
@@ -481,12 +599,12 @@ mannerchi2$expected
 ```
 
     ##               
-    ##                  Homeless   With home
-    ##   Accident      65.002298  10373.9977
-    ##   Homicide       6.114787    975.8852
-    ##   Natural      996.093745 158970.9063
-    ##   Suicide       20.293370   3238.7066
-    ##   Undetermined   4.495800    717.5042
+    ##                  Homeless  With home
+    ##   Accident      19.415651  3420.5843
+    ##   Homicide       1.969786   347.0302
+    ##   Natural      305.638474 53846.3615
+    ##   Suicide        5.751322  1013.2487
+    ##   Undetermined   1.224766   215.7752
 
 ``` r
 mannerchi2
@@ -496,7 +614,7 @@ mannerchi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  mannertable2
-    ## X-squared = 4609.9, df = 4, p-value < 2.2e-16
+    ## X-squared = 1200.2, df = 4, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -525,18 +643,18 @@ lcodchi$expected
 ```
 
     ##                            
-    ##                              Homeless With home
-    ##   Alzheimers                 66.42390 10592.576
-    ##   Cancer                    240.65655 38377.343
-    ##   Chronic Liver dis./cirrh.  17.16839  2737.832
-    ##   Chronic Lwr Resp Dis.      49.16827  7840.832
-    ##   Diabetes                   31.16483  4969.835
-    ##   Flu                        18.27140  2913.729
-    ##   Heart Dis.                226.68503 36149.315
-    ##   Injury-unintentional       61.66287  9833.337
-    ##   Other                     296.89159 47345.108
-    ##   Stroke                     64.61047 10303.390
-    ##   Suicide-all                20.29671  3236.703
+    ##                              Homeless  With home
+    ##   Alzheimers                18.527797  3255.4722
+    ##   Cancer                    74.620504 13111.3795
+    ##   Chronic Liver dis./cirrh.  4.357484   765.6425
+    ##   Chronic Lwr Resp Dis.     15.483217  2720.5168
+    ##   Diabetes                   9.761897  1715.2381
+    ##   Flu                        6.524908  1146.4751
+    ##   Heart Dis.                72.373853 12716.6261
+    ##   Injury-unintentional      18.324070  3219.6759
+    ##   Other                     85.972600 15106.0274
+    ##   Stroke                    23.287075  4091.7129
+    ##   Suicide-all                5.766593  1013.2334
 
 ``` r
 # bar plot
@@ -565,7 +683,7 @@ lcodchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  lcodtable
-    ## X-squared = 3614.4, df = 10, p-value < 2.2e-16
+    ## X-squared = 950.59, df = 10, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -594,23 +712,23 @@ injurychi$observed
 
     ##                          
     ##                           Homeless With home
-    ##   MV - all                      57      2022
-    ##   No injury                    604    164882
-    ##   Other injury                  58      1513
-    ##   Unintentional fall            18      2979
-    ##   Unintentional poisoning      356      2904
+    ##   MV - all                      18       802
+    ##   No injury                    200     55749
+    ##   Other injury                  13       503
+    ##   Unintentional fall             8       926
+    ##   Unintentional poisoning       96       882
 
 ``` r
 injurychi$expected
 ```
 
     ##                          
-    ##                              Homeless  With home
-    ##   MV - all                  12.955745   2066.044
-    ##   No injury               1031.262354 164454.738
-    ##   Other injury               9.790032   1561.210
-    ##   Unintentional fall        18.676464   2978.324
-    ##   Unintentional poisoning   20.315406   3239.685
+    ##                             Homeless  With home
+    ##   MV - all                  4.640438   815.3596
+    ##   No injury               316.619339 55632.3807
+    ##   Other injury              2.920080   513.0799
+    ##   Unintentional fall        5.285572   928.7144
+    ##   Unintentional poisoning   5.534571   972.4654
 
 ``` r
 # bar plot
@@ -639,7 +757,7 @@ injurychi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  injurytable
-    ## X-squared = 6149.2, df = 4, p-value < 2.2e-16
+    ## X-squared = 1605.4, df = 4, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -666,9 +784,9 @@ sachi$observed
 
     ##                     
     ##                      Homeless With home
-    ##   Alcohol-induced          91      2740
-    ##   Drug-induced            357      3335
-    ##   No Substance abuse      645    168225
+    ##   Alcohol-induced          29       791
+    ##   Drug-induced            100      1034
+    ##   No Substance abuse      206     57037
 
 ``` r
 sachi$expected
@@ -676,9 +794,9 @@ sachi$expected
 
     ##                     
     ##                        Homeless  With home
-    ##   Alcohol-induced      17.64200   2813.358
-    ##   Drug-induced         23.00751   3668.992
-    ##   No Substance abuse 1052.35049 167817.650
+    ##   Alcohol-induced      4.640438   815.3596
+    ##   Drug-induced         6.417386  1127.5826
+    ##   No Substance abuse 323.942176 56919.0578
 
 ``` r
 # bar plot
@@ -708,7 +826,7 @@ sachi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  satable
-    ## X-squared = 5344.5, df = 2, p-value < 2.2e-16
+    ## X-squared = 1544.2, df = 2, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -735,15 +853,15 @@ educchi$expected
 
     ##                         
     ##                           Homeless With home
-    ##   <=8th grade             77.42288 12346.577
-    ##   9-12th gr., no diploma  70.74871 11282.251
-    ##   Associate's             62.41067  9952.589
-    ##   Bachelors              166.46793 26546.532
-    ##   Doctorate/Professional  28.89648  4608.104
-    ##   H.S. grad/GED          359.23371 57286.766
-    ##   Masters                 57.56863  9180.431
-    ##   Some college           177.64140 28328.359
-    ##   Unknown                 92.60959 14768.390
+    ##   <=8th grade            23.117303  4061.883
+    ##   9-12th gr., no diploma 21.283764  3739.716
+    ##   Associate's            15.652989  2750.347
+    ##   Bachelors              39.653107  6967.347
+    ##   Doctorate/Professional  8.980945  1578.019
+    ##   H.S. grad/GED          97.132287 17066.868
+    ##   Masters                13.479906  2368.520
+    ##   Some college           45.849790  8056.150
+    ##   Unknown                69.849908 12273.150
 
 ``` r
 # recoding unknown educational status among homeless based on armed forces
@@ -787,7 +905,7 @@ educchi2
     ##  Pearson's Chi-squared test
     ## 
     ## data:  eductable2
-    ## X-squared = 790.94, df = 5, p-value < 2.2e-16
+    ## X-squared = 94.087, df = 5, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the
@@ -814,9 +932,9 @@ milchi$expected
 
     ##    
     ##       Homeless  With home
-    ##   N 798.956310 127409.044
-    ##   U   8.674554   1383.325
-    ##   Y 285.369137  45507.631
+    ##   N 242.632650 42632.3673
+    ##   U   2.580536   453.4195
+    ##   Y  89.786814 15776.2132
 
 ``` r
 # bar plot
@@ -844,7 +962,7 @@ milchi
     ##  Pearson's Chi-squared test
     ## 
     ## data:  miltable
-    ## X-squared = 1493.6, df = 2, p-value < 2.2e-16
+    ## X-squared = 523.12, df = 2, p-value < 2.2e-16
 
 ``` r
 # Plot of Pearson residuals - Color intensity is proportional to the

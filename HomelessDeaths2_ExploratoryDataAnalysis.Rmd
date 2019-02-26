@@ -1,5 +1,5 @@
 ---
-title: "II. Classification of Homeless Deaths: exploratory data analysis"
+title: "Part 2 - Classification of Homeless Deaths: exploratory data analysis"
 author: "Maya Bhat-Gregerson"
 date: '`r format(Sys.Date(), "%B %d, %Y")`'
 always_allow_html: yes
@@ -222,8 +222,6 @@ Figure 4b. shows the contributions of the various race/ethnicity by homeless sta
 
 
 ```{r}
-
-
 # Chi square - checking expected values of cells
 
 raceth5table <- table(EDAdf$raceethnic5, EDAdf$status)
