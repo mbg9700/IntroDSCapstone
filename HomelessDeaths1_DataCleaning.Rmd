@@ -104,8 +104,8 @@ A description of these features and their values is provided in the data diction
 ```{r}
 library(RODBC)
 
-wls <- odbcDriverConnect(connection ="Driver={ODBC Driver 13 for SQL Server};server=DOH01DBTUMP10,9799;
-                            database=WA_DB_DQSS;trusted_connection=yes;")
+wls <- odbcDriverConnect(connection ="Driver={####};server=####;
+                            database=####;trusted_connection=yes;")
 
 WA0317 <- sqlQuery(wls,"SELECT SFN_NUM as 'certno', 
 	DOB as 'dob',
