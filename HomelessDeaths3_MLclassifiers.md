@@ -1911,6 +1911,7 @@ injury
 </tr>
 </tbody>
 </table>
+
 ### C. Next steps
 
 The accuracy of the models depends on the amount of information used to train the models both in terms of the number of observations and also in terms of the number of relevant predictors. Additional labeled records for decedents who died homeless in King County, WA will be useful in validating the accuracy of the models trained in this project.
