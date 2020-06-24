@@ -1,3 +1,3 @@
 # Classifying deaths by homeless status
 
-Springboard Intro to Data Science Capstone project in three notebooks.
+I completed this capstone project to fulfill the requirements of the Springboard Introduction to Data Science course which I completed in February 2019.  The project is documented in three RMarkdown notebooks.  The first notebook details data cleaning and wrangling I did to get the raw data set ready for analysis.  The second notebook presents the findings of exploratory data analysis.  The third and final notebook documents the supervised machine learning models I trained to classify death records into two categories based on whether or not the decedent was homeless at the time of death. 
